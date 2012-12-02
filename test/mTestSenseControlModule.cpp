@@ -19,22 +19,20 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //----------------------------------------------------------------------
-/*!\file    plugins/structure/tModule.cpp
+/*!\file    plugins/structure/test/mTestSenseControlModule.cpp
  *
  * \author  Tobias Foehst
- * \author  Bernd-Helge Schaefer
  * \author  Max Reichardt
  *
  * \date    2012-12-02
  *
  */
 //----------------------------------------------------------------------
-#include "plugins/structure/tModule.h"
+#include "plugins/structure/test/mTestSenseControlModule.h"
 
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
-#include "plugins/scheduling/tPeriodicFrameworkElementTask.h"
 
 //----------------------------------------------------------------------
 // Internal includes with ""
@@ -56,6 +54,8 @@ namespace finroc
 {
 namespace structure
 {
+namespace test
+{
 
 //----------------------------------------------------------------------
 // Forward declarations / typedefs / enums
@@ -64,38 +64,33 @@ namespace structure
 //----------------------------------------------------------------------
 // Const values
 //----------------------------------------------------------------------
+static runtime_construction::tStandardCreateModuleAction<mTestSenseControlModule> cCREATE_ACTION("TestSenseControlModule");
 
 //----------------------------------------------------------------------
 // Implementation
 //----------------------------------------------------------------------
-
-tModule::tModule(tFrameworkElement *parent, const std::string &name)
-  : tModuleBase(parent, name),
-
-    input(new core::tPortGroup(this, "Input", tFlag::INTERFACE, tFlags())),
-    output(new core::tPortGroup(this, "Output", tFlag::INTERFACE, tFlags())),
-    update_task(*this),
-    input_changed(true)
-{
-  this->AddAnnotation(*new scheduling::tPeriodicFrameworkElementTask(*this->input, *this->output, this->update_task));
-}
-
-tModule::~tModule()
+mTestSenseControlModule::mTestSenseControlModule(finroc::core::tFrameworkElement *parent, const std::string &name)
+  : tSenseControlModule(parent, name),
+    counter(0)
 {}
 
-tModule::UpdateTask::UpdateTask(tModule& module)
-  : module(module)
+mTestSenseControlModule::~mTestSenseControlModule()
 {}
 
-void tModule::UpdateTask::ExecuteTask()
+void mTestSenseControlModule::Control()
 {
-  this->module.CheckParameters();
-  this->module.input_changed = this->module.ProcessChangedFlags(this->module.GetInputs());
-  this->module.Update();
+  this->co_signal_2.Publish(this->counter);
+  FINROC_LOG_PRINT(DEBUG, this->counter);
+  this->counter++;
 }
+
+void mTestSenseControlModule::Sense()
+{}
+
 
 //----------------------------------------------------------------------
 // End of namespace declaration
 //----------------------------------------------------------------------
+}
 }
 }

@@ -19,7 +19,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //----------------------------------------------------------------------
-/*!\file    plugins/structure/tModule.cpp
+/*!\file    plugins/structure/default_main_wrapper.h
  *
  * \author  Tobias Foehst
  * \author  Bernd-Helge Schaefer
@@ -27,75 +27,40 @@
  *
  * \date    2012-12-02
  *
+ * Provides an optional main method for Finroc applications
+ * with various command line parameters.
+ * It is customizable and in fact used for most existing Finroc applications.
+ *
  */
 //----------------------------------------------------------------------
-#include "plugins/structure/tModule.h"
+#ifndef __plugins__structure__default_main_wrapper_h__
+#define __plugins__structure__default_main_wrapper_h__
 
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
-#include "plugins/scheduling/tPeriodicFrameworkElementTask.h"
+#include "rrlib/getopt/parser.h"
+#include "plugins/scheduling/tThreadContainerElement.h"
 
 //----------------------------------------------------------------------
 // Internal includes with ""
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
-// Debugging
-//----------------------------------------------------------------------
-#include <cassert>
-
-//----------------------------------------------------------------------
-// Namespace usage
-//----------------------------------------------------------------------
-
-//----------------------------------------------------------------------
-// Namespace declaration
-//----------------------------------------------------------------------
-namespace finroc
-{
-namespace structure
-{
-
-//----------------------------------------------------------------------
 // Forward declarations / typedefs / enums
 //----------------------------------------------------------------------
+extern const char * const cPROGRAM_VERSION;
+extern const char * const cPROGRAM_DESCRIPTION;
+extern int finroc_argc_copy;     // copy of argc for 'finroc' part. TODO: remove when rrlib_getopt supports prioritized evaluation of -m option
+extern char ** finroc_argv_copy; // copy of argv for 'finroc' part. TODO: remove when rrlib_getopt supports prioritized evaluation of -m option
+extern bool links_are_unique;
 
 //----------------------------------------------------------------------
-// Const values
+// Function declarations
 //----------------------------------------------------------------------
 
-//----------------------------------------------------------------------
-// Implementation
-//----------------------------------------------------------------------
+void StartUp();
+void InitMainGroup(finroc::scheduling::tThreadContainer *main_thread, std::vector<char*> remaining_args);
 
-tModule::tModule(tFrameworkElement *parent, const std::string &name)
-  : tModuleBase(parent, name),
 
-    input(new core::tPortGroup(this, "Input", tFlag::INTERFACE, tFlags())),
-    output(new core::tPortGroup(this, "Output", tFlag::INTERFACE, tFlags())),
-    update_task(*this),
-    input_changed(true)
-{
-  this->AddAnnotation(*new scheduling::tPeriodicFrameworkElementTask(*this->input, *this->output, this->update_task));
-}
-
-tModule::~tModule()
-{}
-
-tModule::UpdateTask::UpdateTask(tModule& module)
-  : module(module)
-{}
-
-void tModule::UpdateTask::ExecuteTask()
-{
-  this->module.CheckParameters();
-  this->module.input_changed = this->module.ProcessChangedFlags(this->module.GetInputs());
-  this->module.Update();
-}
-
-//----------------------------------------------------------------------
-// End of namespace declaration
-//----------------------------------------------------------------------
-}
-}
+#endif

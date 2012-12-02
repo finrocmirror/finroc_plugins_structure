@@ -220,8 +220,8 @@ protected:
 //----------------------------------------------------------------------
 private:
 
-  template <typename T>
-  friend class tConveniencePortBase;
+  template <typename TPort, typename TElement, typename TContainer, TContainer& (TElement::*GET_CONTAINER)()>
+  friend class tConveniencePort;
 
   /*! Group's interfaces */
   finroc::core::tPortGroup* controller_input;

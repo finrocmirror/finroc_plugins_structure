@@ -19,7 +19,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //----------------------------------------------------------------------
-/*!\file    plugins/structure/tModule.cpp
+/*!\file    plugins/structure/test/pTestSenseControlModule.cpp
  *
  * \author  Tobias Foehst
  * \author  Bernd-Helge Schaefer
@@ -27,18 +27,25 @@
  *
  * \date    2012-12-02
  *
+ * \brief Contains mTestSenseControlModule
+ *
+ * \b pTestSenseControlModule
+ *
+ * Simple test program for SenseControlModule
+ *
  */
 //----------------------------------------------------------------------
-#include "plugins/structure/tModule.h"
+#include "plugins/structure/default_main_wrapper.h"
 
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
-#include "plugins/scheduling/tPeriodicFrameworkElementTask.h"
+#include <chrono>
 
 //----------------------------------------------------------------------
 // Internal includes with ""
 //----------------------------------------------------------------------
+#include "plugins/structure/test/mTestSenseControlModule.h"
 
 //----------------------------------------------------------------------
 // Debugging
@@ -48,14 +55,7 @@
 //----------------------------------------------------------------------
 // Namespace usage
 //----------------------------------------------------------------------
-
-//----------------------------------------------------------------------
-// Namespace declaration
-//----------------------------------------------------------------------
-namespace finroc
-{
-namespace structure
-{
+using finroc::structure::test::mTestSenseControlModule;
 
 //----------------------------------------------------------------------
 // Forward declarations / typedefs / enums
@@ -64,38 +64,26 @@ namespace structure
 //----------------------------------------------------------------------
 // Const values
 //----------------------------------------------------------------------
+const char * const cPROGRAM_VERSION = "1.0";
+const char * const cPROGRAM_DESCRIPTION = "Test for main wrapper";
 
 //----------------------------------------------------------------------
 // Implementation
 //----------------------------------------------------------------------
 
-tModule::tModule(tFrameworkElement *parent, const std::string &name)
-  : tModuleBase(parent, name),
-
-    input(new core::tPortGroup(this, "Input", tFlag::INTERFACE, tFlags())),
-    output(new core::tPortGroup(this, "Output", tFlag::INTERFACE, tFlags())),
-    update_task(*this),
-    input_changed(true)
-{
-  this->AddAnnotation(*new scheduling::tPeriodicFrameworkElementTask(*this->input, *this->output, this->update_task));
-}
-
-tModule::~tModule()
+//----------------------------------------------------------------------
+// StartUp
+//----------------------------------------------------------------------
+void StartUp()
 {}
 
-tModule::UpdateTask::UpdateTask(tModule& module)
-  : module(module)
-{}
-
-void tModule::UpdateTask::ExecuteTask()
+//----------------------------------------------------------------------
+// InitMainGroup
+//----------------------------------------------------------------------
+void InitMainGroup(finroc::scheduling::tThreadContainer *main_thread, std::vector<char *> remaining_args)
 {
-  this->module.CheckParameters();
-  this->module.input_changed = this->module.ProcessChangedFlags(this->module.GetInputs());
-  this->module.Update();
-}
+  mTestSenseControlModule *test_module = new mTestSenseControlModule(main_thread);
+  test_module->Init();
 
-//----------------------------------------------------------------------
-// End of namespace declaration
-//----------------------------------------------------------------------
-}
+  main_thread->SetCycleTime(2000);
 }

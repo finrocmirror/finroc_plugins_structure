@@ -84,6 +84,9 @@ tSenseControlModule::tSenseControlModule(tFrameworkElement *parent, const std::s
   sensor_input->AddAnnotation(*new scheduling::tPeriodicFrameworkElementTask(*this->sensor_input, *this->sensor_output, this->sense_task));
 }
 
+tSenseControlModule::~tSenseControlModule()
+{}
+
 //----------------------------------------------------------------------
 // tSenseControlModule::ControlTask constructors
 //----------------------------------------------------------------------

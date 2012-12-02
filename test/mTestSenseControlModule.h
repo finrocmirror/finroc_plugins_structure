@@ -19,34 +19,32 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //----------------------------------------------------------------------
-/*!\file    plugins/structure/tModule.cpp
+/*!\file    plugins/structure/test/mTestSenseControlModule.h
  *
  * \author  Tobias Foehst
- * \author  Bernd-Helge Schaefer
  * \author  Max Reichardt
  *
  * \date    2012-12-02
  *
+ * \brief Contains mTestSenseControlModule
+ *
+ * \b mTestSenseControlModule
+ *
+ * Simple SenseControlModule for test program
+ *
  */
 //----------------------------------------------------------------------
-#include "plugins/structure/tModule.h"
+#ifndef __plugins__structure__test__mTestSenseControlModule_h__
+#define __plugins__structure__test__mTestSenseControlModule_h__
+
+#include "plugins/structure/tSenseControlModule.h"
 
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
-#include "plugins/scheduling/tPeriodicFrameworkElementTask.h"
 
 //----------------------------------------------------------------------
 // Internal includes with ""
-//----------------------------------------------------------------------
-
-//----------------------------------------------------------------------
-// Debugging
-//----------------------------------------------------------------------
-#include <cassert>
-
-//----------------------------------------------------------------------
-// Namespace usage
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
@@ -56,46 +54,65 @@ namespace finroc
 {
 namespace structure
 {
+namespace test
+{
 
 //----------------------------------------------------------------------
 // Forward declarations / typedefs / enums
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
-// Const values
+// Class declaration
 //----------------------------------------------------------------------
-
-//----------------------------------------------------------------------
-// Implementation
-//----------------------------------------------------------------------
-
-tModule::tModule(tFrameworkElement *parent, const std::string &name)
-  : tModuleBase(parent, name),
-
-    input(new core::tPortGroup(this, "Input", tFlag::INTERFACE, tFlags())),
-    output(new core::tPortGroup(this, "Output", tFlag::INTERFACE, tFlags())),
-    update_task(*this),
-    input_changed(true)
+//! Simple test module
+/*!
+ * Simple SenseControlModule for test program
+ */
+class mTestSenseControlModule : public structure::tSenseControlModule
 {
-  this->AddAnnotation(*new scheduling::tPeriodicFrameworkElementTask(*this->input, *this->output, this->update_task));
-}
 
-tModule::~tModule()
-{}
+//----------------------------------------------------------------------
+// Ports (These are the only variables that may be declared public)
+//----------------------------------------------------------------------
+public:
 
-tModule::UpdateTask::UpdateTask(tModule& module)
-  : module(module)
-{}
+  tControllerInput<int> ci_signal_1;
+  tControllerOutput<int> co_signal_2;
+  tSensorInput<int> si_signal_3;
+  tSensorOutput<int> so_signal_4;
 
-void tModule::UpdateTask::ExecuteTask()
-{
-  this->module.CheckParameters();
-  this->module.input_changed = this->module.ProcessChangedFlags(this->module.GetInputs());
-  this->module.Update();
-}
+//----------------------------------------------------------------------
+// Public methods and typedefs
+//----------------------------------------------------------------------
+public:
+
+  mTestSenseControlModule(core::tFrameworkElement *parent, const std::string &name = "TestSenseControlModule");
+
+//----------------------------------------------------------------------
+// Private fields and methods
+//----------------------------------------------------------------------
+private:
+
+  int counter;
+
+  /*! Destructor
+   *
+   * The destructor of modules is declared private to avoid accidental deletion. Deleting
+   * modules is already handled by the framework.
+   */
+  ~mTestSenseControlModule();
+
+  virtual void Sense();
+  virtual void Control();
+};
 
 //----------------------------------------------------------------------
 // End of namespace declaration
 //----------------------------------------------------------------------
 }
 }
+}
+
+
+
+#endif

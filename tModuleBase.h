@@ -44,6 +44,7 @@
 #include "plugins/data_ports/tOutputPort.h"
 #include "plugins/parameters/tParameter.h"
 #include "plugins/parameters/tStaticParameter.h"
+#include "plugins/runtime_construction/tStandardCreateModuleAction.h"
 
 //----------------------------------------------------------------------
 // Internal includes with ""
@@ -190,8 +191,8 @@ protected:
 //----------------------------------------------------------------------
 private:
 
-  template <typename T>
-  friend class tConveniencePortBase;
+  template <typename TPort, typename TElement, typename TContainer, TContainer& (TElement::*GET_CONTAINER)()>
+  friend class tConveniencePort;
 
   /*! Introduced this helper class to remove ambiguities when derived classes add listeners to ports */
   class tParameterChangeDetector : public data_ports::tPortListener<const void*>

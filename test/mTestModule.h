@@ -19,34 +19,32 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //----------------------------------------------------------------------
-/*!\file    plugins/structure/tModule.cpp
+/*!\file    plugins/structure/test/mTestModule.h
  *
  * \author  Tobias Foehst
- * \author  Bernd-Helge Schaefer
  * \author  Max Reichardt
  *
  * \date    2012-12-02
  *
+ * \brief Contains mTestModule
+ *
+ * \b mTestModule
+ *
+ * A simple module for test program
+ *
  */
 //----------------------------------------------------------------------
+#ifndef __plugins__structure__test__mTestModule_h__
+#define __plugins__structure__test__mTestModule_h__
+
 #include "plugins/structure/tModule.h"
 
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
-#include "plugins/scheduling/tPeriodicFrameworkElementTask.h"
 
 //----------------------------------------------------------------------
 // Internal includes with ""
-//----------------------------------------------------------------------
-
-//----------------------------------------------------------------------
-// Debugging
-//----------------------------------------------------------------------
-#include <cassert>
-
-//----------------------------------------------------------------------
-// Namespace usage
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
@@ -56,46 +54,65 @@ namespace finroc
 {
 namespace structure
 {
+namespace test
+{
 
 //----------------------------------------------------------------------
 // Forward declarations / typedefs / enums
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
-// Const values
+// Class declaration
 //----------------------------------------------------------------------
-
-//----------------------------------------------------------------------
-// Implementation
-//----------------------------------------------------------------------
-
-tModule::tModule(tFrameworkElement *parent, const std::string &name)
-  : tModuleBase(parent, name),
-
-    input(new core::tPortGroup(this, "Input", tFlag::INTERFACE, tFlags())),
-    output(new core::tPortGroup(this, "Output", tFlag::INTERFACE, tFlags())),
-    update_task(*this),
-    input_changed(true)
+//! Simple module
+/*!
+ * A simple module for test program
+ */
+class mTestModule : public structure::tModule
 {
-  this->AddAnnotation(*new scheduling::tPeriodicFrameworkElementTask(*this->input, *this->output, this->update_task));
-}
 
-tModule::~tModule()
-{}
+//----------------------------------------------------------------------
+// Ports (These are the only variables that may be declared public)
+//----------------------------------------------------------------------
+public:
 
-tModule::UpdateTask::UpdateTask(tModule& module)
-  : module(module)
-{}
+  /** Numeric input port */
+  tInput<double> input_signal;
 
-void tModule::UpdateTask::ExecuteTask()
-{
-  this->module.CheckParameters();
-  this->module.input_changed = this->module.ProcessChangedFlags(this->module.GetInputs());
-  this->module.Update();
-}
+  /** Numeric output port */
+  tOutput<double> output_signal;
+
+//----------------------------------------------------------------------
+// Public methods and typedefs
+//----------------------------------------------------------------------
+public:
+
+  mTestModule(core::tFrameworkElement *parent, const std::string &name = "TestModule");
+
+//----------------------------------------------------------------------
+// Private fields and methods
+//----------------------------------------------------------------------
+private:
+
+  int counter;
+
+  /*! Destructor
+   *
+   * The destructor of modules is declared private to avoid accidental deletion. Deleting
+   * modules is already handled by the framework.
+   */
+  ~mTestModule();
+
+  virtual void Update();
+};
 
 //----------------------------------------------------------------------
 // End of namespace declaration
 //----------------------------------------------------------------------
 }
 }
+}
+
+
+
+#endif

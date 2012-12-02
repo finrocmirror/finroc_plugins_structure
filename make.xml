@@ -3,8 +3,39 @@
 
   <finrocplugin name="structure">
     <sources>
-      **
+      internal/**
+      tConveniencePort.h
+      tGroup.cpp
+      tModule.cpp
+      tModuleBase.cpp
+      tSenseControlModule.cpp
     </sources>
   </finrocplugin>
+  
+  <finrocplugin name="main_wrapper">
+    <sources>
+      default_main_wrapper.cpp
+    </sources>
+  </finrocplugin>
+  
+  <finroclibrary name="structure_test_modules">
+    <sources>
+      test/mTestSenseControlModule.cpp
+      test/mTestModule.cpp
+    </sources>
+  </finroclibrary>
 
+  <testprogram name="sense_control_module">
+    <sources>
+      test/pTestSenseControlModule.cpp
+    </sources>
+  </testprogram>
+
+  <testprogram name="module">
+    <sources>
+      test/pTestModule.cpp
+    </sources>
+  </testprogram>
+  
+  
 </targets>
