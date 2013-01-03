@@ -19,33 +19,23 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //----------------------------------------------------------------------
-/*!\file    plugins/structure/test/pTestModule.cpp
+/*!\file    plugins/structure/tThreadContainer.cpp
  *
- * \author  Tobias Foehst
- * \author  Bernd-Helge Schaefer
  * \author  Max Reichardt
  *
- * \date    2012-12-02
- *
- * \brief Contains mTestModule
- *
- * \b pTestModule
- *
- * Simple test program for plain modules
+ * \date    2012-12-23
  *
  */
 //----------------------------------------------------------------------
-#include "plugins/structure/default_main_wrapper.h"
+#include "plugins/structure/tThreadContainer.h"
 
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
-#include <chrono>
 
 //----------------------------------------------------------------------
 // Internal includes with ""
 //----------------------------------------------------------------------
-#include "plugins/structure/test/mTestModule.h"
 
 //----------------------------------------------------------------------
 // Debugging
@@ -55,7 +45,14 @@
 //----------------------------------------------------------------------
 // Namespace usage
 //----------------------------------------------------------------------
-using namespace finroc::structure::test;
+
+//----------------------------------------------------------------------
+// Namespace declaration
+//----------------------------------------------------------------------
+namespace finroc
+{
+namespace structure
+{
 
 //----------------------------------------------------------------------
 // Forward declarations / typedefs / enums
@@ -64,26 +61,18 @@ using namespace finroc::structure::test;
 //----------------------------------------------------------------------
 // Const values
 //----------------------------------------------------------------------
-const char * const cPROGRAM_VERSION = "1.0";
-const char * const cPROGRAM_DESCRIPTION = "Test for main wrapper";
 
 //----------------------------------------------------------------------
 // Implementation
 //----------------------------------------------------------------------
 
-//----------------------------------------------------------------------
-// StartUp
-//----------------------------------------------------------------------
-void StartUp()
-{}
+static runtime_construction::tStandardCreateModuleAction<tThreadContainer> cCREATE_ACTION_1("ThreadContainer");
 
 //----------------------------------------------------------------------
-// InitMainGroup
+// End of namespace declaration
 //----------------------------------------------------------------------
-void InitMainGroup(finroc::structure::tThreadContainer *main_thread, std::vector<char *> remaining_args)
-{
-  mTestModule *test_module = new mTestModule(main_thread);
-  test_module->Init();
+}
 
-  main_thread->SetCycleTime(500);
+template class scheduling::tThreadContainerElement<structure::tGroup>;
+
 }

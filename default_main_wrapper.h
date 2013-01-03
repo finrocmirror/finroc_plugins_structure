@@ -40,7 +40,7 @@
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
 #include "rrlib/getopt/parser.h"
-#include "plugins/scheduling/tThreadContainerElement.h"
+#include "plugins/structure/tThreadContainer.h"
 
 //----------------------------------------------------------------------
 // Internal includes with ""
@@ -60,7 +60,7 @@ extern bool links_are_unique;
 //----------------------------------------------------------------------
 
 void StartUp();
-void InitMainGroup(finroc::scheduling::tThreadContainer *main_thread, std::vector<char*> remaining_args);
+void InitMainGroup(finroc::structure::tThreadContainer *main_thread, std::vector<char*> remaining_args);
 
 
 #endif

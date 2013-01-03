@@ -80,7 +80,7 @@ void StartUp()
 //----------------------------------------------------------------------
 // InitMainGroup
 //----------------------------------------------------------------------
-void InitMainGroup(finroc::scheduling::tThreadContainer *main_thread, std::vector<char *> remaining_args)
+void InitMainGroup(finroc::structure::tThreadContainer *main_thread, std::vector<char *> remaining_args)
 {
   mTestSenseControlModule *test_module = new mTestSenseControlModule(main_thread);
   test_module->Init();

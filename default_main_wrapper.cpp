@@ -385,8 +385,8 @@ int main(int argc, char **argv)
 
   if (executables.size() == 0)
   {
-    finroc::scheduling::tThreadContainer *main_thread = new finroc::scheduling::tThreadContainer(
-      &runtime_environment, "Main Thread", links_are_unique ? tFlags(tFlag::GLOBALLY_UNIQUE_LINK) : tFlags());
+    finroc::structure::tThreadContainer *main_thread = new finroc::structure::tThreadContainer(
+      &runtime_environment, "Main Thread", "", false, links_are_unique ? tFlags(tFlag::GLOBALLY_UNIQUE_LINK) : tFlags()); // TODO: Put part xml here? Share IOs?
     InitMainGroup(main_thread, remaining_args);
     executables.push_back(main_thread);
   }

@@ -19,71 +19,64 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //----------------------------------------------------------------------
-/*!\file    plugins/structure/test/pTestModule.cpp
+/*!\file    plugins/structure/tThreadContainer.h
  *
- * \author  Tobias Foehst
- * \author  Bernd-Helge Schaefer
  * \author  Max Reichardt
  *
- * \date    2012-12-02
+ * \date    2012-12-23
  *
- * \brief Contains mTestModule
+ * \brief   Contains tThreadContainer
  *
- * \b pTestModule
+ * \b tThreadContainer
  *
- * Simple test program for plain modules
+ * Group containing thread that executes periodic tasks of all children.
+ * Execution is performed in the order of the graph.
  *
  */
 //----------------------------------------------------------------------
-#include "plugins/structure/default_main_wrapper.h"
+#ifndef __plugins__structure__tThreadContainer_h__
+#define __plugins__structure__tThreadContainer_h__
 
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
-#include <chrono>
+#include "plugins/scheduling/tThreadContainerElement.h"
 
 //----------------------------------------------------------------------
 // Internal includes with ""
 //----------------------------------------------------------------------
-#include "plugins/structure/test/mTestModule.h"
+#include "plugins/structure/tGroup.h"
 
 //----------------------------------------------------------------------
-// Debugging
+// Namespace declaration
 //----------------------------------------------------------------------
-#include <cassert>
-
-//----------------------------------------------------------------------
-// Namespace usage
-//----------------------------------------------------------------------
-using namespace finroc::structure::test;
+namespace finroc
+{
+namespace structure
+{
 
 //----------------------------------------------------------------------
 // Forward declarations / typedefs / enums
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
-// Const values
+// Class declaration
 //----------------------------------------------------------------------
-const char * const cPROGRAM_VERSION = "1.0";
-const char * const cPROGRAM_DESCRIPTION = "Test for main wrapper";
+//! Group containing thread for execution
+/*!
+ * Group containing thread that executes periodic tasks of all children.
+ * Execution is performed in the order of the graph.
+ */
+typedef scheduling::tThreadContainerElement<tGroup> tThreadContainer;
 
 //----------------------------------------------------------------------
-// Implementation
+// End of namespace declaration
 //----------------------------------------------------------------------
-
-//----------------------------------------------------------------------
-// StartUp
-//----------------------------------------------------------------------
-void StartUp()
-{}
-
-//----------------------------------------------------------------------
-// InitMainGroup
-//----------------------------------------------------------------------
-void InitMainGroup(finroc::structure::tThreadContainer *main_thread, std::vector<char *> remaining_args)
-{
-  mTestModule *test_module = new mTestModule(main_thread);
-  test_module->Init();
-
-  main_thread->SetCycleTime(500);
 }
+
+extern template class scheduling::tThreadContainerElement<structure::tGroup>;
+
+}
+
+
+#endif

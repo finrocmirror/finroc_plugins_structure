@@ -9,6 +9,7 @@
       tModule.cpp
       tModuleBase.cpp
       tSenseControlModule.cpp
+      tThreadContainer.cpp
     </sources>
   </finrocplugin>
   

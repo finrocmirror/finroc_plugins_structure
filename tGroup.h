@@ -92,8 +92,10 @@ public:
    * \param name Name of module
    * \param structure_config_file XML
    * \param share_so_and_ci_ports Share sensor output and controller input ports so that they can be accessed from other runtime environments?
+   * \param extra_flags Any extra flags for group
    */
-  tGroup(core::tFrameworkElement *parent, const std::string &name, const std::string &structure_config_file, bool share_so_and_ci_ports = false);
+  tGroup(core::tFrameworkElement *parent, const std::string &name, const std::string &structure_config_file = "",
+         bool share_so_and_ci_ports = false, tFlags extra_flags = tFlags());
 
   /*!
    * \return Parent port group of all controller inputs
