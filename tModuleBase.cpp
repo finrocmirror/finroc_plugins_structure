@@ -98,7 +98,7 @@ void tModuleBase::CheckParameters()
   }
 }
 
-void tModuleBase::tParameterChangeDetector::PortChanged(data_ports::common::tAbstractDataPort& origin, const void* value, const rrlib::time::tTimestamp&)
+void tModuleBase::tParameterChangeDetector::PortChanged(data_ports::common::tAbstractDataPort& origin)
 {
   parameters_changed = true;
 }
@@ -114,7 +114,7 @@ bool tModuleBase::ProcessChangedFlags(core::tFrameworkElement& port_group)
       static_cast<data_ports::common::tAbstractDataPort&>(*it).ResetChanged();
       any_changed |= changed;
       static_cast<data_ports::common::tAbstractDataPort&>(*it).SetCustomChangedFlag(changed ?
-          data_ports::common::tAbstractDataPort::tChangeStatus::CHANGED : data_ports::common::tAbstractDataPort::tChangeStatus::NO_CHANGE);
+          data_ports::tChangeStatus::CHANGED : data_ports::tChangeStatus::NO_CHANGE);
     }
   }
   return any_changed;

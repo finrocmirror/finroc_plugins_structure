@@ -69,11 +69,11 @@ namespace structure
 // Implementation
 //----------------------------------------------------------------------
 
-tModule::tModule(tFrameworkElement *parent, const std::string &name)
+tModule::tModule(tFrameworkElement *parent, const std::string &name, bool shared_output_ports, bool share_input_ports)
   : tModuleBase(parent, name),
 
-    input(new core::tPortGroup(this, "Input", tFlag::INTERFACE, tFlags())),
-    output(new core::tPortGroup(this, "Output", tFlag::INTERFACE, tFlags())),
+    input(new core::tPortGroup(this, "Input", tFlag::INTERFACE, share_input_ports ? tFlags(tFlag::SHARED) : tFlags())),
+    output(new core::tPortGroup(this, "Output", tFlag::INTERFACE, shared_output_ports ? tFlags(tFlag::SHARED) : tFlags())),
     update_task(*this),
     input_changed(true)
 {

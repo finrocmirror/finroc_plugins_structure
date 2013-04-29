@@ -76,7 +76,7 @@ class tModule : public tModuleBase
 //----------------------------------------------------------------------
 public:
 
-  tModule(core::tFrameworkElement *parent, const std::string &name);
+  tModule(core::tFrameworkElement *parent, const std::string &name, bool shared_output_ports = false, bool share_input_ports = false);
 
   /*!
    * \return Parent port group of all inputs

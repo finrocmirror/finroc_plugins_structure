@@ -24,6 +24,7 @@
  * \author  Tobias Foehst
  * \author  Bernd-Helge Schaefer
  * \author  Max Reichardt
+ * \author  Michael Arndt
  *
  * \date    2012-12-02
  *
@@ -52,8 +53,7 @@ extern "C"
 #include "plugins/scheduling/tExecutionControl.h"
 
 #ifdef _LIB_FINROC_PLUGIN_TCP_PRESENT_
-#include "plugins/tcp/tTCPServer.h"
-#include "plugins/tcp/tTCPPeer.h"
+#include "plugins/tcp/tPeer.h"
 #endif
 
 //----------------------------------------------------------------------
@@ -86,6 +86,7 @@ char ** finroc_argv_copy; // copy of argv for 'finroc' part. TODO: remove when r
 
 static bool run_main_loop = false;
 static bool pause_at_startup = false;
+static std::string listen_address = "0.0.0.0";
 static int network_port = 4444;
 bool links_are_unique = true;
 static std::string connect_to;
@@ -94,6 +95,7 @@ static bool enable_crash_handler = false;
 #else
 static bool enable_crash_handler = true;
 #endif
+std::string finroc_peer_name;
 
 // We do not use stuff from rrlib_thread, because we have the rare case that in signal handler
 // waiting thread does something else, which is problematic with respect to enforcing lock order
@@ -221,7 +223,10 @@ bool PortHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
 bool UniqueHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
 {
   rrlib::getopt::tOption opt(name_to_option_map.at("port-links-are-not-unique"));
-  links_are_unique = !opt->IsActive();
+  if (opt->IsActive())
+  {
+    links_are_unique = false;
+  }
   return true;
 }
 
@@ -240,41 +245,15 @@ bool ConnectHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
   return true;
 }
 
-bool MaxPortsHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
+bool ListenAddressHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
 {
-  rrlib::getopt::tOption max_ports(name_to_option_map.at("max-ports"));
-  if (max_ports->IsActive())
+  rrlib::getopt::tOption listen_address_option(name_to_option_map.at("listen-address"));
+  if (listen_address_option->IsActive())
   {
-    const char* max_string = boost::any_cast<const char *>(max_ports->GetValue());
-    int m = atoi(max_string);
-    if (m < 2 || m > 0xFFFFFF)
-    {
-      FINROC_LOG_PRINT(ERROR, "Invalid value for maximum number of ports: ", max_string, ". Please provide a value between 2 and 16.7 million");
-    }
-    else
-    {
-      finroc::core::internal::tFrameworkElementRegister<finroc::core::tAbstractPort*>::SetMaximumNumberOfElements(m);
-    }
+    listen_address = boost::any_cast<const char *>(listen_address_option->GetValue());
+    FINROC_LOG_PRINT(DEBUG, "Listening on ", listen_address);
   }
-  return true;
-}
 
-bool MaxElementsHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
-{
-  rrlib::getopt::tOption max_elements(name_to_option_map.at("max-elements"));
-  if (max_elements->IsActive())
-  {
-    const char* max_string = boost::any_cast<const char *>(max_elements->GetValue());
-    int m = atoi(max_string);
-    if (m < 2 || m > 0xFFFFFF)
-    {
-      FINROC_LOG_PRINT(ERROR, "Invalid value for maximum number of framework elements: ", max_string, ". Please provide a value between 2 and 16.7 million");
-    }
-    else
-    {
-      finroc::core::internal::tFrameworkElementRegister<finroc::core::tFrameworkElement*>::SetMaximumNumberOfElements(m);
-    }
-  }
   return true;
 }
 
@@ -328,10 +307,9 @@ int main(int argc, char **argv)
 
   rrlib::getopt::AddValue("log-config", 'l', "Log config file", &LogConfigHandler);
   rrlib::getopt::AddValue("config-file", 'c', "Parameter config file", &ParameterConfigHandler);
+  rrlib::getopt::AddValue("listen-address", 0, "Address on which to listen for connections (default: 0.0.0.0), set this to :: to enable IPv6", &ListenAddressHandler);
   rrlib::getopt::AddValue("port", 'p', "Network port to use", &PortHandler);
   rrlib::getopt::AddValue("connect", 0, "TCP address of finroc application to connect to (default: localhost:<port>)", &ConnectHandler);
-  rrlib::getopt::AddValue("max-ports", 0, "Maximum number of ports (default: 65535). Has significant impact on memory footprint.", &MaxPortsHandler);
-  rrlib::getopt::AddValue("max-elements", 0, "Maximum number of framework elements excluding ports (default: 65535).", &MaxElementsHandler);
   rrlib::getopt::AddValue("crash-handler", 0, "Enable/disable crash handler (default: 'on' in debug mode - 'off' in release mode).", &CrashHandler);
   rrlib::getopt::AddFlag("pause", 0, "Pause program at startup", &PauseHandler);
   rrlib::getopt::AddFlag("port-links-are-not-unique", 0, "Port links in this part are not unique in P2P network (=> host name is prepended in GUI, for instance).", &UniqueHandler);
@@ -364,14 +342,16 @@ int main(int argc, char **argv)
     }
   }
 
-  // Create and connect TCP peer
-  if (connect_to.length() == 0)
+#ifdef _LIB_FINROC_PLUGIN_TCP_PRESENT_
+
+  if (finroc_peer_name.length() == 0)
   {
-    connect_to = std::string("localhost:") + boost::lexical_cast<std::string>(network_port);
+    const char* finroc_peer_name_temp = strrchr(argv[0], '/');
+    finroc_peer_name = finroc_peer_name_temp != NULL ? (finroc_peer_name_temp + 1) : argv[0];
   }
 
-#ifdef _LIB_FINROC_PLUGIN_TCP_PRESENT_
-  finroc::tcp::tTCPPeer* tcp_peer = new finroc::tcp::tTCPPeer(connect_to, "", finroc::tcp::tTCPPeer::eFULL, network_port, finroc::tcp::tTCPPeer::cDEFAULT_FILTER, true);
+  // Create and connect TCP peer
+  finroc::tcp::tPeer* tcp_peer = new finroc::tcp::tPeer(finroc_peer_name, connect_to, network_port, true, true, listen_address);
   tcp_peer->Init();
   try
   {
@@ -402,6 +382,15 @@ int main(int argc, char **argv)
     {
       fe->Init();
     }
+  }
+
+#ifdef _LIB_FINROC_PLUGIN_TCP_PRESENT_
+  tcp_peer->StartServingStructure();
+#endif
+
+  for (size_t i = 0; i < executables.size(); i++)
+  {
+    finroc::core::tFrameworkElement* fe = executables[i];
     if (pause_at_startup)
     {
       finroc::scheduling::tExecutionControl::PauseAll(*fe); // Shouldn't be necessary, but who knows what people might implement

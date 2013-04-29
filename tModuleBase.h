@@ -125,7 +125,7 @@ public:
       : tConveniencePort<parameters::tParameter<T>, tModuleBase, tFrameworkElement, &tModuleBase::GetParameterParent>(args...)
     {
       assert(this->GetWrapped()->GetParent()->NameEquals("Parameters"));
-      this->AddPortListener(static_cast<tModuleBase*>(this->GetWrapped()->GetParent()->GetParent())->parameters_changed);
+      this->AddPortListenerSimple(static_cast<tModuleBase*>(this->GetWrapped()->GetParent()->GetParent())->parameters_changed);
     }
   };
 
@@ -195,7 +195,7 @@ private:
   friend class tConveniencePort;
 
   /*! Introduced this helper class to remove ambiguities when derived classes add listeners to ports */
-  class tParameterChangeDetector : public data_ports::tPortListener<const void*>
+  class tParameterChangeDetector
   {
     friend class tModuleBase;
 
@@ -203,7 +203,7 @@ private:
     volatile bool parameters_changed;
 
     /*! Implementation of tPortListenerRaw */
-    virtual void PortChanged(data_ports::common::tAbstractDataPort& origin, const void* value, const rrlib::time::tTimestamp&);
+    void PortChanged(data_ports::common::tAbstractDataPort& origin);
 
     tParameterChangeDetector() : parameters_changed(true) {}
   };

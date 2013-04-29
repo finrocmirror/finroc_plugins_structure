@@ -234,7 +234,7 @@ private:
   /*! Helper methods for different kinds of base classes */
   bool HasChangedImpl(core::tPortWrapperBase* p)
   {
-    return static_cast<data_ports::common::tAbstractDataPort*>(p->GetWrapped())->GetCustomChangedFlag() != data_ports::common::tAbstractDataPort::tChangeStatus::NO_CHANGE;
+    return static_cast<data_ports::common::tAbstractDataPort*>(p->GetWrapped())->GetCustomChangedFlag() != data_ports::tChangeStatus::NO_CHANGE;
   }
   bool HasChangedImpl(...) // tStaticParameter<T>* p
   {
@@ -244,7 +244,7 @@ private:
   void ResetChangedImpl(core::tPortWrapperBase* p)
   {
     static_cast<data_ports::common::tAbstractDataPort*>(p->GetWrapped())->ResetChanged();
-    static_cast<data_ports::common::tAbstractDataPort*>(p->GetWrapped())->SetCustomChangedFlag(data_ports::common::tAbstractDataPort::tChangeStatus::NO_CHANGE);
+    static_cast<data_ports::common::tAbstractDataPort*>(p->GetWrapped())->SetCustomChangedFlag(data_ports::tChangeStatus::NO_CHANGE);
   }
   void ResetChangedImpl(...) // tStaticParameter<T>* p
   {

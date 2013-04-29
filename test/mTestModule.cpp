@@ -92,6 +92,11 @@ void mTestModule::Update()
   this->output_signal.Publish(this->counter);
   FINROC_LOG_PRINT(DEBUG, this->counter);
   this->counter++;
+
+  if (this->input_signal.HasChanged())
+  {
+    FINROC_LOG_PRINT(USER, "Received input signal: ", this->input_signal.Get());
+  }
 }
 
 //----------------------------------------------------------------------
