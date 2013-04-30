@@ -98,7 +98,7 @@ void tModuleBase::CheckParameters()
   }
 }
 
-void tModuleBase::tParameterChangeDetector::PortChanged(data_ports::common::tAbstractDataPort& origin)
+void tModuleBase::tParameterChangeDetector::PortChanged(data_ports::tChangeContext& change_context)
 {
   parameters_changed = true;
 }

@@ -202,10 +202,11 @@ private:
     /*! Changed flag that is set whenever a parameter change is detected */
     volatile bool parameters_changed;
 
-    /*! Implementation of tPortListenerRaw */
-    void PortChanged(data_ports::common::tAbstractDataPort& origin);
-
     tParameterChangeDetector() : parameters_changed(true) {}
+
+  public:
+    /*! Implementation of tPortListenerRaw */
+    void PortChanged(data_ports::tChangeContext& change_context);
   };
 
   /*! Element aggregating parameters */
