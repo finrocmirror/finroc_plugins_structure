@@ -76,7 +76,7 @@ class tModuleBase : public core::tFrameworkElement
   /*! GetContainer function for tParameter */
   tFrameworkElement& GetParameterParent()
   {
-    return *this;
+    return *parameters;
   }
 
   /*! GetContainer function for tStaticParameter */
