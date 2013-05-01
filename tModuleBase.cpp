@@ -94,11 +94,11 @@ void tModuleBase::CheckParameters()
   {
     this->ProcessChangedFlags(*parameters);
     parameters_changed.parameters_changed = false;
-    this->EvaluateParameters();
+    this->OnParameterChange();
   }
 }
 
-void tModuleBase::tParameterChangeDetector::PortChanged(data_ports::tChangeContext& change_context)
+void tModuleBase::tParameterChangeDetector::OnPortChange(data_ports::tChangeContext& change_context)
 {
   parameters_changed = true;
 }

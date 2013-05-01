@@ -85,7 +85,7 @@ mTestModule::~mTestModule()
 {}
 
 //----------------------------------------------------------------------
-// mTestModule EvaluateStaticParameters
+// mTestModule Update
 //----------------------------------------------------------------------
 void mTestModule::Update()
 {

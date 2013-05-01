@@ -168,7 +168,7 @@ protected:
   /*!
    * (Should only be called by abstract module classes such as tModule and tSenseControlModule)
    *
-   * Calls EvaluateParameters() if a parameter change was detected and resets change flag
+   * Calls OnParameterChange() if a parameter change was detected and resets change flag
    */
   void CheckParameters();
 
@@ -206,7 +206,7 @@ private:
 
   public:
     /*! Implementation of tPortListenerRaw */
-    void PortChanged(data_ports::tChangeContext& change_context);
+    void OnPortChange(data_ports::tChangeContext& change_context);
   };
 
   /*! Element aggregating parameters */
@@ -223,7 +223,7 @@ private:
 
 
   /*! Called whenever parameters have changed */
-  virtual void EvaluateParameters()
+  virtual void OnParameterChange()
   {}
 };
 
