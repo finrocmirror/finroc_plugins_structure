@@ -232,21 +232,23 @@ private:
   }
 
   /*! Helper methods for different kinds of base classes */
-  bool HasChangedImpl(core::tPortWrapperBase* p)
+  bool HasChangedImpl(...) // Ports and parameters
   {
-    return static_cast<data_ports::common::tAbstractDataPort*>(p->GetWrapped())->GetCustomChangedFlag() != data_ports::tChangeStatus::NO_CHANGE;
+    return TPort::GetWrapped()->GetCustomChangedFlag() != data_ports::tChangeStatus::NO_CHANGE;
   }
-  bool HasChangedImpl(...) // tStaticParameter<T>* p
+  template <typename T>
+  bool HasChangedImpl(parameters::tStaticParameter<T>* p)
   {
     return TPort::HasChanged();
   }
 
-  void ResetChangedImpl(core::tPortWrapperBase* p)
+  void ResetChangedImpl(...) // Ports and parameters
   {
-    static_cast<data_ports::common::tAbstractDataPort*>(p->GetWrapped())->ResetChanged();
-    static_cast<data_ports::common::tAbstractDataPort*>(p->GetWrapped())->SetCustomChangedFlag(data_ports::tChangeStatus::NO_CHANGE);
+    TPort::GetWrapped()->ResetChanged();
+    TPort::GetWrapped()->SetCustomChangedFlag(data_ports::tChangeStatus::NO_CHANGE);
   }
-  void ResetChangedImpl(...) // tStaticParameter<T>* p
+  template <typename T>
+  void ResetChangedImpl(parameters::tStaticParameter<T>* p)
   {
     TPort::ResetChanged();
   }
