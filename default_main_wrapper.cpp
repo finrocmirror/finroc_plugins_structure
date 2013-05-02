@@ -342,13 +342,13 @@ int main(int argc, char **argv)
     }
   }
 
-#ifdef _LIB_FINROC_PLUGIN_TCP_PRESENT_
-
   if (finroc_peer_name.length() == 0)
   {
     const char* finroc_peer_name_temp = strrchr(argv[0], '/');
     finroc_peer_name = finroc_peer_name_temp != NULL ? (finroc_peer_name_temp + 1) : argv[0];
   }
+
+#ifdef _LIB_FINROC_PLUGIN_TCP_PRESENT_
 
   // Create and connect TCP peer
   finroc::tcp::tPeer* tcp_peer = new finroc::tcp::tPeer(finroc_peer_name, connect_to, network_port, true, true, listen_address);
@@ -398,6 +398,7 @@ int main(int argc, char **argv)
     else
     {
       finroc::scheduling::tExecutionControl::StartAll(*fe);
+      FINROC_LOG_PRINT(USER, "Finroc program '", finroc_peer_name, "' is now running.");
     }
   }
 
