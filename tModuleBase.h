@@ -42,6 +42,8 @@
 //----------------------------------------------------------------------
 #include "rrlib/thread/tTask.h"
 #include "plugins/data_ports/tOutputPort.h"
+#include "plugins/parameters/tConfigFile.h"
+#include "plugins/parameters/tConfigNode.h"
 #include "plugins/parameters/tParameter.h"
 #include "plugins/parameters/tStaticParameter.h"
 #include "plugins/runtime_construction/tStandardCreateModuleAction.h"
@@ -156,6 +158,22 @@ public:
   // operator new is overloaded for auto-port naming feature
   void* operator new(size_t size);
   void* operator new[](size_t size); // not allowed => exception
+
+  /*!
+   * \param node Common parent config file node for all child parameter config entries (starting with '/' => absolute link - otherwise relative).
+   */
+  void SetConfigNode(const std::string& node)
+  {
+    parameters::tConfigNode::SetConfigNode(*this, node);
+  }
+
+  /*!
+   * \return Config file for module
+   */
+  parameters::tConfigFile* GetConfigFile() const
+  {
+    return parameters::tConfigFile::Find(*this);
+  }
 
 //----------------------------------------------------------------------
 // Protected methods

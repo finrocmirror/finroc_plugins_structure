@@ -130,7 +130,7 @@ public:
     {}
   };
 
-  template < typename T = double >
+  template <typename T>
   class tOutput : public tConveniencePort<data_ports::tOutputPort<T>, tModule, core::tPortGroup, &tModule::GetOutputs>
   {
   public:
