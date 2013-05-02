@@ -177,22 +177,22 @@ public:
   };
 
   template <typename T>
-  class tSensorInput : public tConveniencePort<data_ports::tProxyPort<T, false>, tGroup, core::tPortGroup, &tGroup::GetControllerInputs>
+  class tSensorInput : public tConveniencePort<data_ports::tProxyPort<T, false>, tGroup, core::tPortGroup, &tGroup::GetSensorInputs>
   {
   public:
     template<typename ... ARGS>
     explicit tSensorInput(const ARGS&... args)
-      : tConveniencePort<data_ports::tProxyPort<T, false>, tGroup, core::tPortGroup, &tGroup::GetControllerInputs>(args...)
+      : tConveniencePort<data_ports::tProxyPort<T, false>, tGroup, core::tPortGroup, &tGroup::GetSensorInputs>(args...)
     {}
   };
 
   template <typename T>
-  class tSensorOutput : public tConveniencePort<data_ports::tProxyPort<T, true>, tGroup, core::tPortGroup, &tGroup::GetControllerOutputs>
+  class tSensorOutput : public tConveniencePort<data_ports::tProxyPort<T, true>, tGroup, core::tPortGroup, &tGroup::GetSensorOutputs>
   {
   public:
     template<typename ... ARGS>
     explicit tSensorOutput(const ARGS&... args)
-      : tConveniencePort<data_ports::tProxyPort<T, true>, tGroup, core::tPortGroup, &tGroup::GetControllerOutputs>(args...)
+      : tConveniencePort<data_ports::tProxyPort<T, true>, tGroup, core::tPortGroup, &tGroup::GetSensorOutputs>(args...)
     {}
   };
 
