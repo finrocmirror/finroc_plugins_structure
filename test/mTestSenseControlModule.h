@@ -26,7 +26,7 @@
  *
  * \date    2012-12-02
  *
- * \brief Contains mTestSenseControlModule
+ * \brief   Contains mTestSenseControlModule
  *
  * \b mTestSenseControlModule
  *

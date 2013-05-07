@@ -25,6 +25,8 @@
  *
  * \date    2012-12-02
  *
+ * \brief
+ *
  * Internal helper functions:
  * Can be used to determine which is the parent module or group of a port
  *

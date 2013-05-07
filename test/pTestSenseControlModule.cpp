@@ -27,8 +27,6 @@
  *
  * \date    2012-12-02
  *
- * \brief Contains mTestSenseControlModule
- *
  * \b pTestSenseControlModule
  *
  * Simple test program for SenseControlModule

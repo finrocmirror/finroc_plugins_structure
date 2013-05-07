@@ -26,7 +26,7 @@
  *
  * \date    2012-12-02
  *
- * \brief Contains mTestModule
+ * \brief   Contains mTestModule
  *
  * \b mTestModule
  *

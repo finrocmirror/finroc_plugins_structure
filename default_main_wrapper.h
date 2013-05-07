@@ -27,6 +27,8 @@
  *
  * \date    2012-12-02
  *
+ * \brief
+ *
  * Provides an optional main method for Finroc applications
  * with various command line parameters.
  * It is customizable and in fact used for most existing Finroc applications.

@@ -27,8 +27,6 @@
  *
  * \date    2012-12-02
  *
- * \brief Contains mTestModule
- *
  * \b pTestModule
  *
  * Simple test program for plain modules
