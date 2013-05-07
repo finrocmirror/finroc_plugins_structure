@@ -45,9 +45,11 @@ extern "C"
 }
 
 #include "rrlib/logging/configuration.h"
-#include "rrlib/finroc_core_utils/sFiles.h"
-#include "rrlib/finroc_core_utils/crash_handler.h"
+#ifdef _LIB_RRLIB_CRASH_HANDLER_PRESENT_
+#include "rrlib/crash_handler/crash_handler.h"
+#endif
 
+#include "core/file_lookup.h"
 #include "core/tRuntimeEnvironment.h"
 #include "plugins/parameters/tConfigFile.h"
 #include "plugins/scheduling/tExecutionControl.h"
@@ -170,7 +172,7 @@ bool ParameterConfigHandler(const rrlib::getopt::tNameToOptionMap &name_to_optio
   if (parameter_config->IsActive())
   {
     const char* file = boost::any_cast<const char *>(parameter_config->GetValue());
-    if (!finroc::util::sFiles::FinrocFileExists(file))
+    if (!finroc::core::FinrocFileExists(file))
     {
       FINROC_LOG_PRINT(ERROR, "Could not find specified config file ", file);
     }
@@ -320,10 +322,12 @@ int main(int argc, char **argv)
 
   if (enable_crash_handler)
   {
-    if (!finroc::util::InstallCrashHandler())
+#ifdef _LIB_RRLIB_CRASH_HANDLER_PRESENT_
+    if (!rrlib::crash_handler::InstallCrashHandler())
     {
       FINROC_LOG_PRINT(ERROR, "Error installing crash handler. Crashes will simply terminate the program.");
     }
+#endif
   }
 
   finroc::core::tRuntimeEnvironment &runtime_environment = finroc::core::tRuntimeEnvironment::GetInstance();
