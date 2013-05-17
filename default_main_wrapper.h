@@ -29,7 +29,7 @@
  *
  * \brief
  *
- * Provides an optional main method for Finroc applications
+ * Provides an optional main function for Finroc applications
  * with various command line parameters.
  * It is customizable and in fact used for most existing Finroc applications.
  *
@@ -51,19 +51,21 @@
 //----------------------------------------------------------------------
 // Forward declarations / typedefs / enums
 //----------------------------------------------------------------------
-extern const char * const cPROGRAM_VERSION;
-extern const char * const cPROGRAM_DESCRIPTION;
-extern int finroc_argc_copy;         // copy of argc for 'finroc' part. TODO: remove when rrlib_getopt supports prioritized evaluation of -m option
-extern char ** finroc_argv_copy;     // copy of argv for 'finroc' part. TODO: remove when rrlib_getopt supports prioritized evaluation of -m option
-extern bool links_are_unique;        // can be set in StartUp() to specify whether links in program are globally unique
-extern std::string finroc_peer_name; // can be set in StartUp() to specify another name for TCP peer (default is executable name)
+typedef finroc::core::tFrameworkElement::tFlags tFlags;
+
+extern const std::string cPROGRAM_DESCRIPTION;
+extern const std::string cCOMMAND_LINE_ARGUMENTS;
+extern const std::string cADDITIONAL_HELP_TEXT;
+extern const std::string cMAIN_THREAD_CONTAINER_NAME;
+
+extern bool make_all_port_links_unique;
 
 //----------------------------------------------------------------------
 // Function declarations
 //----------------------------------------------------------------------
 
 void StartUp();
-void InitMainGroup(finroc::structure::tThreadContainer *main_thread, std::vector<char*> remaining_args);
+void InitMainGroup(finroc::structure::tThreadContainer *main_thread, const std::vector<std::string> &remaining_arguments);
 
 
 #endif

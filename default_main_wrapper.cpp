@@ -22,9 +22,7 @@
 /*!\file    plugins/structure/default_main_wrapper.cpp
  *
  * \author  Tobias Foehst
- * \author  Bernd-Helge Schaefer
  * \author  Max Reichardt
- * \author  Michael Arndt
  *
  * \date    2012-12-02
  *
@@ -36,31 +34,15 @@
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
 #include <cstdlib>
-#include <csignal>
-#include <boost/lexical_cast.hpp>
 
-extern "C"
-{
-#include <libgen.h>
-}
+#include "core/tRuntimeEnvironment.h"
 
 #include "rrlib/logging/configuration.h"
-#ifdef _LIB_RRLIB_CRASH_HANDLER_PRESENT_
-#include "rrlib/crash_handler/crash_handler.h"
-#endif
-
-#include "core/file_lookup.h"
-#include "core/tRuntimeEnvironment.h"
-#include "plugins/parameters/tConfigFile.h"
-#include "plugins/scheduling/tExecutionControl.h"
-
-#ifdef _LIB_FINROC_PLUGIN_TCP_PRESENT_
-#include "plugins/tcp/tPeer.h"
-#endif
 
 //----------------------------------------------------------------------
 // Internal includes with ""
 //----------------------------------------------------------------------
+#include "plugins/structure/main_utilities.h"
 
 //----------------------------------------------------------------------
 // Debugging
@@ -74,6 +56,8 @@ extern "C"
 //----------------------------------------------------------------------
 // Forward declarations / typedefs / enums
 //----------------------------------------------------------------------
+typedef finroc::core::tFrameworkElement::tFlag tFlag;
+typedef finroc::core::tFrameworkElement::tFlags tFlags;
 
 //----------------------------------------------------------------------
 // Const values
@@ -83,219 +67,12 @@ extern "C"
 // Implementation
 //----------------------------------------------------------------------
 
-int finroc_argc_copy;     // copy of argc for 'finroc' part. TODO: remove when rrlib_getopt supports prioritized evaluation of -m option
-char ** finroc_argv_copy; // copy of argv for 'finroc' part. TODO: remove when rrlib_getopt supports prioritized evaluation of -m option
-
-static bool run_main_loop = false;
-static bool pause_at_startup = false;
-static std::string listen_address = "0.0.0.0";
-static int network_port = 4444;
-bool links_are_unique = true;
-static std::string connect_to;
-#ifdef NDEBUG
-static bool enable_crash_handler = false;
-#else
-static bool enable_crash_handler = true;
-#endif
-std::string finroc_peer_name;
-
-// We do not use stuff from rrlib_thread, because we have the rare case that in signal handler
-// waiting thread does something else, which is problematic with respect to enforcing lock order
-static std::mutex main_thread_wait_mutex;
-static std::condition_variable main_thread_wait_variable;
-
-//----------------------------------------------------------------------
-// HandleSignalSIGINT
-//----------------------------------------------------------------------
-void HandleSignalSIGINT(int signal)
-{
-  static int call_count = 0; // How many time has function been called?
-  assert(signal == SIGINT);
-  call_count++;
-  if (call_count == 1)
-  {
-    FINROC_LOG_PRINT(USER, "\nCaught SIGINT. Exiting...");
-    run_main_loop = false;
-    std::unique_lock<std::mutex> l(main_thread_wait_mutex);
-    main_thread_wait_variable.notify_all();
-  }
-  else if (call_count < 5)
-  {
-    FINROC_LOG_PRINT(USER, "\nCaught SIGINT again. Unfortunately, the program still hasn't terminated. Program will be aborted at fifth SIGINT.");
-  }
-  else
-  {
-    FINROC_LOG_PRINT(USER, "\nCaught SIGINT for the fifth time. Aborting program.");
-    abort();
-  }
-}
-
-//----------------------------------------------------------------------
-// InstallSignalHandler
-//----------------------------------------------------------------------
-bool InstallSignalHandler()
-{
-  struct sigaction signal_action;
-  signal_action.sa_handler = HandleSignalSIGINT;
-  sigemptyset(&signal_action.sa_mask);
-  signal_action.sa_flags = 0;
-
-  if (sigaction(SIGINT, &signal_action, NULL) != 0)
-  {
-    perror("Could not install signal handler");
-    return false;
-  }
-
-  return true;
-}
-
-//----------------------------------------------------------------------
-// LogConfigHandler
-//----------------------------------------------------------------------
-bool LogConfigHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
-{
-  rrlib::getopt::tOption log_config(name_to_option_map.at("log-config"));
-  if (log_config->IsActive())
-  {
-    rrlib::logging::ConfigureFromFile(boost::any_cast<const char *>(log_config->GetValue()));
-  }
-
-  return true;
-}
-
-//----------------------------------------------------------------------
-// ParameterConfigHandler
-//----------------------------------------------------------------------
-bool ParameterConfigHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
-{
-  rrlib::getopt::tOption parameter_config(name_to_option_map.at("config-file"));
-  if (parameter_config->IsActive())
-  {
-    const char* file = boost::any_cast<const char *>(parameter_config->GetValue());
-    if (!finroc::core::FinrocFileExists(file))
-    {
-      FINROC_LOG_PRINT(ERROR, "Could not find specified config file ", file);
-    }
-    else
-    {
-      FINROC_LOG_PRINT(DEBUG, "Loading config file ", file);
-    }
-    finroc::core::tRuntimeEnvironment::GetInstance().AddAnnotation(*new finroc::parameters::tConfigFile(file));
-  }
-  return true;
-}
-
-//----------------------------------------------------------------------
-// PauseHandler
-//----------------------------------------------------------------------
-bool PauseHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
-{
-  rrlib::getopt::tOption pause(name_to_option_map.at("pause"));
-  pause_at_startup = pause->IsActive();
-  return true;
-}
-
-//----------------------------------------------------------------------
-// PortHandler
-//----------------------------------------------------------------------
-bool PortHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
-{
-  rrlib::getopt::tOption port_option(name_to_option_map.at("port"));
-  if (port_option->IsActive())
-  {
-    const char* port_string = boost::any_cast<const char *>(port_option->GetValue());
-    int port = atoi(port_string);
-    if (port < 1 || port > 65535)
-    {
-      FINROC_LOG_PRINT(ERROR, "Invalid port '", port_string, "'. Using default: ", network_port);
-    }
-    else
-    {
-      FINROC_LOG_PRINT(DEBUG, "Listening on user defined port ", port, ".");
-      network_port = port;
-    }
-  }
-
-  return true;
-}
-
-//----------------------------------------------------------------------
-// UniqueHandler
-//----------------------------------------------------------------------
-bool UniqueHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
-{
-  rrlib::getopt::tOption opt(name_to_option_map.at("port-links-are-not-unique"));
-  if (opt->IsActive())
-  {
-    links_are_unique = false;
-  }
-  return true;
-}
-
-//----------------------------------------------------------------------
-// ConnectHandler
-//----------------------------------------------------------------------
-bool ConnectHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
-{
-  rrlib::getopt::tOption connect_option(name_to_option_map.at("connect"));
-  if (connect_option->IsActive())
-  {
-    connect_to = boost::any_cast<const char *>(connect_option->GetValue());
-    FINROC_LOG_PRINT(DEBUG, "Connecting to ", connect_to);
-  }
-
-  return true;
-}
-
-bool ListenAddressHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
-{
-  rrlib::getopt::tOption listen_address_option(name_to_option_map.at("listen-address"));
-  if (listen_address_option->IsActive())
-  {
-    listen_address = boost::any_cast<const char *>(listen_address_option->GetValue());
-    FINROC_LOG_PRINT(DEBUG, "Listening on ", listen_address);
-  }
-
-  return true;
-}
-
-//----------------------------------------------------------------------
-// CrashHandler
-//----------------------------------------------------------------------
-bool CrashHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
-{
-  rrlib::getopt::tOption crash_config(name_to_option_map.at("crash-handler"));
-  if (crash_config->IsActive())
-  {
-    std::string s(boost::any_cast<const char*>(crash_config->GetValue()));
-    if (s.compare("on") == 0)
-    {
-      enable_crash_handler = true;
-    }
-    else if (s.compare("off") == 0)
-    {
-      enable_crash_handler = false;
-    }
-    else
-    {
-      FINROC_LOG_PRINT(ERROR, "Option --crash-handler needs be either 'on' or 'off' (not '", s, "'). Using default.");
-    }
-  }
-
-  return true;
-}
-
 //----------------------------------------------------------------------
 // main
 //----------------------------------------------------------------------
 int main(int argc, char **argv)
 {
-
-  // TODO: remove when rrlib_getopt supports prioritized evaluation of -m option
-  finroc_argc_copy = argc;
-  finroc_argv_copy = argv;
-
-  if (!InstallSignalHandler())
+  if (!finroc::structure::InstallSignalHandler())
   {
     FINROC_LOG_PRINT(ERROR, "Error installing signal handler. Exiting...");
     return EXIT_FAILURE;
@@ -304,121 +81,19 @@ int main(int argc, char **argv)
   rrlib::logging::default_log_description = basename(argv[0]);
   rrlib::logging::SetLogFilenamePrefix(basename(argv[0]));
 
-  rrlib::getopt::SetProgramVersion(cPROGRAM_VERSION);
-  rrlib::getopt::SetProgramDescription(cPROGRAM_DESCRIPTION);
-
-  rrlib::getopt::AddValue("log-config", 'l', "Log config file", &LogConfigHandler);
-  rrlib::getopt::AddValue("config-file", 'c', "Parameter config file", &ParameterConfigHandler);
-  rrlib::getopt::AddValue("listen-address", 0, "Address on which to listen for connections (default: 0.0.0.0), set this to :: to enable IPv6", &ListenAddressHandler);
-  rrlib::getopt::AddValue("port", 'p', "Network port to use", &PortHandler);
-  rrlib::getopt::AddValue("connect", 0, "TCP address of finroc application to connect to (default: localhost:<port>)", &ConnectHandler);
-  rrlib::getopt::AddValue("crash-handler", 0, "Enable/disable crash handler (default: 'on' in debug mode - 'off' in release mode).", &CrashHandler);
-  rrlib::getopt::AddFlag("pause", 0, "Pause program at startup", &PauseHandler);
-  rrlib::getopt::AddFlag("port-links-are-not-unique", 0, "Port links in this part are not unique in P2P network (=> host name is prepended in GUI, for instance).", &UniqueHandler);
+  finroc::structure::RegisterCommonOptions();
 
   StartUp();
 
-  std::vector<char *> remaining_args = rrlib::getopt::ProcessCommandLine(argc, argv);
+  std::vector<std::string> remaining_arguments = rrlib::getopt::ProcessCommandLine(argc, argv, cPROGRAM_DESCRIPTION, cCOMMAND_LINE_ARGUMENTS, cADDITIONAL_HELP_TEXT);
 
-  if (enable_crash_handler)
-  {
-#ifdef _LIB_RRLIB_CRASH_HANDLER_PRESENT_
-    if (!rrlib::crash_handler::InstallCrashHandler())
-    {
-      FINROC_LOG_PRINT(ERROR, "Error installing crash handler. Crashes will simply terminate the program.");
-    }
-#endif
-  }
+  finroc::structure::InstallCrashHandler();
+  finroc::structure::ConnectTCPPeer(basename(argv[0]));
 
-  finroc::core::tRuntimeEnvironment &runtime_environment = finroc::core::tRuntimeEnvironment::GetInstance();
+  finroc::structure::tThreadContainer *main_thread = new finroc::structure::tThreadContainer(
+    &finroc::core::tRuntimeEnvironment::GetInstance(), cMAIN_THREAD_CONTAINER_NAME, "", false, make_all_port_links_unique ? tFlags(tFlag::GLOBALLY_UNIQUE_LINK) : tFlags()); // TODO: Put part xml here? Share IOs?
 
-  typedef finroc::core::tFrameworkElement::tFlag tFlag;
-  typedef finroc::core::tFrameworkElement::tFlags tFlags;
+  InitMainGroup(main_thread, remaining_arguments);
 
-  // Have any top-level framework elements containing threads already been created?
-  // In this case, we won't create an extra thread container (finstructed part does not need one for example)
-  std::vector<finroc::core::tFrameworkElement*> executables;
-  for (auto it = runtime_environment.ChildrenBegin(); it != runtime_environment.ChildrenEnd(); ++it)
-  {
-    if (it->GetAnnotation<finroc::scheduling::tExecutionControl>() && (it->GetFlag(tFlag::FINSTRUCTABLE_GROUP) || it->GetFlag(tFlag::EDGE_AGGREGATOR)))
-    {
-      executables.push_back(&(*it));
-    }
-  }
-
-  if (finroc_peer_name.length() == 0)
-  {
-    const char* finroc_peer_name_temp = strrchr(argv[0], '/');
-    finroc_peer_name = finroc_peer_name_temp != NULL ? (finroc_peer_name_temp + 1) : argv[0];
-  }
-
-#ifdef _LIB_FINROC_PLUGIN_TCP_PRESENT_
-
-  // Create and connect TCP peer
-  finroc::tcp::tPeer* tcp_peer = new finroc::tcp::tPeer(finroc_peer_name, connect_to, network_port, true, true, listen_address);
-  tcp_peer->Init();
-  try
-  {
-    tcp_peer->Connect();
-  }
-  catch (const std::exception& e1)
-  {
-    FINROC_LOG_PRINT(WARNING, "Error connecting Peer: ", e1);
-  }
-#endif
-
-  if (executables.size() == 0)
-  {
-    finroc::structure::tThreadContainer *main_thread = new finroc::structure::tThreadContainer(
-      &runtime_environment, "Main Thread", "", false, links_are_unique ? tFlags(tFlag::GLOBALLY_UNIQUE_LINK) : tFlags()); // TODO: Put part xml here? Share IOs?
-    InitMainGroup(main_thread, remaining_args);
-    executables.push_back(main_thread);
-  }
-  else
-  {
-    InitMainGroup(NULL, remaining_args);
-  }
-
-  for (size_t i = 0; i < executables.size(); i++)
-  {
-    finroc::core::tFrameworkElement* fe = executables[i];
-    if (!fe->IsReady())
-    {
-      fe->Init();
-    }
-  }
-
-#ifdef _LIB_FINROC_PLUGIN_TCP_PRESENT_
-  tcp_peer->StartServingStructure();
-#endif
-
-  for (size_t i = 0; i < executables.size(); i++)
-  {
-    finroc::core::tFrameworkElement* fe = executables[i];
-    if (pause_at_startup)
-    {
-      finroc::scheduling::tExecutionControl::PauseAll(*fe); // Shouldn't be necessary, but who knows what people might implement
-    }
-    else
-    {
-      finroc::scheduling::tExecutionControl::StartAll(*fe);
-      FINROC_LOG_PRINT(USER, "Finroc program '", finroc_peer_name, "' is now running.");
-    }
-  }
-
-  run_main_loop = true;
-  {
-    std::unique_lock<std::mutex> l(main_thread_wait_mutex);
-    while (run_main_loop)
-    {
-      main_thread_wait_variable.wait_for(l, std::chrono::seconds(10));
-    }
-  }
-  FINROC_LOG_PRINT(DEBUG, "Left main loop");
-
-  // In many cases this is not necessary.
-  // However, doing this before static deinitialization can avoid issues with external libraries and thread container threads still running.
-  finroc::core::tRuntimeEnvironment::Shutdown();
-
-  return EXIT_SUCCESS;
+  return finroc::structure::InitializeAndRunMainLoop(basename(argv[0]));
 }

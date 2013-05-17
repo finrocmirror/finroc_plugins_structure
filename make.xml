@@ -4,6 +4,7 @@
   <finrocplugin name="structure">
     <sources>
       internal/**
+      main_utilities.cpp
       tConveniencePort.h
       tGroup.cpp
       tModule.cpp

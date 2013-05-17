@@ -19,72 +19,56 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //----------------------------------------------------------------------
-/*!\file    plugins/structure/test/pTestSenseControlModule.cpp
+/*!\file    plugins/structure/main_utilities.h
  *
  * \author  Tobias Foehst
- * \author  Bernd-Helge Schaefer
- * \author  Max Reichardt
  *
- * \date    2012-12-02
+ * \date    2013-05-16
  *
- * \b pTestSenseControlModule
+ * \brief
  *
- * Simple test program for SenseControlModule
+ * Provides some utilities for the default_main_wrapper and applications that
+ * vary in some points but should use the same concepts (e.g. finroc_run).
  *
  */
 //----------------------------------------------------------------------
-#include "plugins/structure/default_main_wrapper.h"
+#ifndef __plugins__structure__main_utilities_h__
+#define __plugins__structure__main_utilities_h__
 
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
-#include <chrono>
 
 //----------------------------------------------------------------------
 // Internal includes with ""
 //----------------------------------------------------------------------
-#include "plugins/structure/test/mTestSenseControlModule.h"
 
 //----------------------------------------------------------------------
-// Debugging
+// Namespace declaration
 //----------------------------------------------------------------------
-#include <cassert>
-
-//----------------------------------------------------------------------
-// Namespace usage
-//----------------------------------------------------------------------
-using finroc::structure::test::mTestSenseControlModule;
+namespace finroc
+{
+namespace structure
+{
 
 //----------------------------------------------------------------------
 // Forward declarations / typedefs / enums
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
-// Const values
-//----------------------------------------------------------------------
-const std::string cPROGRAM_DESCRIPTION = "Test program for sense-control modules";
-const std::string cCOMMAND_LINE_ARGUMENTS = "";
-const std::string cADDITIONAL_HELP_TEXT = "";
-const std::string cMAIN_THREAD_CONTAINER_NAME = "Main Thread";
-bool make_all_port_links_unique = true;
-
-//----------------------------------------------------------------------
-// Implementation
+// Function declarations
 //----------------------------------------------------------------------
 
-//----------------------------------------------------------------------
-// StartUp
-//----------------------------------------------------------------------
-void StartUp()
-{}
+bool InstallSignalHandler();
+void RegisterCommonOptions();
+void InstallCrashHandler();
+void ConnectTCPPeer(const std::string &peer_name);
+int InitializeAndRunMainLoop(const std::string &program_name);
 
 //----------------------------------------------------------------------
-// InitMainGroup
+// End of namespace declaration
 //----------------------------------------------------------------------
-void InitMainGroup(finroc::structure::tThreadContainer *main_thread, const std::vector<std::string> &remaining_arguments)
-{
-  mTestSenseControlModule *test_module = new mTestSenseControlModule(main_thread);
-  test_module->Init();
-
-  main_thread->SetCycleTime(2000);
 }
+}
+
+#endif
