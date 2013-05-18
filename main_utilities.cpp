@@ -36,7 +36,6 @@
 //----------------------------------------------------------------------
 #include <cstdlib>
 #include <csignal>
-#include <boost/lexical_cast.hpp>
 
 extern "C"
 {
