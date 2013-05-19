@@ -19,17 +19,15 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //----------------------------------------------------------------------
-/*!\file    plugins/structure/tGroup.cpp
+/*!\file    plugins/structure/tGroupBase.cpp
  *
- * \author  Tobias Foehst
- * \author  Bernd-Helge Schaefer
  * \author  Max Reichardt
  *
- * \date    2012-12-02
+ * \date    2013-05-19
  *
  */
 //----------------------------------------------------------------------
-#include "plugins/structure/tGroup.h"
+#include "plugins/structure/tGroupBase.h"
 
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
@@ -67,13 +65,34 @@ namespace structure
 //----------------------------------------------------------------------
 // Implementation
 //----------------------------------------------------------------------
-tGroup::tGroup(tFrameworkElement *parent, const std::string &name, const std::string &structure_config_file, bool share_so_and_ci_ports, tFlags extra_flags)
-  : tGroupBase(parent, name, structure_config_file, extra_flags),
-    controller_input(new core::tPortGroup(this, "Controller Input", tFlag::INTERFACE | tFlag::CONTROLLER_DATA, share_so_and_ci_ports ? tFlags(tFlag::SHARED) : tFlags())),
-    controller_output(new core::tPortGroup(this, "Controller Output", tFlag::INTERFACE | tFlag::CONTROLLER_DATA, tFlags())),
-    sensor_input(new core::tPortGroup(this, "Sensor Input", tFlag::INTERFACE | tFlag::SENSOR_DATA, tFlags())),
-    sensor_output(new core::tPortGroup(this, "Sensor Output", tFlag::INTERFACE | tFlag::SENSOR_DATA, share_so_and_ci_ports ? tFlags(tFlag::SHARED) : tFlags()))
+
+tGroupBase::tGroupBase(core::tFrameworkElement *parent, const std::string &name, const std::string &structure_config_file, tFlags extra_flags) :
+  tFinstructableGroup(parent, name, structure_config_file, extra_flags),
+  auto_name_port_count(0),
+  count_for_type(NULL)
 {
+  internal::AddModule(this);
+  if (!internal::FindParent(this, false))
+  {
+    FINROC_LOG_PRINT(ERROR, "Group ", GetQualifiedName(), " was not created using new().");
+    abort();
+  }
+}
+
+tGroupBase::~tGroupBase()
+{}
+
+void* tGroupBase::operator new(size_t size)
+{
+  void* result = ::operator new(size);
+  internal::AddMemoryBlock(result, size);
+  return result;
+}
+
+void* tGroupBase::operator new[](size_t size)
+{
+  FINROC_LOG_PRINT_STATIC(ERROR, "Allocating (non-pointer) array of framework elements is not allowed.");
+  throw std::bad_alloc();
 }
 
 //----------------------------------------------------------------------

@@ -45,12 +45,11 @@
 //----------------------------------------------------------------------
 #include "core/port/tPortGroup.h"
 #include "plugins/data_ports/tProxyPort.h"
-#include "plugins/runtime_construction/tFinstructableGroup.h"
 
 //----------------------------------------------------------------------
 // Internal includes with ""
 //----------------------------------------------------------------------
-#include "plugins/structure/tConveniencePort.h"
+#include "plugins/structure/tGroupBase.h"
 
 //----------------------------------------------------------------------
 // Namespace declaration
@@ -74,13 +73,8 @@ namespace structure
  * Used to structure finroc applications.
  * Its contents can be edited and saved using finstruct.
  */
-class tGroup : public runtime_construction::tFinstructableGroup
+class tGroup : public tGroupBase
 {
-  /*! GetContainer function for tStaticParameter */
-  tFrameworkElement& GetThis()
-  {
-    return *this;
-  }
 
 //----------------------------------------------------------------------
 // Public methods and typedefs
@@ -131,16 +125,17 @@ public:
 
 
   /**
-   * Port and parameter classes to use in group.
+   * Port classes to use in group.
+   * (see base class for static parameters)
    *
-   * Constructors take a variadic argument list... just any properties you want to assign to port/parameter.
+   * Constructors take a variadic argument list... just any properties you want to assign to port.
    *
    * Unlike tPort, port name and parent are usually determined automatically (however, only possible when port is direct class member).
    * If this is not possible/desired, name needs to be provided as first constructor argument - parent as arbitrary one.
    *
    * So...
    *
-   * A string as first parameter is interpreted as port name; Any other or further string as config entry (relevant for parameters only).
+   * A string as first parameter is interpreted as port name; Any other or further string as config entry (irrelevant for ports).
    * A framework element pointer is interpreted as parent.
    * tFrameworkElement::tFlags arguments are interpreted as flags.
    * A tQueueSettings argument creates an input queue with the specified settings.
@@ -193,46 +188,16 @@ public:
     {}
   };
 
-  template <typename T>
-  class tStaticParameter : public tConveniencePort<parameters::tStaticParameter<T>, tGroup, core::tFrameworkElement, &tGroup::GetThis>
-  {
-  public:
-    template<typename ... ARGS>
-    explicit tStaticParameter(const ARGS&... args)
-      : tConveniencePort<parameters::tStaticParameter<T>, tGroup, core::tFrameworkElement, &tGroup::GetThis>(args...)
-    {}
-  };
-
-  // operator new is overloaded for auto-port naming feature
-  void* operator new(size_t size);
-  void* operator new[](size_t size); // not allowed
-
-//----------------------------------------------------------------------
-// Protected destructor (framework elements have their own memory management and are deleted with ManagedDelete)
-//----------------------------------------------------------------------
-protected:
-
-  virtual ~tGroup();
-
 //----------------------------------------------------------------------
 // Private fields and methods
 //----------------------------------------------------------------------
 private:
-
-  template <typename TPort, typename TElement, typename TContainer, TContainer& (TElement::*GET_CONTAINER)()>
-  friend class tConveniencePort;
 
   /*! Group's interfaces */
   finroc::core::tPortGroup* controller_input;
   finroc::core::tPortGroup* controller_output;
   finroc::core::tPortGroup* sensor_input;
   finroc::core::tPortGroup* sensor_output;
-
-  /*! Number of ports already created that have auto-generated names */
-  int auto_name_port_count;
-
-  /*! Counter should be reset for every module class in type hierarchy. This helper variable is used to detect this. */
-  const char* count_for_type;
 };
 
 //----------------------------------------------------------------------
