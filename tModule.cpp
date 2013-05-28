@@ -69,19 +69,25 @@ namespace structure
 // Implementation
 //----------------------------------------------------------------------
 
-tModule::tModule(tFrameworkElement *parent, const std::string &name, bool shared_output_ports, bool share_input_ports)
+tModule::tModule(tFrameworkElement *parent, const std::string &name, bool share_output_ports, bool share_input_ports)
   : tModuleBase(parent, name),
 
-    input(new core::tPortGroup(this, "Input", tFlag::INTERFACE, share_input_ports ? tFlags(tFlag::SHARED) : tFlags())),
-    output(new core::tPortGroup(this, "Output", tFlag::INTERFACE, shared_output_ports ? tFlags(tFlag::SHARED) : tFlags())),
+    input(NULL),
+    output(NULL),
+    share_output_ports(share_output_ports),
+    share_input_ports(share_input_ports),
     update_task(*this),
     input_changed(true)
 {
-  this->AddAnnotation(*new scheduling::tPeriodicFrameworkElementTask(*this->input, *this->output, this->update_task));
 }
 
 tModule::~tModule()
 {}
+
+void tModule::PostChildInit()
+{
+  this->AddAnnotation(*new scheduling::tPeriodicFrameworkElementTask(this->input, this->output, this->update_task));
+}
 
 tModule::UpdateTask::UpdateTask(tModule& module)
   : module(module)
@@ -90,7 +96,10 @@ tModule::UpdateTask::UpdateTask(tModule& module)
 void tModule::UpdateTask::ExecuteTask()
 {
   this->module.CheckParameters();
-  this->module.input_changed = this->module.ProcessChangedFlags(this->module.GetInputs());
+  if (this->module.input)
+  {
+    this->module.input_changed = this->module.ProcessChangedFlags(*this->module.input);
+  }
   this->module.Update();
 }
 

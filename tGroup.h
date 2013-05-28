@@ -43,7 +43,6 @@
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
-#include "core/port/tPortGroup.h"
 #include "plugins/data_ports/tProxyPort.h"
 
 //----------------------------------------------------------------------
@@ -96,6 +95,10 @@ public:
    */
   inline core::tPortGroup& GetControllerInputs()
   {
+    if (!controller_input)
+    {
+      controller_input = CreateInterface("Controller Input", share_so_and_ci_ports, tFlag::CONTROLLER_DATA);
+    }
     return *controller_input;
   }
 
@@ -104,6 +107,10 @@ public:
    */
   inline core::tPortGroup& GetControllerOutputs()
   {
+    if (!controller_output)
+    {
+      controller_output = CreateInterface("Controller Output", false, tFlag::CONTROLLER_DATA);
+    }
     return *controller_output;
   }
 
@@ -112,6 +119,10 @@ public:
    */
   inline core::tPortGroup& GetSensorInputs()
   {
+    if (!sensor_input)
+    {
+      sensor_input = CreateInterface("Sensor Input", false, tFlag::SENSOR_DATA);
+    }
     return *sensor_input;
   }
 
@@ -120,6 +131,10 @@ public:
    */
   inline core::tPortGroup& GetSensorOutputs()
   {
+    if (!sensor_output)
+    {
+      sensor_output = CreateInterface("Sensor Output", share_so_and_ci_ports, tFlag::SENSOR_DATA);
+    }
     return *sensor_output;
   }
 
@@ -198,6 +213,9 @@ private:
   finroc::core::tPortGroup* controller_output;
   finroc::core::tPortGroup* sensor_input;
   finroc::core::tPortGroup* sensor_output;
+
+  /*! Share sensor output and controller input ports so that they can be accessed from other runtime environments? */
+  bool share_so_and_ci_ports;
 };
 
 //----------------------------------------------------------------------

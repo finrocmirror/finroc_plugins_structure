@@ -71,21 +71,45 @@ namespace structure
 
 tSenseControlModule::tSenseControlModule(tFrameworkElement *parent, const std::string &name, bool share_so_and_ci_ports)
   : tModuleBase(parent, name),
-    sensor_input(new core::tPortGroup(this, "Sensor Input", tFlag::INTERFACE | tFlag::SENSOR_DATA, tFlags())),
-    sensor_output(new core::tPortGroup(this, "Sensor Output", tFlag::INTERFACE | tFlag::SENSOR_DATA, share_so_and_ci_ports ? tFlags(tFlag::SHARED) : tFlags())),
-    controller_input(new core::tPortGroup(this, "Controller Input", tFlag::INTERFACE | tFlag::CONTROLLER_DATA, share_so_and_ci_ports ? tFlags(tFlag::SHARED) : tFlags())),
-    controller_output(new core::tPortGroup(this, "Controller Output", tFlag::INTERFACE | tFlag::CONTROLLER_DATA, tFlags())),
+    sensor_input(NULL),
+    sensor_output(NULL),
+    controller_input(NULL),
+    controller_output(NULL),
+    share_so_and_ci_ports(share_so_and_ci_ports),
     sense_task(*this),
     control_task(*this),
     sensor_input_changed(true),
     controller_input_changed(true)
 {
-  controller_input->AddAnnotation(*new scheduling::tPeriodicFrameworkElementTask(*this->controller_input, *this->controller_output, this->control_task));
-  sensor_input->AddAnnotation(*new scheduling::tPeriodicFrameworkElementTask(*this->sensor_input, *this->sensor_output, this->sense_task));
+  //controller_input->AddAnnotation(*new scheduling::tPeriodicFrameworkElementTask(*this->controller_input, *this->controller_output, this->control_task));
+  //sensor_input->AddAnnotation(*new scheduling::tPeriodicFrameworkElementTask(*this->sensor_input, *this->sensor_output, this->sense_task));
 }
 
 tSenseControlModule::~tSenseControlModule()
 {}
+
+void tSenseControlModule::PostChildInit()
+{
+  tFrameworkElement* controller_task_parent = controller_input ? controller_input : (controller_output ? controller_output : NULL);
+  if (controller_task_parent)
+  {
+    controller_task_parent->AddAnnotation(*new scheduling::tPeriodicFrameworkElementTask(this->controller_input, this->controller_output, this->control_task));
+  }
+  else
+  {
+    FINROC_LOG_PRINT(WARNING, "Module has no controller interfaces. Control() will not be called!");
+  }
+
+  tFrameworkElement* sensor_task_parent = sensor_input ? sensor_input : (sensor_output ? sensor_output : NULL);
+  if (sensor_task_parent)
+  {
+    sensor_task_parent->AddAnnotation(*new scheduling::tPeriodicFrameworkElementTask(this->sensor_input, this->sensor_output, this->sense_task));
+  }
+  else
+  {
+    FINROC_LOG_PRINT(WARNING, "Module has no sensor interfaces. Sense() will not be called!");
+  }
+}
 
 //----------------------------------------------------------------------
 // tSenseControlModule::ControlTask constructors
@@ -100,7 +124,10 @@ tSenseControlModule::ControlTask::ControlTask(tSenseControlModule& module)
 void tSenseControlModule::ControlTask::ExecuteTask()
 {
   this->module.CheckParameters();
-  this->module.controller_input_changed = this->module.ProcessChangedFlags(this->module.GetControllerInputs());
+  if (this->module.controller_input)
+  {
+    this->module.controller_input_changed = this->module.ProcessChangedFlags(*this->module.controller_input);
+  }
   this->module.Control();
 }
 
@@ -117,7 +144,10 @@ tSenseControlModule::SenseTask::SenseTask(tSenseControlModule& module)
 void tSenseControlModule::SenseTask::ExecuteTask()
 {
   this->module.CheckParameters();
-  this->module.sensor_input_changed = this->module.ProcessChangedFlags(this->module.GetSensorInputs());
+  if (this->module.sensor_input)
+  {
+    this->module.sensor_input_changed = this->module.ProcessChangedFlags(*this->module.sensor_input);
+  }
   this->module.Sense();
 }
 

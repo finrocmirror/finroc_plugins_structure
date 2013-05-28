@@ -69,7 +69,7 @@ namespace structure
 
 tModuleBase::tModuleBase(tFrameworkElement *parent, const std::string &name)
   : tFrameworkElement(parent, name),
-    parameters(new tFrameworkElement(this, "Parameters")),
+    parameters(NULL),
     parameters_changed(),
     auto_name_port_count(0),
     count_for_type(NULL)
@@ -90,12 +90,36 @@ tModuleBase::~tModuleBase()
 
 void tModuleBase::CheckParameters()
 {
-  if (parameters_changed.parameters_changed)
+  if (parameters_changed.parameters_changed && parameters)
   {
     this->ProcessChangedFlags(*parameters);
     parameters_changed.parameters_changed = false;
     this->OnParameterChange();
   }
+}
+
+core::tFrameworkElement& tModuleBase::GetParameterParent()
+{
+  if (!parameters)
+  {
+    parameters = new tFrameworkElement(this, "Parameters");
+  }
+  return *parameters;
+}
+
+
+core::tPortGroup* tModuleBase::CreateInterface(const std::string& name, bool share_ports, tFlags extra_flags)
+{
+  if (IsReady())
+  {
+    std::string name_without_space = name;
+    if (name.find(' ') != std::string::npos)
+    {
+      name_without_space.erase(name.find(' '), 1);
+    }
+    FINROC_LOG_PRINT(WARNING, "Interface ", name, " created after module has been initialized. Data dependencies via this interface will not be considered for scheduling. Call Get", name_without_space, "s() in constructor or OnStaticParameterChange() to avoid this.");
+  }
+  return new core::tPortGroup(this, name, tFlag::INTERFACE | extra_flags, share_ports ? tFlags(tFlag::SHARED) : tFlags());
 }
 
 void tModuleBase::tParameterChangeDetector::OnPortChange(data_ports::tChangeContext& change_context)

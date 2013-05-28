@@ -69,10 +69,11 @@ namespace structure
 //----------------------------------------------------------------------
 tGroup::tGroup(tFrameworkElement *parent, const std::string &name, const std::string &structure_config_file, bool share_so_and_ci_ports, tFlags extra_flags)
   : tGroupBase(parent, name, structure_config_file, extra_flags),
-    controller_input(new core::tPortGroup(this, "Controller Input", tFlag::INTERFACE | tFlag::CONTROLLER_DATA, share_so_and_ci_ports ? tFlags(tFlag::SHARED) : tFlags())),
-    controller_output(new core::tPortGroup(this, "Controller Output", tFlag::INTERFACE | tFlag::CONTROLLER_DATA, tFlags())),
-    sensor_input(new core::tPortGroup(this, "Sensor Input", tFlag::INTERFACE | tFlag::SENSOR_DATA, tFlags())),
-    sensor_output(new core::tPortGroup(this, "Sensor Output", tFlag::INTERFACE | tFlag::SENSOR_DATA, share_so_and_ci_ports ? tFlags(tFlag::SHARED) : tFlags()))
+    controller_input(NULL),
+    controller_output(NULL),
+    sensor_input(NULL),
+    sensor_output(NULL),
+    share_so_and_ci_ports(share_so_and_ci_ports)
 {
 }
 

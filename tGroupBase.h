@@ -40,6 +40,7 @@
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
+#include "core/port/tPortGroup.h"
 #include "plugins/runtime_construction/tFinstructableGroup.h"
 
 //----------------------------------------------------------------------
@@ -131,6 +132,15 @@ public:
 protected:
 
   virtual ~tGroupBase();
+
+  /*!
+   * Creates interface for this group
+   *
+   * \param name Name of interface
+   * \param share_ports Should ports in this interfaces be shared? (so that they can be accessed from other runtime environments)
+   * \param extra_flags Any extra flags to assign to interface
+   */
+  core::tPortGroup* CreateInterface(const std::string& name, bool share_ports, tFlags extra_flags = tFlags());
 
 //----------------------------------------------------------------------
 // Private fields and methods

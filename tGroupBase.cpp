@@ -82,6 +82,16 @@ tGroupBase::tGroupBase(core::tFrameworkElement *parent, const std::string &name,
 tGroupBase::~tGroupBase()
 {}
 
+core::tPortGroup* tGroupBase::CreateInterface(const std::string& name, bool share_ports, tFlags extra_flags)
+{
+  core::tPortGroup* created_group = new core::tPortGroup(this, name, tFlag::INTERFACE | extra_flags, share_ports ? tFlags(tFlag::SHARED) : tFlags());
+  if (IsReady())
+  {
+    created_group->Init();
+  }
+  return created_group;
+}
+
 void* tGroupBase::operator new(size_t size)
 {
   void* result = ::operator new(size);

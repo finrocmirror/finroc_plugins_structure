@@ -76,10 +76,7 @@ namespace structure
 class tModuleBase : public core::tFrameworkElement
 {
   /*! GetContainer function for tParameter */
-  tFrameworkElement& GetParameterParent()
-  {
-    return *parameters;
-  }
+  tFrameworkElement& GetParameterParent();
 
   /*! GetContainer function for tStaticParameter */
   tFrameworkElement& GetThis()
@@ -186,6 +183,15 @@ protected:
    * Calls OnParameterChange() if a parameter change was detected and resets change flag
    */
   void CheckParameters();
+
+  /*!
+   * Creates interface for this module
+   *
+   * \param name Name of interface
+   * \param share_ports Should ports in this interfaces be shared? (so that they can be accessed from other runtime environments)
+   * \param extra_flags Any extra flags to assign to interface
+   */
+  core::tPortGroup* CreateInterface(const std::string& name, bool share_ports, tFlags extra_flags = tFlags());
 
   /*!
    * (Automatically called)
