@@ -151,7 +151,7 @@ core::tFrameworkElement* FindParent(void* ptr, bool abort_if_not_found)
   }
   if (abort_if_not_found)
   {
-    FINROC_LOG_PRINT(ERROR, "Could not find parent for port (or parameter). Please provide port name as first and parent as second constructor paremeter for all ports that are not plain module/group class members (e.g. pushed in a std::vector).");
+    FINROC_LOG_PRINT(ERROR, "Could not find parent for port (or parameter). Please provide port name as first and parent as second constructor parameter for all ports that are not plain module/group class members (e.g. pushed in a std::vector).");
     abort();
   }
   return NULL;
