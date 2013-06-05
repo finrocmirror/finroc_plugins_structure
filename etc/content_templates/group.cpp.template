@@ -45,7 +45,7 @@
 //----------------------------------------------------------------------
 // Const values
 //----------------------------------------------------------------------
-static runtime_construction::tStandardCreateModuleAction<g%%NAME%%> cCREATE_ACTION_FOR_G%%NAME_IN_UPPER_CASE%%("%%NAME%%");
+static runtime_construction::tStandardCreateModuleAction<g%%NAME%%> cCREATE_ACTION_FOR_G_%%NAME_IN_UPPER_CASE%%("%%NAME%%");
 
 //----------------------------------------------------------------------
 // Implementation
