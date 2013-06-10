@@ -97,7 +97,7 @@ public:
   {
     if (!controller_input)
     {
-      controller_input = CreateInterface("Controller Input", share_so_and_ci_ports, tFlag::CONTROLLER_DATA);
+      controller_input = CreateInterface("Controller Input", share_so_and_ci_ports, tFlag::CONTROLLER_DATA, tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA);
     }
     return *controller_input;
   }
@@ -109,7 +109,7 @@ public:
   {
     if (!controller_output)
     {
-      controller_output = CreateInterface("Controller Output", false, tFlag::CONTROLLER_DATA);
+      controller_output = CreateInterface("Controller Output", false, tFlag::CONTROLLER_DATA, tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA | tFlag::OUTPUT_PORT);
     }
     return *controller_output;
   }
@@ -121,7 +121,7 @@ public:
   {
     if (!sensor_input)
     {
-      sensor_input = CreateInterface("Sensor Input", false, tFlag::SENSOR_DATA);
+      sensor_input = CreateInterface("Sensor Input", false, tFlag::SENSOR_DATA, tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA);
     }
     return *sensor_input;
   }
@@ -133,7 +133,7 @@ public:
   {
     if (!sensor_output)
     {
-      sensor_output = CreateInterface("Sensor Output", share_so_and_ci_ports, tFlag::SENSOR_DATA);
+      sensor_output = CreateInterface("Sensor Output", share_so_and_ci_ports, tFlag::SENSOR_DATA, tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA | tFlag::OUTPUT_PORT);
     }
     return *sensor_output;
   }
