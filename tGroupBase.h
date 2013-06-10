@@ -139,8 +139,9 @@ protected:
    * \param name Name of interface
    * \param share_ports Should ports in this interfaces be shared? (so that they can be accessed from other runtime environments)
    * \param extra_flags Any extra flags to assign to interface
+   * \param extra_flags Any extra flags to assign to all ports
    */
-  core::tPortGroup* CreateInterface(const std::string& name, bool share_ports, tFlags extra_flags = tFlags());
+  core::tPortGroup* CreateInterface(const std::string& name, bool share_ports, tFlags extra_interface_flags = tFlags(), tFlags default_port_flags = tFlags());
 
 //----------------------------------------------------------------------
 // Private fields and methods
