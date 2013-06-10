@@ -4,7 +4,6 @@
   <finrocplugin name="structure">
     <sources>
       internal/**
-      main_utilities.cpp
       tConveniencePort.h
       tGroup.cpp
       tGroupBase.cpp
@@ -15,7 +14,13 @@
     </sources>
   </finrocplugin>
   
-  <finrocplugin name="main_wrapper">
+  <finrocplugin name="structure_main_utilities">
+    <sources>
+      main_utilities.cpp
+    </sources>
+  </finrocplugin>
+
+  <finrocplugin name="structure_main_wrapper">
     <sources>
       default_main_wrapper.cpp
     </sources>
