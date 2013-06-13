@@ -95,11 +95,7 @@ public:
    */
   inline core::tPortGroup& GetControllerInputs()
   {
-    if (!controller_input)
-    {
-      controller_input = CreateInterface("Controller Input", share_so_and_ci_ports, tFlag::CONTROLLER_DATA, tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA);
-    }
-    return *controller_input;
+    return GetInterface(eINTERFACE_CONTROLLER_INPUT);
   }
 
   /*!
@@ -107,11 +103,7 @@ public:
    */
   inline core::tPortGroup& GetControllerOutputs()
   {
-    if (!controller_output)
-    {
-      controller_output = CreateInterface("Controller Output", false, tFlag::CONTROLLER_DATA, tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA | tFlag::OUTPUT_PORT);
-    }
-    return *controller_output;
+    return GetInterface(eINTERFACE_CONTROLLER_OUTPUT);
   }
 
   /*!
@@ -119,11 +111,7 @@ public:
    */
   inline core::tPortGroup& GetSensorInputs()
   {
-    if (!sensor_input)
-    {
-      sensor_input = CreateInterface("Sensor Input", false, tFlag::SENSOR_DATA, tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA);
-    }
-    return *sensor_input;
+    return GetInterface(eINTERFACE_SENSOR_INPUT);
   }
 
   /*!
@@ -131,11 +119,7 @@ public:
    */
   inline core::tPortGroup& GetSensorOutputs()
   {
-    if (!sensor_output)
-    {
-      sensor_output = CreateInterface("Sensor Output", share_so_and_ci_ports, tFlag::SENSOR_DATA, tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA | tFlag::OUTPUT_PORT);
-    }
-    return *sensor_output;
+    return GetInterface(eINTERFACE_SENSOR_OUTPUT);
   }
 
 
@@ -208,14 +192,27 @@ public:
 //----------------------------------------------------------------------
 private:
 
-  /*! Group's interfaces */
-  finroc::core::tPortGroup* controller_input;
-  finroc::core::tPortGroup* controller_output;
-  finroc::core::tPortGroup* sensor_input;
-  finroc::core::tPortGroup* sensor_output;
+  /*! Enum for more elegant internal handling of the group's interfaces */
+  enum tInterfaceEnumeration
+  {
+    eINTERFACE_SENSOR_INPUT,
+    eINTERFACE_SENSOR_OUTPUT,
+    eINTERFACE_CONTROLLER_INPUT,
+    eINTERFACE_CONTROLLER_OUTPUT,
+    eINTERFACE_DIMENSION
+  };
 
-  /*! Share sensor output and controller input ports so that they can be accessed from other runtime environments? */
-  bool share_so_and_ci_ports;
+  /*!
+   * Pointers to group's interfaces
+   * Initially, no interface exists and all pointers are NULL.
+   */
+  std::array<finroc::core::tPortGroup*, eINTERFACE_DIMENSION> interface_array;
+
+  /*!
+   * \param desired_interface Interface to obtain.
+   * \return Interface. Will be created if it does not exist yet.
+   */
+  core::tPortGroup& GetInterface(tInterfaceEnumeration desired_interface);
 };
 
 //----------------------------------------------------------------------
