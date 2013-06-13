@@ -149,9 +149,21 @@ public:
     }
   };
 
-  // operator new is overloaded for auto-port naming feature
-  void* operator new(size_t size);
-  void* operator new[](size_t size); // not allowed => exception
+  /*!
+   * Checks the module's static parameters for changes
+   * and calls OnStaticParameterChange() if any static parameters changed.
+   *
+   * (Not thread-safe: Should not be called in parallel to an active thread already executing the module.)
+   */
+  void CheckStaticParameters();
+
+  /*!
+   * \return Config file for module
+   */
+  parameters::tConfigFile* GetConfigFile() const
+  {
+    return parameters::tConfigFile::Find(*this);
+  }
 
   /*!
    * \param node Common parent config file node for all child parameter config entries (starting with '/' => absolute link - otherwise relative).
@@ -161,13 +173,9 @@ public:
     parameters::tConfigNode::SetConfigNode(*this, node);
   }
 
-  /*!
-   * \return Config file for module
-   */
-  parameters::tConfigFile* GetConfigFile() const
-  {
-    return parameters::tConfigFile::Find(*this);
-  }
+  // operator new is overloaded for auto-port naming feature
+  void* operator new(size_t size);
+  void* operator new[](size_t size); // not allowed => exception
 
 //----------------------------------------------------------------------
 // Protected methods

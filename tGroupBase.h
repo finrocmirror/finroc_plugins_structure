@@ -122,6 +122,14 @@ public:
     {}
   };
 
+  /*!
+   * Checks the module's static parameters for changes
+   * and calls OnStaticParameterChange() if any static parameters changed.
+   *
+   * (Not thread-safe: Should not be called in parallel to an active thread already executing the module.)
+   */
+  void CheckStaticParameters();
+
   // operator new is overloaded for auto-port naming feature
   void* operator new(size_t size);
   void* operator new[](size_t size); // not allowed

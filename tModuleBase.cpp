@@ -98,6 +98,11 @@ void tModuleBase::CheckParameters()
   }
 }
 
+void tModuleBase::CheckStaticParameters()
+{
+  parameters::internal::tStaticParameterList::DoStaticParameterEvaluation(*this);
+}
+
 core::tFrameworkElement& tModuleBase::GetParameterParent()
 {
   if (!parameters)

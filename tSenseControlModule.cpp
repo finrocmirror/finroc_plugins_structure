@@ -90,6 +90,7 @@ tSenseControlModule::~tSenseControlModule()
 
 void tSenseControlModule::PostChildInit()
 {
+  CheckStaticParameters(); // evaluate static parameters before we create the tasks
   tFrameworkElement* controller_task_parent = controller_input ? controller_input : (controller_output ? controller_output : NULL);
   if (controller_task_parent)
   {

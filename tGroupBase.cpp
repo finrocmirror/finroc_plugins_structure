@@ -92,6 +92,11 @@ core::tPortGroup* tGroupBase::CreateInterface(const std::string& name, bool shar
   return created_group;
 }
 
+void tGroupBase::CheckStaticParameters()
+{
+  parameters::internal::tStaticParameterList::DoStaticParameterEvaluation(*this);
+}
+
 void* tGroupBase::operator new(size_t size)
 {
   void* result = ::operator new(size);

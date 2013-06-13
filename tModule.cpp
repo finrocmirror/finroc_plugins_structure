@@ -86,6 +86,7 @@ tModule::~tModule()
 
 void tModule::PostChildInit()
 {
+  CheckStaticParameters(); // evaluate static parameters before we create the task
   this->AddAnnotation(*new scheduling::tPeriodicFrameworkElementTask(this->input, this->output, this->update_task));
 }
 
