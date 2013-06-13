@@ -97,6 +97,18 @@ core::tPortGroup& tGroup::GetInterface(tInterfaceEnumeration desired_interface)
   return *interface_array[desired_interface];
 }
 
+core::tPortGroup& tGroup::GetInterface(const std::string& interface_name)
+{
+  for (size_t i = 0; i < cSTATIC_INTERFACE_INFO_GROUP.size(); i++)
+  {
+    if (interface_name.compare(cSTATIC_INTERFACE_INFO_GROUP[i].name) == 0)
+    {
+      return GetInterface(static_cast<tInterfaceEnumeration>(i));
+    }
+  }
+  throw std::runtime_error("No interface with name '" + interface_name + "' is meant to be added to a group.");
+}
+
 //----------------------------------------------------------------------
 // End of namespace declaration
 //----------------------------------------------------------------------

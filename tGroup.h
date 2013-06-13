@@ -122,6 +122,14 @@ public:
     return GetInterface(eINTERFACE_SENSOR_OUTPUT);
   }
 
+  /*!
+   * Get interface (or "port group") by name
+   *
+   * \param Interface name
+   * \return Interface with specified name (e.g. "Sensor Output")
+   * \throw std::runtime_error if no interface with this name can be obtained
+   */
+  core::tPortGroup& GetInterface(const std::string& interface_name);
 
   /**
    * Port classes to use in group.
