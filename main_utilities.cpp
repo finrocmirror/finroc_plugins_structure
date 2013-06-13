@@ -36,6 +36,8 @@
 //----------------------------------------------------------------------
 #include <cstdlib>
 #include <csignal>
+#include <mutex>
+#include <condition_variable>
 
 extern "C"
 {
