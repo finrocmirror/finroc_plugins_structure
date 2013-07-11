@@ -68,6 +68,7 @@ namespace structure
 
 tGroupBase::tGroupBase(core::tFrameworkElement *parent, const std::string &name, const std::string &structure_config_file, tFlags extra_flags) :
   tFinstructableGroup(parent, name, structure_config_file, extra_flags),
+  parameters(NULL),
   auto_name_port_count(0),
   count_for_type(NULL)
 {
@@ -96,6 +97,16 @@ void tGroupBase::CheckStaticParameters()
 {
   parameters::internal::tStaticParameterList::DoStaticParameterEvaluation(*this);
 }
+
+core::tFrameworkElement& tGroupBase::GetParameterParent()
+{
+  if (!parameters)
+  {
+    parameters = new tFrameworkElement(this, "Parameters");
+  }
+  return *parameters;
+}
+
 
 void* tGroupBase::operator new(size_t size)
 {

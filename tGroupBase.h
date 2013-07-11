@@ -41,6 +41,7 @@
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
 #include "core/port/tPortGroup.h"
+#include "plugins/parameters/tParameter.h"
 #include "plugins/runtime_construction/tFinstructableGroup.h"
 
 //----------------------------------------------------------------------
@@ -70,6 +71,9 @@ namespace structure
  */
 class tGroupBase : public runtime_construction::tFinstructableGroup
 {
+  /*! GetContainer function for tParameter */
+  tFrameworkElement& GetParameterParent();
+
   /*! GetContainer function for tStaticParameter */
   tFrameworkElement& GetThis()
   {
@@ -112,6 +116,27 @@ public:
    * A String not provided as first argument is interpreted as default value.
    * Any further string is interpreted as config entry.
    */
+  template <typename T>
+  class tParameter : public tConveniencePort<parameters::tParameter<T>, tGroupBase, tFrameworkElement, &tGroupBase::GetParameterParent>
+  {
+  public:
+    template<typename ... ARGS>
+    explicit tParameter(const ARGS&... args)
+      : tConveniencePort<parameters::tParameter<T>, tGroupBase, tFrameworkElement, &tGroupBase::GetParameterParent>(args..., core::tFrameworkElement::tFlag::EMITS_DATA)
+    {
+      assert(this->GetWrapped()->GetParent()->NameEquals("Parameters"));
+    }
+
+    /*!
+     * Attach this parameter to another one.
+     * If this parameter is changed, the change is also propagated to the attached parameter.
+     */
+    void AttachTo(parameters::tParameter<T>& other)
+    {
+      this->GetWrapped()->ConnectTo(*other.GetWrapped());
+    }
+  };
+
   template <typename T>
   class tStaticParameter : public tConveniencePort<parameters::tStaticParameter<T>, tGroupBase, core::tFrameworkElement, &tGroupBase::GetThis>
   {
@@ -158,6 +183,9 @@ private:
 
   template <typename TPort, typename TElement, typename TContainer, TContainer& (TElement::*GET_CONTAINER)()>
   friend class tConveniencePort;
+
+  /*! Element aggregating parameters */
+  core::tFrameworkElement* parameters;
 
   /*! Number of ports already created that have auto-generated names */
   int auto_name_port_count;
