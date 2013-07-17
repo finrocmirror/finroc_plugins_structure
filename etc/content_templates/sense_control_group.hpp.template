@@ -12,18 +12,8 @@
  *
  * \date    %%DATE%%
  *
- * \brief Contains g%%NAME%%
- *
- * \b g%%NAME%%
- *
- * %%DESCRIPTION%%
- *
  */
 //----------------------------------------------------------------------
-#ifndef %%SENTINEL%%
-#define %%SENTINEL%%
-
-#include "plugins/structure/tGroup.h"
 
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
@@ -31,6 +21,15 @@
 
 //----------------------------------------------------------------------
 // Internal includes with ""
+//----------------------------------------------------------------------
+
+//----------------------------------------------------------------------
+// Debugging
+//----------------------------------------------------------------------
+#include <cassert>
+
+//----------------------------------------------------------------------
+// Namespace usage
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
@@ -43,48 +42,30 @@
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
-// Class declaration
+// Const values
 //----------------------------------------------------------------------
-//! %%SHORT_DESCRIPTION%%
-/*!
- * %%DESCRIPTION%%
- */
-class g%%NAME%% : public structure::tGroup
-{
 
 //----------------------------------------------------------------------
-// Ports (These are the only variables that may be declared public)
+// Implementation
 //----------------------------------------------------------------------
-public:
-
-  tInput<double> signal_1;
 
 //----------------------------------------------------------------------
-// Public methods and typedefs
+// g%%NAME%% constructor
 //----------------------------------------------------------------------
-public:
-
-  g%%NAME%%(core::tFrameworkElement *parent, const std::string &name = "%%NAME%%",
-    %%INDENT_ONE_NAME%%const std::string &structure_config_file = __FILE__".xml");
+template <>
+g%%NAME%%<>::g%%NAME%%(core::tFrameworkElement *parent, const std::string &name,
+       %%INDENT_TWO_NAMES%%const std::string &structure_config_file) :
+  tGroup(parent, name, structure_config_file)
+{}
 
 //----------------------------------------------------------------------
-// Private fields and methods
+// g%%NAME%% destructor
 //----------------------------------------------------------------------
-private:
-
-  /*! Destructor
-   *
-   * The destructor of modules is declared private to avoid accidental deletion. Deleting
-   * modules is already handled by the framework.
-   */
-  ~g%%NAME%%();
-
-};
+template <>
+g%%NAME%%<>::~g%%NAME%%()
+{}
 
 //----------------------------------------------------------------------
 // End of namespace declaration
 //----------------------------------------------------------------------
 %%CLOSE_NAMESPACE%%
-%%INCLUDE_HPP%%
-
-#endif

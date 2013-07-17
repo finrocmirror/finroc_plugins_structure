@@ -45,7 +45,7 @@
 //----------------------------------------------------------------------
 // Internal includes with ""
 //----------------------------------------------------------------------
-#include "plugins/structure/tGroup.h"
+#include "plugins/structure/tSenseControlGroup.h"
 
 //----------------------------------------------------------------------
 // Namespace declaration
@@ -67,14 +67,14 @@ namespace structure
  * Group containing thread that executes periodic tasks of all children.
  * Execution is performed in the order of the graph.
  */
-typedef scheduling::tThreadContainerElement<tGroup> tThreadContainer;
+typedef scheduling::tThreadContainerElement<tSenseControlGroup> tThreadContainer;
 
 //----------------------------------------------------------------------
 // End of namespace declaration
 //----------------------------------------------------------------------
 }
 
-extern template class scheduling::tThreadContainerElement<structure::tGroup>;
+extern template class scheduling::tThreadContainerElement<structure::tSenseControlGroup>;
 
 }
 

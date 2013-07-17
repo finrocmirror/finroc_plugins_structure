@@ -73,6 +73,6 @@ static runtime_construction::tStandardCreateModuleAction<tThreadContainer> cCREA
 //----------------------------------------------------------------------
 }
 
-template class scheduling::tThreadContainerElement<structure::tGroup>;
+template class scheduling::tThreadContainerElement<structure::tSenseControlGroup>;
 
 }

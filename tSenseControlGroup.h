@@ -19,7 +19,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //----------------------------------------------------------------------
-/*!\file    plugins/structure/tGroup.h
+/*!\file    plugins/structure/tSenseControlGroup.h
  *
  * \author  Tobias Foehst
  * \author  Bernd-Helge Schaefer
@@ -27,17 +27,18 @@
  *
  * \date    2012-12-02
  *
- * \brief   Contains tGroup
+ * \brief   Contains tSenseControlGroup
  *
- * \b tGroup
+ * \b tSenseControlGroup
  *
- * Plain group with an input and an output port interface.
+ * Group with sensor input, sensor output, controller input and controller
+ * output interfaces.
  * Used to structure finroc applications.
  * Its contents can be edited and saved using finstruct.
  */
 //----------------------------------------------------------------------
-#ifndef __plugins__structure__tGroup_h__
-#define __plugins__structure__tGroup_h__
+#ifndef __plugins__structure__tSenseControlGroup_h__
+#define __plugins__structure__tSenseControlGroup_h__
 
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
@@ -64,35 +65,72 @@ namespace structure
 //----------------------------------------------------------------------
 // Class declaration
 //----------------------------------------------------------------------
-//! Plain Group in default Finroc API
+//! Group in default Finroc API
 /*!
- * Plain group with an input and an output port interface.
+ * Group with sensor input, sensor output, controller input and controller
+ * output interfaces.
  * Used to structure finroc applications.
  * Its contents can be edited and saved using finstruct.
  */
-class tGroup : public tGroupBase
+class tSenseControlGroup : public tGroupBase
 {
 
 //----------------------------------------------------------------------
-// Ports (These are the only variables that may be declared public)
+// Public methods and typedefs
 //----------------------------------------------------------------------
 public:
 
   /*!
-   * \return Parent port group of all inputs
+   * \param parent Parent
+   * \param name Name of module
+   * \param structure_config_file XML
+   * \param share_so_and_ci_ports Share sensor output and controller input ports so that they can be accessed from other runtime environments?
+   * \param extra_flags Any extra flags for group
    */
-  inline core::tPortGroup& GetInputs()
+  tSenseControlGroup(core::tFrameworkElement *parent, const std::string &name,
+                     const std::string &structure_config_file = "",
+                     bool share_so_and_ci_ports = false, tFlags extra_flags = tFlags());
+
+  /*!
+   * \return Parent port group of all controller inputs
+   */
+  inline core::tPortGroup& GetControllerInputs()
   {
-    return GetInterface(eINTERFACE_INPUT);
+    return GetInterface(eINTERFACE_CONTROLLER_INPUT);
   }
 
   /*!
-   * \return Parent port group of all outputs
+   * \return Parent port group of all controller outputs
    */
-  inline core::tPortGroup& GetOutputs()
+  inline core::tPortGroup& GetControllerOutputs()
   {
-    return GetInterface(eINTERFACE_OUTPUT);
+    return GetInterface(eINTERFACE_CONTROLLER_OUTPUT);
   }
+
+  /*!
+   * \return Parent port group of all sensor inputs
+   */
+  inline core::tPortGroup& GetSensorInputs()
+  {
+    return GetInterface(eINTERFACE_SENSOR_INPUT);
+  }
+
+  /*!
+   * \return Parent port group of all sensor outputs
+   */
+  inline core::tPortGroup& GetSensorOutputs()
+  {
+    return GetInterface(eINTERFACE_SENSOR_OUTPUT);
+  }
+
+  /*!
+   * Get interface (or "port group") by name
+   *
+   * \param Interface name
+   * \return Interface with specified name (e.g. "Sensor Output")
+   * \throw std::runtime_error if no interface with this name can be obtained
+   */
+  core::tPortGroup& GetInterface(const std::string& interface_name);
 
   /**
    * Port classes to use in group.
@@ -119,42 +157,44 @@ public:
    * Any further string is interpreted as config entry.
    */
   template <typename T>
-  class tInput : public tConveniencePort<data_ports::tProxyPort<T, false>, tGroup, core::tPortGroup, &tGroup::GetInputs>
+  class tControllerInput : public tConveniencePort<data_ports::tProxyPort<T, false>, tSenseControlGroup, core::tPortGroup, &tSenseControlGroup::GetControllerInputs>
   {
   public:
     template<typename ... ARGS>
-    explicit tInput(const ARGS&... args)
-      : tConveniencePort<data_ports::tProxyPort<T, false>, tGroup, core::tPortGroup, &tGroup::GetInputs>(args...)
+    explicit tControllerInput(const ARGS&... args)
+      : tConveniencePort<data_ports::tProxyPort<T, false>, tSenseControlGroup, core::tPortGroup, &tSenseControlGroup::GetControllerInputs>(args...)
     {}
   };
 
   template <typename T>
-  class tOutput : public tConveniencePort<data_ports::tProxyPort<T, true>, tGroup, core::tPortGroup, &tGroup::GetOutputs>
+  class tControllerOutput : public tConveniencePort<data_ports::tProxyPort<T, true>, tSenseControlGroup, core::tPortGroup, &tSenseControlGroup::GetControllerOutputs>
   {
   public:
     template<typename ... ARGS>
-    explicit tOutput(const ARGS&... args)
-      : tConveniencePort<data_ports::tProxyPort<T, true>, tGroup, core::tPortGroup, &tGroup::GetOutputs>(args...)
+    explicit tControllerOutput(const ARGS&... args)
+      : tConveniencePort<data_ports::tProxyPort<T, true>, tSenseControlGroup, core::tPortGroup, &tSenseControlGroup::GetControllerOutputs>(args...)
     {}
   };
 
-//----------------------------------------------------------------------
-// Public methods and typedefs
-//----------------------------------------------------------------------
-public:
+  template <typename T>
+  class tSensorInput : public tConveniencePort<data_ports::tProxyPort<T, false>, tSenseControlGroup, core::tPortGroup, &tSenseControlGroup::GetSensorInputs>
+  {
+  public:
+    template<typename ... ARGS>
+    explicit tSensorInput(const ARGS&... args)
+      : tConveniencePort<data_ports::tProxyPort<T, false>, tSenseControlGroup, core::tPortGroup, &tSenseControlGroup::GetSensorInputs>(args...)
+    {}
+  };
 
-  tGroup(core::tFrameworkElement *parent, const std::string &name,
-         const std::string &structure_config_file = "",
-         bool share_output_ports = false, bool share_input_ports = false, tFlags extra_flags = tFlags());
-
-  /*!
-   * Get interface (or "port group") by name
-   *
-   * \param Interface name
-   * \return Interface with specified name (e.g. "Output")
-   * \throw std::runtime_error if no interface with this name can be obtained
-   */
-  core::tPortGroup& GetInterface(const std::string& interface_name);
+  template <typename T>
+  class tSensorOutput : public tConveniencePort<data_ports::tProxyPort<T, true>, tSenseControlGroup, core::tPortGroup, &tSenseControlGroup::GetSensorOutputs>
+  {
+  public:
+    template<typename ... ARGS>
+    explicit tSensorOutput(const ARGS&... args)
+      : tConveniencePort<data_ports::tProxyPort<T, true>, tSenseControlGroup, core::tPortGroup, &tSenseControlGroup::GetSensorOutputs>(args...)
+    {}
+  };
 
 //----------------------------------------------------------------------
 // Private fields and methods
@@ -164,8 +204,10 @@ private:
   /*! Enum for more elegant internal handling of the group's interfaces */
   enum tInterfaceEnumeration
   {
-    eINTERFACE_INPUT,
-    eINTERFACE_OUTPUT,
+    eINTERFACE_SENSOR_INPUT,
+    eINTERFACE_SENSOR_OUTPUT,
+    eINTERFACE_CONTROLLER_INPUT,
+    eINTERFACE_CONTROLLER_OUTPUT,
     eINTERFACE_DIMENSION
   };
 

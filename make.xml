@@ -9,11 +9,12 @@
       tGroupBase.cpp
       tModule.cpp
       tModuleBase.cpp
+      tSenseControlGroup.cpp
       tSenseControlModule.cpp
       tThreadContainer.cpp
     </sources>
   </finrocplugin>
-  
+
   <finrocplugin name="structure_main_utilities">
     <sources>
       main_utilities.cpp

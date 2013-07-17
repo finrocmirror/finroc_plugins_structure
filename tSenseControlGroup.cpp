@@ -19,7 +19,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //----------------------------------------------------------------------
-/*!\file    plugins/structure/tGroup.cpp
+/*!\file    plugins/structure/tSenseControlGroup.cpp
  *
  * \author  Tobias Foehst
  * \author  Bernd-Helge Schaefer
@@ -29,7 +29,7 @@
  *
  */
 //----------------------------------------------------------------------
-#include "plugins/structure/tGroup.h"
+#include "plugins/structure/tSenseControlGroup.h"
 
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
@@ -68,25 +68,27 @@ namespace structure
 typedef runtime_construction::tEditableInterfaces::tStaticInterfaceInfo tStaticInterfaceInfo;
 typedef core::tFrameworkElement::tFlag tFlag;
 
-const std::vector<tStaticInterfaceInfo>& cSTATIC_INTERFACE_INFO_GROUP =
+const std::vector<tStaticInterfaceInfo>& cSTATIC_INTERFACE_INFO_SENSE_CONTROL_GROUP =
 {
-  tStaticInterfaceInfo { "Input", tFlag::INTERFACE, tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA, false },
-  tStaticInterfaceInfo { "Output", tFlag::INTERFACE, tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA | tFlag::OUTPUT_PORT, false },
+  tStaticInterfaceInfo { "Sensor Input", tFlag::SENSOR_DATA, tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA, false },
+  tStaticInterfaceInfo { "Sensor Output", tFlag::SENSOR_DATA, tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA | tFlag::OUTPUT_PORT, false },
+  tStaticInterfaceInfo { "Controller Input", tFlag::CONTROLLER_DATA, tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA, false },
+  tStaticInterfaceInfo { "Controller Output", tFlag::CONTROLLER_DATA, tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA | tFlag::OUTPUT_PORT, false }
 };
 
 //----------------------------------------------------------------------
 // Implementation
 //----------------------------------------------------------------------
-tGroup::tGroup(tFrameworkElement *parent, const std::string &name,
-               const std::string &structure_config_file,
-               bool share_output_ports, bool share_input_ports, tFlags extra_flags) :
+tSenseControlGroup::tSenseControlGroup(tFrameworkElement *parent, const std::string &name,
+                                       const std::string &structure_config_file,
+                                       bool share_so_and_ci_ports, tFlags extra_flags) :
   tGroupBase(parent, name, structure_config_file, extra_flags)
 {
   interface_array.fill(NULL);
-  this->EmplaceAnnotation<runtime_construction::tEditableInterfaces>(cSTATIC_INTERFACE_INFO_GROUP, interface_array.begin(), share_input_ports | (share_output_ports << 1));
+  this->EmplaceAnnotation<runtime_construction::tEditableInterfaces>(cSTATIC_INTERFACE_INFO_SENSE_CONTROL_GROUP, interface_array.begin(), share_so_and_ci_ports ? 6 : 0); // 6 => bits 2 and 3 are set (Sensor Output and Controller Input)
 }
 
-core::tPortGroup& tGroup::GetInterface(tInterfaceEnumeration desired_interface)
+core::tPortGroup& tSenseControlGroup::GetInterface(tInterfaceEnumeration desired_interface)
 {
   if (!interface_array[desired_interface])
   {
@@ -96,11 +98,11 @@ core::tPortGroup& tGroup::GetInterface(tInterfaceEnumeration desired_interface)
   return *interface_array[desired_interface];
 }
 
-core::tPortGroup& tGroup::GetInterface(const std::string& interface_name)
+core::tPortGroup& tSenseControlGroup::GetInterface(const std::string& interface_name)
 {
-  for (size_t i = 0; i < cSTATIC_INTERFACE_INFO_GROUP.size(); i++)
+  for (size_t i = 0; i < cSTATIC_INTERFACE_INFO_SENSE_CONTROL_GROUP.size(); i++)
   {
-    if (interface_name.compare(cSTATIC_INTERFACE_INFO_GROUP[i].name) == 0)
+    if (interface_name.compare(cSTATIC_INTERFACE_INFO_SENSE_CONTROL_GROUP[i].name) == 0)
     {
       return GetInterface(static_cast<tInterfaceEnumeration>(i));
     }

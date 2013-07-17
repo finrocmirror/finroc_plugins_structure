@@ -23,7 +23,7 @@
 #ifndef %%SENTINEL%%
 #define %%SENTINEL%%
 
-#include "plugins/structure/tGroup.h"
+#include "plugins/structure/tSenseControlGroup.h"
 
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
@@ -49,7 +49,7 @@
 /*!
  * %%DESCRIPTION%%
  */
-class g%%NAME%% : public structure::tGroup
+class g%%NAME%% : public structure::tSenseControlGroup
 {
 
 //----------------------------------------------------------------------
@@ -57,7 +57,7 @@ class g%%NAME%% : public structure::tGroup
 //----------------------------------------------------------------------
 public:
 
-  tInput<double> signal_1;
+  tControllerInput<double> ci_signal_1;
 
 //----------------------------------------------------------------------
 // Public methods and typedefs
