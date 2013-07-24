@@ -18,7 +18,7 @@
       <file name="Implementation File (cpp)" extension="cpp" template="sense_control_module.cpp.template" optional="true" preselected="true"/>
       <file name="Implementation File (hpp)" extension="hpp" template="sense_control_module.hpp.template" optional="true"/>
     </type>
-    <type name="SenseControlGroup" description="Finroc Sense &amp; Control Group" format="UpperCamelCase" filename="qq(m$name)">
+    <type name="SenseControlGroup" description="Finroc Sense &amp; Control Group" format="UpperCamelCase" filename="qq(g$name)">
       <file name="Header File" extension="h" template="sense_control_group.h.template"/>
       <file name="Implementation File (cpp)" extension="cpp" template="sense_control_group.cpp.template" optional="true" preselected="true"/>
       <file name="Implementation File (hpp)" extension="hpp" template="sense_control_group.hpp.template" optional="true"/>
@@ -43,7 +43,7 @@
       <file name="Implementation File (cpp)" extension="cpp" template="sense_control_module.cpp.template" optional="true" preselected="true"/>
       <file name="Implementation File (hpp)" extension="hpp" template="sense_control_module.hpp.template" optional="true"/>
     </type>
-    <type name="SenseControlGroup" description="Finroc Sense &amp; Control Group" format="UpperCamelCase" filename="qq(m$name)">
+    <type name="SenseControlGroup" description="Finroc Sense &amp; Control Group" format="UpperCamelCase" filename="qq(g$name)">
       <file name="Header File" extension="h" template="sense_control_group.h.template"/>
       <file name="Implementation File (cpp)" extension="cpp" template="sense_control_group.cpp.template" optional="true" preselected="true"/>
       <file name="Implementation File (hpp)" extension="hpp" template="sense_control_group.hpp.template" optional="true"/>
@@ -68,7 +68,7 @@
       <file name="Implementation File (cpp)" extension="cpp" template="sense_control_module.cpp.template" optional="true" preselected="true"/>
       <file name="Implementation File (hpp)" extension="hpp" template="sense_control_module.hpp.template" optional="true"/>
     </type>
-    <type name="SenseControlGroup" description="Finroc Sense &amp; Control Group" format="UpperCamelCase" filename="qq(m$name)">
+    <type name="SenseControlGroup" description="Finroc Sense &amp; Control Group" format="UpperCamelCase" filename="qq(g$name)">
       <file name="Header File" extension="h" template="sense_control_group.h.template"/>
       <file name="Implementation File (cpp)" extension="cpp" template="sense_control_group.cpp.template" optional="true" preselected="true"/>
       <file name="Implementation File (hpp)" extension="hpp" template="sense_control_group.hpp.template" optional="true"/>
@@ -93,7 +93,7 @@
       <file name="Implementation File (cpp)" extension="cpp" template="sense_control_module.cpp.template" optional="true" preselected="true"/>
       <file name="Implementation File (hpp)" extension="hpp" template="sense_control_module.hpp.template" optional="true"/>
     </type>
-    <type name="SenseControlGroup" description="Finroc Sense &amp; Control Group" format="UpperCamelCase" filename="qq(m$name)">
+    <type name="SenseControlGroup" description="Finroc Sense &amp; Control Group" format="UpperCamelCase" filename="qq(g$name)">
       <file name="Header File" extension="h" template="sense_control_group.h.template"/>
       <file name="Implementation File (cpp)" extension="cpp" template="sense_control_group.cpp.template" optional="true" preselected="true"/>
       <file name="Implementation File (hpp)" extension="hpp" template="sense_control_group.hpp.template" optional="true"/>
