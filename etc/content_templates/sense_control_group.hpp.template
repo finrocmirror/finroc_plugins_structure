@@ -55,7 +55,7 @@
 template <>
 g%%NAME%%<>::g%%NAME%%(core::tFrameworkElement *parent, const std::string &name,
        %%INDENT_TWO_NAMES%%const std::string &structure_config_file) :
-  tGroup(parent, name, structure_config_file)
+  tSenseControlGroup(parent, name, structure_config_file)
 {}
 
 //----------------------------------------------------------------------
