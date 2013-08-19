@@ -65,6 +65,8 @@ namespace structure
 // Const values
 //----------------------------------------------------------------------
 
+static runtime_construction::tStandardCreateModuleAction<tSenseControlGroup> cCREATE_ACTION_FOR_SENSE_CONTROL_GROUP("SenseControlGroup");
+
 typedef runtime_construction::tEditableInterfaces::tStaticInterfaceInfo tStaticInterfaceInfo;
 typedef core::tFrameworkElement::tFlag tFlag;
 

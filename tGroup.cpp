@@ -65,6 +65,8 @@ namespace structure
 // Const values
 //----------------------------------------------------------------------
 
+static runtime_construction::tStandardCreateModuleAction<tGroup> cCREATE_ACTION_FOR_GROUP("Group");
+
 typedef runtime_construction::tEditableInterfaces::tStaticInterfaceInfo tStaticInterfaceInfo;
 typedef core::tFrameworkElement::tFlag tFlag;
 
