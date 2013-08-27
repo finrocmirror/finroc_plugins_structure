@@ -54,7 +54,7 @@
 //----------------------------------------------------------------------
 template <>
 m%%NAME%%<>::m%%NAME%%(core::tFrameworkElement *parent, const std::string &name) :
-  tModule(parent, name, false, false), // change to 'true' to make module's ports shared (so that ports in other processes can connect to its input and/or output ports)
+  tModule(parent, name, false, false), // change to 'true' to make module's ports shared (so that ports in other processes can connect to its output and/or input ports)
   If you have some member variables, please initialize them here. Especially built-in types (like pointers!). Delete this line otherwise!
 {}
 
