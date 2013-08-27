@@ -72,10 +72,10 @@ typedef core::tFrameworkElement::tFlag tFlag;
 
 const std::vector<tStaticInterfaceInfo>& cSTATIC_INTERFACE_INFO_SENSE_CONTROL_GROUP =
 {
-  tStaticInterfaceInfo { "Sensor Input", tFlag::SENSOR_DATA, tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA, false },
-  tStaticInterfaceInfo { "Sensor Output", tFlag::SENSOR_DATA, tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA | tFlag::OUTPUT_PORT, false },
-  tStaticInterfaceInfo { "Controller Input", tFlag::CONTROLLER_DATA, tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA, false },
-  tStaticInterfaceInfo { "Controller Output", tFlag::CONTROLLER_DATA, tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA | tFlag::OUTPUT_PORT, false }
+  tStaticInterfaceInfo { "Sensor Input", tFlag::SENSOR_DATA, tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA | tFlag::PUSH_STRATEGY, false },
+  tStaticInterfaceInfo { "Sensor Output", tFlag::SENSOR_DATA, tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA | tFlag::OUTPUT_PORT | tFlag::PUSH_STRATEGY, false },
+  tStaticInterfaceInfo { "Controller Input", tFlag::CONTROLLER_DATA, tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA | tFlag::PUSH_STRATEGY, false },
+  tStaticInterfaceInfo { "Controller Output", tFlag::CONTROLLER_DATA, tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA | tFlag::OUTPUT_PORT | tFlag::PUSH_STRATEGY, false }
 };
 
 //----------------------------------------------------------------------
