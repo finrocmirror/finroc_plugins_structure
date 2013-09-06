@@ -192,7 +192,7 @@ private:
     data_ports::tPortCreationInfo<tDataType> result;
     if (data_ports::tIsString<A1>::value)
     {
-      result = data_ports::tPortCreationInfo<tDataType>(arg1, rest...);
+      result = core::tPortWrapperBase::tConstructorArguments<data_ports::tPortCreationInfo<tDataType>>(arg1, rest...);
       if (result.name.length() == 0)
       {
         result.name = this->GetPortName();
@@ -211,7 +211,7 @@ private:
     }
     else
     {
-      result = data_ports::tPortCreationInfo<tDataType>(this->GetPortName(), arg1, rest...);
+      result = core::tPortWrapperBase::tConstructorArguments<data_ports::tPortCreationInfo<tDataType>>(this->GetPortName(), arg1, rest...);
     }
     if (result.parent == NULL)
     {
