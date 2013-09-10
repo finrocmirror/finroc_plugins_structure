@@ -81,6 +81,7 @@ template <typename TPort, typename TElement, typename TContainer, TContainer& (T
 class tConveniencePort : public TPort
 {
   typedef typename TPort::tDataType tDataType;
+  typedef typename TPort::tConstructorParameters tConstructorParameters;
 
 //----------------------------------------------------------------------
 // Public methods and typedefs
@@ -104,7 +105,7 @@ public:
    * tBounds<T> are port's bounds.
    * tUnit argument is port's unit.
    * const T& is interpreted as port's default value.
-   * tPortCreationInfo<T> argument is copied. This is only allowed as first argument.
+   * tConstructorParameters argument is copied.
    *
    * This becomes a little tricky when T is a string type. There we have these rules:
    * A String not provided as first argument is interpreted as default value.
@@ -171,9 +172,9 @@ private:
   /*!
    * Create port creation info for this convenience port (non-template constructor)
    */
-  data_ports::tPortCreationInfo<tDataType> MakeStandardCreationInfo(const std::string& name, core::tFrameworkElement* parent)
+  tConstructorParameters MakeStandardCreationInfo(const std::string& name, core::tFrameworkElement* parent)
   {
-    data_ports::tPortCreationInfo<tDataType> result;
+    tConstructorParameters result;
     result.name = name;
     result.parent = parent;
     if (result.parent && typeid(*result.parent) == typeid(core::tPortGroup))
@@ -187,12 +188,12 @@ private:
    * Create port creation info for this convenience port (template constructor)
    */
   template<typename A1, typename ... ARest>
-  data_ports::tPortCreationInfo<tDataType> MakeCreationInfo(const A1& arg1, const ARest&... rest)
+  tConstructorParameters MakeCreationInfo(const A1& arg1, const ARest&... rest)
   {
-    data_ports::tPortCreationInfo<tDataType> result;
+    tConstructorParameters result;
     if (data_ports::tIsString<A1>::value)
     {
-      result = core::tPortWrapperBase::tConstructorArguments<data_ports::tPortCreationInfo<tDataType>>(arg1, rest...);
+      result = core::tPortWrapperBase::tConstructorArguments<tConstructorParameters>(arg1, rest...);
       if (result.name.length() == 0)
       {
         result.name = this->GetPortName();
@@ -211,7 +212,7 @@ private:
     }
     else
     {
-      result = core::tPortWrapperBase::tConstructorArguments<data_ports::tPortCreationInfo<tDataType>>(this->GetPortName(), arg1, rest...);
+      result = core::tPortWrapperBase::tConstructorArguments<tConstructorParameters>(this->GetPortName(), arg1, rest...);
     }
     if (result.parent == NULL)
     {
