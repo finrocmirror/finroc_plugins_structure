@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <targets>
 
-  <finrocplugin name="structure">
+  <finrocplugin>
     <sources>
       internal/**
       tConveniencePort.h
@@ -15,19 +15,19 @@
     </sources>
   </finrocplugin>
 
-  <finrocplugin name="structure_main_utilities">
+  <finrocplugin name="main_utilities">
     <sources>
       main_utilities.cpp
     </sources>
   </finrocplugin>
 
-  <finrocplugin name="structure_main_wrapper">
+  <finrocplugin name="main_wrapper">
     <sources>
       default_main_wrapper.cpp
     </sources>
   </finrocplugin>
   
-  <finroclibrary name="structure_test_modules">
+  <finroclibrary name="test_modules">
     <sources>
       test/mTestSenseControlModule.cpp
       test/mTestModule.cpp
