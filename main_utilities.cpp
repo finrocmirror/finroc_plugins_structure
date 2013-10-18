@@ -54,7 +54,7 @@ extern "C"
 #include "plugins/parameters/tConfigFile.h"
 #include "plugins/scheduling/tExecutionControl.h"
 
-#ifdef _LIB_FINROC_PLUGIN_TCP_PRESENT_
+#ifdef _LIB_FINROC_PLUGINS_TCP_PRESENT_
 #include "plugins/tcp/tPeer.h"
 #endif
 
@@ -113,7 +113,7 @@ bool enable_crash_handler = true;
 std::mutex main_thread_wait_mutex;
 std::condition_variable main_thread_wait_variable;
 
-#ifdef _LIB_FINROC_PLUGIN_TCP_PRESENT_
+#ifdef _LIB_FINROC_PLUGINS_TCP_PRESENT_
 finroc::tcp::tPeer *tcp_peer;
 #endif
 
@@ -295,7 +295,7 @@ void InstallCrashHandler()
 //----------------------------------------------------------------------
 void ConnectTCPPeer(const std::string &peer_name)
 {
-#ifdef _LIB_FINROC_PLUGIN_TCP_PRESENT_
+#ifdef _LIB_FINROC_PLUGINS_TCP_PRESENT_
   // Create and connect TCP peer
   tcp_peer = new finroc::tcp::tPeer(peer_name, connect_to, network_port, true, true, listen_address);
   tcp_peer->Init();
@@ -340,7 +340,7 @@ int InitializeAndRunMainLoop(const std::string &program_name)
     }
   }
 
-#ifdef _LIB_FINROC_PLUGIN_TCP_PRESENT_
+#ifdef _LIB_FINROC_PLUGINS_TCP_PRESENT_
   if (tcp_peer->IsReady())
   {
     tcp_peer->StartServingStructure();
