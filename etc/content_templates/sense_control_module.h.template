@@ -59,17 +59,17 @@ public:
 
   tStaticParameter<double> static_parameter_1;   Example for a static parameter. Replace or delete it!
   
-  tParameter<double> parameter_1;   Example for a runtime parameter. Replace or delete it!
+  tParameter<double> par_parameter_1;   Example for a runtime parameter named "Parameter 1. Replace or delete it!
 
-  tSensorInput<double> si_signal_1;   Example for sensor input ports. Replace or delete them!
+  tSensorInput<double> si_signal_1;   Example for sensor input ports named "Signal 1" and "Signal 2". Replace or delete them!
   tSensorInput<double> si_signal_2;
 
-  tSensorOutput<double> so_signal_1;   Examples for sensor output ports. Replace or delete them!
+  tSensorOutput<double> so_signal_1;   Examples for a sensor output port named "Signal 1". Replace or delete them!
 
-  tControllerInput<double> ci_signal_1;   Example for controller input ports. Replace or delete them!
+  tControllerInput<double> ci_signal_1;   Example for controller input ports named "Signal 1" and "Signal 2". Replace or delete them!
   tControllerInput<double> ci_signal_2;
 
-  tControllerOutput<double> co_signal_1;   Examples for controller output ports. Replace or delete them!
+  tControllerOutput<double> co_signal_1;   Examples for a controller output port named "Signal 1". Replace or delete them!
 
 //----------------------------------------------------------------------
 // Public methods and typedefs
