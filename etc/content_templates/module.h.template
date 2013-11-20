@@ -58,14 +58,14 @@ class m%%NAME%% : public structure::tModule
 public:
 
   tStaticParameter<double> static_parameter_1;   Example for a static parameter. Replace or delete it!
-  
-  tParameter<double> parameter_1;   Example for a runtime parameter. Replace or delete it!
 
-  tInput<double> input_signal_1;   Example for input ports. Replace or delete them!
-  tInput<double> input_signal_2;
+  tParameter<double> par_parameter_1;   Example for a runtime parameter named "Parameter 1". Replace or delete it!
 
-  tOutput<double> output_signal_1;   Examples for output ports. Replace or delete them!
-  tOutput<double> output_signal_2;
+  tInput<double> in_signal_1;   Example for input ports named "Signal 1" and "Signal 2". Replace or delete them!
+  tInput<double> in_signal_2;
+
+  tOutput<double> out_signal_1;   Examples for output ports named "Signal 1" and "Signal 2". Replace or delete them!
+  tOutput<double> out_signal_2;
 
 //----------------------------------------------------------------------
 // Public methods and typedefs

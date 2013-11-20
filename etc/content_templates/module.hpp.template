@@ -100,7 +100,7 @@ void m%%NAME%%<>::Update()
   
   Do something each cycle independent from changing ports.
   
-  this->output_signal_1.Publish(some meaningful value); can be used to publish data via your output ports.
+  this->out_signal_1.Publish(some meaningful value); can be used to publish data via your output ports.
 }
 
 //----------------------------------------------------------------------
