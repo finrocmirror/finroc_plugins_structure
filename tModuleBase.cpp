@@ -108,6 +108,10 @@ core::tFrameworkElement& tModuleBase::GetParameterParent()
   if (!parameters)
   {
     parameters = new tFrameworkElement(this, "Parameters");
+    if (IsReady())
+    {
+      parameters->Init();
+    }
   }
   return *parameters;
 }

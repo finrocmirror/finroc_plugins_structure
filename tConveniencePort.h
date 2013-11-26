@@ -43,6 +43,8 @@
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
 #include "core/port/tPortGroup.h"
+#include "plugins/data_ports/definitions.h"
+#include "plugins/parameters/tStaticParameter.h"
 
 //----------------------------------------------------------------------
 // Internal includes with ""
