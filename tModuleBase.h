@@ -121,7 +121,7 @@ public:
       : tConveniencePort<parameters::tParameter<T>, tModuleBase, tFrameworkElement, &tModuleBase::GetParameterParent>(args...)
     {
       assert(this->GetWrapped()->GetParent()->NameEquals("Parameters"));
-      this->AddPortListenerSimple(static_cast<tModuleBase*>(this->GetWrapped()->GetParent()->GetParent())->parameters_changed);
+      this->AddListenerSimple(static_cast<tModuleBase*>(this->GetWrapped()->GetParent()->GetParent())->parameters_changed);
     }
   };
 
