@@ -99,9 +99,6 @@ namespace
 
 bool run_main_loop = false;
 bool pause_at_startup = false;
-std::string listen_address = "0.0.0.0";
-int network_port = 4444;
-std::string connect_to;
 #ifdef NDEBUG
 bool enable_crash_handler = false;
 #else
@@ -183,12 +180,12 @@ bool OptionsHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
     int port = atoi(rrlib::getopt::EvaluateValue(port_option).c_str());
     if (port < 1 || port > 65535)
     {
-      FINROC_LOG_PRINT(ERROR, "Invalid port '", port, "'. Using default: ", network_port);
+      FINROC_LOG_PRINT(ERROR, "Invalid port '", port, "'. Using default: ", tcp::tOptions::GetDefaultOptions().preferred_server_port);
     }
     else
     {
       FINROC_LOG_PRINT(DEBUG, "Listening on user defined port ", port, ".");
-      network_port = port;
+      tcp::tOptions::GetDefaultOptions().preferred_server_port = port;
     }
   }
 
@@ -203,16 +200,16 @@ bool OptionsHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
   rrlib::getopt::tOption connect_option(name_to_option_map.at("connect"));
   if (connect_option->IsActive())
   {
-    connect_to = rrlib::getopt::EvaluateValue(connect_option);
-    FINROC_LOG_PRINT(DEBUG, "Connecting to ", connect_to);
+    tcp::tOptions::GetDefaultOptions().connect_to.push_back(rrlib::getopt::EvaluateValue(connect_option));
+    FINROC_LOG_PRINT(DEBUG, "Connecting to ", rrlib::getopt::EvaluateValue(connect_option));
   }
 
   // listen-address
   rrlib::getopt::tOption listen_address_option(name_to_option_map.at("listen-address"));
   if (listen_address_option->IsActive())
   {
-    listen_address = rrlib::getopt::EvaluateValue(listen_address_option);
-    FINROC_LOG_PRINT(DEBUG, "Listening on ", listen_address);
+    tcp::tOptions::GetDefaultOptions().server_listen_address = rrlib::getopt::EvaluateValue(listen_address_option);
+    FINROC_LOG_PRINT(DEBUG, "Listening on ", tcp::tOptions::GetDefaultOptions().server_listen_address);
   }
 
   // crash-handler
@@ -297,7 +294,8 @@ void ConnectTCPPeer(const std::string &peer_name)
 {
 #ifdef _LIB_FINROC_PLUGINS_TCP_PRESENT_
   // Create and connect TCP peer
-  tcp_peer = new finroc::tcp::tPeer(peer_name, connect_to, network_port, true, true, listen_address);
+  tcp::tOptions::GetDefaultOptions().peer_name = peer_name;
+  tcp_peer = new finroc::tcp::tPeer();
   tcp_peer->Init();
   try
   {
@@ -318,7 +316,7 @@ int InitializeAndRunMainLoop(const std::string &program_name)
   finroc::core::tRuntimeEnvironment &runtime_environment = finroc::core::tRuntimeEnvironment::GetInstance();
 
   typedef finroc::core::tFrameworkElement::tFlag tFlag;
-  typedef finroc::core::tFrameworkElement::tFlags tFlags;
+  //typedef finroc::core::tFrameworkElement::tFlags tFlags;
 
   // Have any top-level framework elements containing threads already been created?
   // In this case, we won't create an extra thread container (finstructed part does not need one for example)
