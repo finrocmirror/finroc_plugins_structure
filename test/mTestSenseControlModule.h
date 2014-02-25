@@ -102,8 +102,8 @@ private:
    */
   ~mTestSenseControlModule();
 
-  virtual void Sense();
-  virtual void Control();
+  virtual void Sense() override;
+  virtual void Control() override;
 };
 
 //----------------------------------------------------------------------

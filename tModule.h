@@ -163,7 +163,7 @@ protected:
     return input_changed;
   }
 
-  virtual void PostChildInit();
+  virtual void PostChildInit() override;
 
 //----------------------------------------------------------------------
 // Private fields and methods
@@ -186,7 +186,7 @@ private:
     tModule& module;
   public:
     UpdateTask(tModule& module);
-    virtual void ExecuteTask();
+    virtual void ExecuteTask() override;
   };
 
   UpdateTask update_task;

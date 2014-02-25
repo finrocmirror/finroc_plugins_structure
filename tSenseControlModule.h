@@ -228,7 +228,7 @@ protected:
     return controller_input_changed;
   }
 
-  virtual void PostChildInit();
+  virtual void PostChildInit() override;
 
 //----------------------------------------------------------------------
 // Private fields and methods
@@ -250,7 +250,7 @@ private:
     tSenseControlModule& module;
   public:
     ControlTask(tSenseControlModule& module);
-    virtual void ExecuteTask();
+    virtual void ExecuteTask() override;
   };
 
   /*! Task that calls Sense() regularly */
@@ -259,7 +259,7 @@ private:
     tSenseControlModule& module;
   public:
     SenseTask(tSenseControlModule& module);
-    virtual void ExecuteTask();
+    virtual void ExecuteTask() override;
   };
 
   SenseTask sense_task;

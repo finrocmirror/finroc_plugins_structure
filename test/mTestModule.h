@@ -103,7 +103,7 @@ private:
    */
   ~mTestModule();
 
-  virtual void Update();
+  virtual void Update() override;
 };
 
 //----------------------------------------------------------------------
