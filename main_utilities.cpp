@@ -318,7 +318,6 @@ int InitializeAndRunMainLoop(const std::string &program_name)
   finroc::core::tRuntimeEnvironment &runtime_environment = finroc::core::tRuntimeEnvironment::GetInstance();
 
   typedef finroc::core::tFrameworkElement::tFlag tFlag;
-  typedef finroc::core::tFrameworkElement::tFlags tFlags;
 
   // Have any top-level framework elements containing threads already been created?
   // In this case, we won't create an extra thread container (finstructed part does not need one for example)
