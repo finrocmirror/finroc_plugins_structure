@@ -74,8 +74,8 @@ private:
 
   /*! Destructor
    *
-   * The destructor of modules is declared private to avoid accidental deletion. Deleting
-   * modules is already handled by the framework.
+   * The destructor of groups is declared private to avoid accidental deletion. Deleting
+   * groups is already handled by the framework.
    */
   ~g%%NAME%%();
 

@@ -88,11 +88,11 @@ private:
    */
   ~m%%NAME%%();
 
-  virtual void OnStaticParameterChange();   Might be needed to process static parameters. Delete otherwise!
+  virtual void OnStaticParameterChange() override;   Might be needed to process static parameters. Delete otherwise!
 
-  virtual void OnParameterChange();   Might be needed to react to changes in parameters independent from Update() calls. Delete otherwise!
+  virtual void OnParameterChange() override;   Might be needed to react to changes in parameters independent from Update() calls. Delete otherwise!
 
-  virtual void Update();
+  virtual void Update() override;
 
 };
 
