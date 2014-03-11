@@ -157,44 +157,16 @@ public:
    * Any further string is interpreted as config entry.
    */
   template <typename T>
-  class tControllerInput : public tConveniencePort<data_ports::tProxyPort<T, false>, tSenseControlGroup, core::tPortGroup, &tSenseControlGroup::GetControllerInputs>
-  {
-  public:
-    template<typename ... ARGS>
-    explicit tControllerInput(const ARGS&... args)
-      : tConveniencePort<data_ports::tProxyPort<T, false>, tSenseControlGroup, core::tPortGroup, &tSenseControlGroup::GetControllerInputs>(args...)
-    {}
-  };
+  using tControllerInput = tConveniencePort<data_ports::tProxyPort<T, false>, tSenseControlGroup, core::tPortGroup, &tSenseControlGroup::GetControllerInputs>;
 
   template <typename T>
-  class tControllerOutput : public tConveniencePort<data_ports::tProxyPort<T, true>, tSenseControlGroup, core::tPortGroup, &tSenseControlGroup::GetControllerOutputs>
-  {
-  public:
-    template<typename ... ARGS>
-    explicit tControllerOutput(const ARGS&... args)
-      : tConveniencePort<data_ports::tProxyPort<T, true>, tSenseControlGroup, core::tPortGroup, &tSenseControlGroup::GetControllerOutputs>(args...)
-    {}
-  };
+  using tControllerOutput = tConveniencePort<data_ports::tProxyPort<T, true>, tSenseControlGroup, core::tPortGroup, &tSenseControlGroup::GetControllerOutputs>;
 
   template <typename T>
-  class tSensorInput : public tConveniencePort<data_ports::tProxyPort<T, false>, tSenseControlGroup, core::tPortGroup, &tSenseControlGroup::GetSensorInputs>
-  {
-  public:
-    template<typename ... ARGS>
-    explicit tSensorInput(const ARGS&... args)
-      : tConveniencePort<data_ports::tProxyPort<T, false>, tSenseControlGroup, core::tPortGroup, &tSenseControlGroup::GetSensorInputs>(args...)
-    {}
-  };
+  using tSensorInput = tConveniencePort<data_ports::tProxyPort<T, false>, tSenseControlGroup, core::tPortGroup, &tSenseControlGroup::GetSensorInputs>;
 
   template <typename T>
-  class tSensorOutput : public tConveniencePort<data_ports::tProxyPort<T, true>, tSenseControlGroup, core::tPortGroup, &tSenseControlGroup::GetSensorOutputs>
-  {
-  public:
-    template<typename ... ARGS>
-    explicit tSensorOutput(const ARGS&... args)
-      : tConveniencePort<data_ports::tProxyPort<T, true>, tSenseControlGroup, core::tPortGroup, &tSenseControlGroup::GetSensorOutputs>(args...)
-    {}
-  };
+  using tSensorOutput = tConveniencePort<data_ports::tProxyPort<T, true>, tSenseControlGroup, core::tPortGroup, &tSenseControlGroup::GetSensorOutputs>;
 
 //----------------------------------------------------------------------
 // Private fields and methods

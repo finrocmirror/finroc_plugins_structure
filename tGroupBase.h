@@ -138,14 +138,7 @@ public:
   };
 
   template <typename T>
-  class tStaticParameter : public tConveniencePort<parameters::tStaticParameter<T>, tGroupBase, core::tFrameworkElement, &tGroupBase::GetThis>
-  {
-  public:
-    template<typename ... ARGS>
-    explicit tStaticParameter(const ARGS&... args)
-      : tConveniencePort<parameters::tStaticParameter<T>, tGroupBase, core::tFrameworkElement, &tGroupBase::GetThis>(args...)
-    {}
-  };
+  using tStaticParameter = tConveniencePort<parameters::tStaticParameter<T>, tGroupBase, core::tFrameworkElement, &tGroupBase::GetThis>;
 
   /*!
    * Checks the module's static parameters for changes

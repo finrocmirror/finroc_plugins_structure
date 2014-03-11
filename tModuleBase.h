@@ -126,14 +126,7 @@ public:
   };
 
   template <typename T>
-  class tStaticParameter : public tConveniencePort<parameters::tStaticParameter<T>, tModuleBase, core::tFrameworkElement, &tModuleBase::GetThis>
-  {
-  public:
-    template<typename ... ARGS>
-    explicit tStaticParameter(const ARGS&... args)
-      : tConveniencePort<parameters::tStaticParameter<T>, tModuleBase, core::tFrameworkElement, &tModuleBase::GetThis>(args...)
-    {}
-  };
+  using tStaticParameter = tConveniencePort<parameters::tStaticParameter<T>, tModuleBase, core::tFrameworkElement, &tModuleBase::GetThis>;
 
   /*!
    * When storing convenience ports in std::unique pointers, this class can be used as deleter so that

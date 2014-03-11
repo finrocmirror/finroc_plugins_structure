@@ -160,44 +160,16 @@ public:
    * Any further string is interpreted as config entry.
    */
   template <typename T>
-  class tControllerInput : public tConveniencePort<data_ports::tInputPort<T>, tSenseControlModule, core::tPortGroup, &tSenseControlModule::GetControllerInputs>
-  {
-  public:
-    template<typename ... ARGS>
-    explicit tControllerInput(const ARGS&... args)
-      : tConveniencePort<data_ports::tInputPort<T>, tSenseControlModule, core::tPortGroup, &tSenseControlModule::GetControllerInputs>(args...)
-    {}
-  };
+  using tControllerInput = tConveniencePort<data_ports::tInputPort<T>, tSenseControlModule, core::tPortGroup, &tSenseControlModule::GetControllerInputs>;
 
   template <typename T>
-  class tControllerOutput : public tConveniencePort<data_ports::tOutputPort<T>, tSenseControlModule, core::tPortGroup, &tSenseControlModule::GetControllerOutputs>
-  {
-  public:
-    template<typename ... ARGS>
-    explicit tControllerOutput(const ARGS&... args)
-      : tConveniencePort<data_ports::tOutputPort<T>, tSenseControlModule, core::tPortGroup, &tSenseControlModule::GetControllerOutputs>(args...)
-    {}
-  };
+  using tControllerOutput = tConveniencePort<data_ports::tOutputPort<T>, tSenseControlModule, core::tPortGroup, &tSenseControlModule::GetControllerOutputs>;
 
   template <typename T>
-  class tSensorInput : public tConveniencePort<data_ports::tInputPort<T>, tSenseControlModule, core::tPortGroup, &tSenseControlModule::GetSensorInputs>
-  {
-  public:
-    template<typename ... ARGS>
-    explicit tSensorInput(const ARGS&... args)
-      : tConveniencePort<data_ports::tInputPort<T>, tSenseControlModule, core::tPortGroup, &tSenseControlModule::GetSensorInputs>(args...)
-    {}
-  };
+  using tSensorInput = tConveniencePort<data_ports::tInputPort<T>, tSenseControlModule, core::tPortGroup, &tSenseControlModule::GetSensorInputs>;
 
   template <typename T>
-  class tSensorOutput : public tConveniencePort<data_ports::tOutputPort<T>, tSenseControlModule, core::tPortGroup, &tSenseControlModule::GetSensorOutputs>
-  {
-  public:
-    template<typename ... ARGS>
-    explicit tSensorOutput(const ARGS&... args)
-      : tConveniencePort<data_ports::tOutputPort<T>, tSenseControlModule, core::tPortGroup, &tSenseControlModule::GetSensorOutputs>(args...)
-    {}
-  };
+  using tSensorOutput = tConveniencePort<data_ports::tOutputPort<T>, tSenseControlModule, core::tPortGroup, &tSenseControlModule::GetSensorOutputs>;
 
 //----------------------------------------------------------------------
 // Protected destructor (framework elements have their own memory management and are deleted with ManagedDelete)

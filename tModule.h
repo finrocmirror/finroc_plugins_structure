@@ -126,24 +126,10 @@ public:
    * Any further string is interpreted as config entry.
    */
   template <typename T>
-  class tInput : public tConveniencePort<data_ports::tInputPort<T>, tModule, core::tPortGroup, &tModule::GetInputs>
-  {
-  public:
-    template<typename ... ARGS>
-    explicit tInput(const ARGS&... args)
-      : tConveniencePort<data_ports::tInputPort<T>, tModule, core::tPortGroup, &tModule::GetInputs>(args...)
-    {}
-  };
+  using tInput = tConveniencePort<data_ports::tInputPort<T>, tModule, core::tPortGroup, &tModule::GetInputs>;
 
   template <typename T>
-  class tOutput : public tConveniencePort<data_ports::tOutputPort<T>, tModule, core::tPortGroup, &tModule::GetOutputs>
-  {
-  public:
-    template<typename ... ARGS>
-    explicit tOutput(const ARGS&... args)
-      : tConveniencePort<data_ports::tOutputPort<T>, tModule, core::tPortGroup, &tModule::GetOutputs>(args...)
-    {}
-  };
+  using tOutput = tConveniencePort<data_ports::tOutputPort<T>, tModule, core::tPortGroup, &tModule::GetOutputs>;
 
 //----------------------------------------------------------------------
 // Protected destructor (framework elements have their own memory management and are deleted with ManagedDelete)

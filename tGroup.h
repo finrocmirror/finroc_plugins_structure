@@ -119,24 +119,10 @@ public:
    * Any further string is interpreted as config entry.
    */
   template <typename T>
-  class tInput : public tConveniencePort<data_ports::tProxyPort<T, false>, tGroup, core::tPortGroup, &tGroup::GetInputs>
-  {
-  public:
-    template<typename ... ARGS>
-    explicit tInput(const ARGS&... args)
-      : tConveniencePort<data_ports::tProxyPort<T, false>, tGroup, core::tPortGroup, &tGroup::GetInputs>(args...)
-    {}
-  };
+  using tInput = tConveniencePort<data_ports::tProxyPort<T, false>, tGroup, core::tPortGroup, &tGroup::GetInputs>;
 
   template <typename T>
-  class tOutput : public tConveniencePort<data_ports::tProxyPort<T, true>, tGroup, core::tPortGroup, &tGroup::GetOutputs>
-  {
-  public:
-    template<typename ... ARGS>
-    explicit tOutput(const ARGS&... args)
-      : tConveniencePort<data_ports::tProxyPort<T, true>, tGroup, core::tPortGroup, &tGroup::GetOutputs>(args...)
-    {}
-  };
+  using tOutput = tConveniencePort<data_ports::tProxyPort<T, true>, tGroup, core::tPortGroup, &tGroup::GetOutputs>;
 
 //----------------------------------------------------------------------
 // Public methods and typedefs
