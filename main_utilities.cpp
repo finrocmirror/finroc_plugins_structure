@@ -177,6 +177,7 @@ bool OptionsHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
   rrlib::getopt::tOption port_option(name_to_option_map.at("port"));
   if (port_option->IsActive())
   {
+#ifdef _LIB_FINROC_PLUGINS_TCP_PRESENT_
     int port = atoi(rrlib::getopt::EvaluateValue(port_option).c_str());
     if (port < 1 || port > 65535)
     {
@@ -187,6 +188,7 @@ bool OptionsHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
       FINROC_LOG_PRINT(DEBUG, "Listening on user defined port ", port, ".");
       tcp::tOptions::GetDefaultOptions().preferred_server_port = port;
     }
+#endif
   }
 
   // port-links-are-not-unique
@@ -200,16 +202,20 @@ bool OptionsHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
   rrlib::getopt::tOption connect_option(name_to_option_map.at("connect"));
   if (connect_option->IsActive())
   {
+#ifdef _LIB_FINROC_PLUGINS_TCP_PRESENT_
     tcp::tOptions::GetDefaultOptions().connect_to.push_back(rrlib::getopt::EvaluateValue(connect_option));
     FINROC_LOG_PRINT(DEBUG, "Connecting to ", rrlib::getopt::EvaluateValue(connect_option));
+#endif
   }
 
   // listen-address
   rrlib::getopt::tOption listen_address_option(name_to_option_map.at("listen-address"));
   if (listen_address_option->IsActive())
   {
+#ifdef _LIB_FINROC_PLUGINS_TCP_PRESENT_
     tcp::tOptions::GetDefaultOptions().server_listen_address = rrlib::getopt::EvaluateValue(listen_address_option);
     FINROC_LOG_PRINT(DEBUG, "Listening on ", tcp::tOptions::GetDefaultOptions().server_listen_address);
+#endif
   }
 
   // crash-handler
