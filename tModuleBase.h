@@ -103,12 +103,12 @@ public:
    * Any further string is interpreted as config entry.
    */
   template <typename T>
-  class tParameter : public tConveniencePort<parameters::tParameter<T>, tComponent, tFrameworkElement, &tComponent::GetParameterParent>
+  class tParameter : public tConveniencePort<parameters::tParameter<T>, tComponent, tFrameworkElement, &tModuleBase::GetParameterParent>
   {
   public:
     template<typename ... ARGS>
     explicit tParameter(const ARGS&... args)
-      : tConveniencePort<parameters::tParameter<T>, tComponent, tFrameworkElement, &tComponent::GetParameterParent>(args...)
+      : tConveniencePort<parameters::tParameter<T>, tComponent, tFrameworkElement, &tModuleBase::GetParameterParent>(args...)
     {
       assert(this->GetWrapped()->GetParent()->NameEquals("Parameters"));
       this->AddListenerSimple(static_cast<tModuleBase*>(this->GetWrapped()->GetParent()->GetParent())->parameters_changed);

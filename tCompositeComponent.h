@@ -72,8 +72,6 @@ namespace structure
  */
 class tCompositeComponent : public tComponent
 {
-  using tComponent::GetParameterParent;
-  using tComponent::GetThis;
 
 //----------------------------------------------------------------------
 // Public methods and typedefs
@@ -112,12 +110,12 @@ public:
    * Any further string is interpreted as config entry.
    */
   template <typename T>
-  class tParameter : public tConveniencePort<parameters::tParameter<T>, tComponent, tFrameworkElement, &tComponent::GetParameterParent>
+  class tParameter : public tConveniencePort<parameters::tParameter<T>, tComponent, tFrameworkElement, &tCompositeComponent::GetParameterParent>
   {
   public:
     template<typename ... ARGS>
     explicit tParameter(const ARGS&... args)
-      : tConveniencePort<parameters::tParameter<T>, tComponent, tFrameworkElement, &tComponent::GetParameterParent>(args..., core::tFrameworkElement::tFlag::EMITS_DATA)
+      : tConveniencePort<parameters::tParameter<T>, tComponent, tFrameworkElement, &tCompositeComponent::GetParameterParent>(args..., core::tFrameworkElement::tFlag::EMITS_DATA)
     {
       assert(this->GetWrapped()->GetParent()->NameEquals("Parameters"));
     }
