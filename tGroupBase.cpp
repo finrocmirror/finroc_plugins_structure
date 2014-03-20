@@ -81,7 +81,9 @@ tGroupBase::tGroupBase(core::tFrameworkElement *parent, const std::string &name,
 }
 
 tGroupBase::~tGroupBase()
-{}
+{
+  internal::RemoveModule(this);
+}
 
 core::tPortGroup* tGroupBase::CreateInterface(const std::string& name, bool share_ports, tFlags extra_flags, tFlags default_port_flags)
 {
@@ -103,6 +105,10 @@ core::tFrameworkElement& tGroupBase::GetParameterParent()
   if (!parameters)
   {
     parameters = new tFrameworkElement(this, "Parameters");
+    if (IsReady())
+    {
+      parameters->Init();
+    }
   }
   return *parameters;
 }
