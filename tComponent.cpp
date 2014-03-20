@@ -19,15 +19,15 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
 //----------------------------------------------------------------------
-/*!\file    plugins/structure/tGroupBase.cpp
+/*!\file    plugins/structure/tComponent.cpp
  *
  * \author  Max Reichardt
  *
- * \date    2013-05-19
+ * \date    2014-03-19
  *
  */
 //----------------------------------------------------------------------
-#include "plugins/structure/tGroupBase.h"
+#include "plugins/structure/tComponent.h"
 
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
@@ -66,8 +66,8 @@ namespace structure
 // Implementation
 //----------------------------------------------------------------------
 
-tGroupBase::tGroupBase(core::tFrameworkElement *parent, const std::string &name, const std::string &structure_config_file, tFlags extra_flags) :
-  tFinstructableGroup(parent, name, structure_config_file, extra_flags),
+tComponent::tComponent(core::tFrameworkElement *parent, const std::string &name, tFlags extra_flags) :
+  tFrameworkElement(parent, name, extra_flags),
   parameters(NULL),
   auto_name_port_count(0),
   count_for_type(NULL)
@@ -75,32 +75,22 @@ tGroupBase::tGroupBase(core::tFrameworkElement *parent, const std::string &name,
   internal::AddModule(this);
   if (!internal::FindParent(this, false))
   {
-    FINROC_LOG_PRINT(ERROR, "Group ", GetQualifiedName(), " was not created using new().");
+    FINROC_LOG_PRINT(ERROR, "Component ", GetQualifiedName(), " was not created using new().");
     abort();
   }
 }
 
-tGroupBase::~tGroupBase()
+tComponent::~tComponent()
 {
   internal::RemoveModule(this);
 }
 
-core::tPortGroup* tGroupBase::CreateInterface(const std::string& name, bool share_ports, tFlags extra_flags, tFlags default_port_flags)
-{
-  core::tPortGroup* created_group = new core::tPortGroup(this, name, tFlag::INTERFACE | extra_flags, default_port_flags | (share_ports ? tFlags(tFlag::SHARED) : tFlags()));
-  if (IsReady())
-  {
-    created_group->Init();
-  }
-  return created_group;
-}
-
-void tGroupBase::CheckStaticParameters()
+void tComponent::CheckStaticParameters()
 {
   parameters::internal::tStaticParameterList::DoStaticParameterEvaluation(*this);
 }
 
-core::tFrameworkElement& tGroupBase::GetParameterParent()
+core::tFrameworkElement& tComponent::GetParameterParent()
 {
   if (!parameters)
   {
@@ -114,14 +104,14 @@ core::tFrameworkElement& tGroupBase::GetParameterParent()
 }
 
 
-void* tGroupBase::operator new(size_t size)
+void* tComponent::operator new(size_t size)
 {
   void* result = ::operator new(size);
   internal::AddMemoryBlock(result, size);
   return result;
 }
 
-void* tGroupBase::operator new[](size_t size)
+void* tComponent::operator new[](size_t size)
 {
   FINROC_LOG_PRINT_STATIC(ERROR, "Allocating (non-pointer) array of framework elements is not allowed.");
   throw std::bad_alloc();

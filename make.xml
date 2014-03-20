@@ -4,9 +4,10 @@
   <finrocplugin>
     <sources>
       internal/**
+      tComponent.cpp
+      tCompositeComponent.cpp
       tConveniencePort.h
       tGroup.cpp
-      tGroupBase.cpp
       tModule.cpp
       tModuleBase.cpp
       tSenseControlGroup.cpp

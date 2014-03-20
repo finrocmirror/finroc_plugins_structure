@@ -19,28 +19,29 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
 //----------------------------------------------------------------------
-/*!\file    plugins/structure/tModuleBase.h
+/*!\file    plugins/structure/tCompositeComponent.h
  *
  * \author  Max Reichardt
  *
- * \date    2012-12-02
+ * \date    2013-05-19
  *
- * \brief   Contains tModuleBase
+ * \brief   Contains tCompositeComponent
  *
- * \b tModuleBase
+ * \b tCompositeComponent
  *
- * Base class for different types of modules
- * with common functionality.
+ * Base class for different types of composite components (e.g. "groups")
  *
  */
 //----------------------------------------------------------------------
-#ifndef __plugins__structure__tModuleBase_h__
-#define __plugins__structure__tModuleBase_h__
+#ifndef __plugins__structure__tCompositeComponent_h__
+#define __plugins__structure__tCompositeComponent_h__
 
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
-#include "rrlib/thread/tTask.h"
+#include "rrlib/util/string.h"
+#include "core/tFrameworkElementTags.h"
+#include "core/file_lookup.h"
 #include "plugins/data_ports/tOutputPort.h"
 #include "plugins/parameters/tParameter.h"
 #include "plugins/parameters/tStaticParameter.h"
@@ -65,24 +66,32 @@ namespace structure
 //----------------------------------------------------------------------
 // Class declaration
 //----------------------------------------------------------------------
-//! Base class for modules
+//! Base class for composite components
 /*!
- * Base class for different types of modules -
- * with common functionality.
+ * Base class for different types of composite components (e.g. "groups")
  */
-class tModuleBase : public tComponent
+class tCompositeComponent : public tComponent
 {
-
+  using tComponent::GetParameterParent;
+  using tComponent::GetThis;
 
 //----------------------------------------------------------------------
 // Public methods and typedefs
 //----------------------------------------------------------------------
 public:
 
-  tModuleBase(core::tFrameworkElement *parent, const std::string &name);
+  /*!
+   * \param parent Parent
+   * \param name Name of module
+   * \param structure_config_file XML
+   * \param share_so_and_ci_ports Share sensor output and controller input ports so that they can be accessed from other runtime environments?
+   * \param extra_flags Any extra flags for group
+   */
+  tCompositeComponent(core::tFrameworkElement *parent, const std::string &name, const std::string &structure_config_file = "",
+                      tFlags extra_flags = tFlags());
 
   /**
-   * Parameter classes to use in module.
+   * Parameter class to use in composite component.
    *
    * Constructors take a variadic argument list... just any properties you want to assign to parameter.
    *
@@ -108,78 +117,51 @@ public:
   public:
     template<typename ... ARGS>
     explicit tParameter(const ARGS&... args)
-      : tConveniencePort<parameters::tParameter<T>, tComponent, tFrameworkElement, &tComponent::GetParameterParent>(args...)
+      : tConveniencePort<parameters::tParameter<T>, tComponent, tFrameworkElement, &tComponent::GetParameterParent>(args..., core::tFrameworkElement::tFlag::EMITS_DATA)
     {
       assert(this->GetWrapped()->GetParent()->NameEquals("Parameters"));
-      this->AddListenerSimple(static_cast<tModuleBase*>(this->GetWrapped()->GetParent()->GetParent())->parameters_changed);
+    }
+
+    /*!
+     * Attach this parameter to another one.
+     * If this parameter is changed, the change is also propagated to the attached parameter.
+     */
+    void AttachTo(parameters::tParameter<T>& other)
+    {
+      this->GetWrapped()->ConnectTo(*other.GetWrapped());
     }
   };
 
   template <typename T>
   using tStaticParameter = tConveniencePort<parameters::tStaticParameter<T>, tComponent, core::tFrameworkElement, &tComponent::GetThis>;
 
+
+  /*!
+   * Contains name of XML file to use
+   * Parameter only exists if no (fixed) XML file was provided via constructor
+   */
+  std::unique_ptr<tStaticParameter<std::string>> structure_config_file_parameter;
+
 //----------------------------------------------------------------------
-// Protected methods
+// Protected fields and methods
 //----------------------------------------------------------------------
 protected:
 
-  /*!
-   * (Should only be called by abstract module classes such as tModule and tSenseControlModule)
-   *
-   * Calls OnParameterChange() if a parameter change was detected and resets change flag
-   */
-  void CheckParameters();
+  /*! Local variable with current XML file to use - reference to this is passed to tFinstructable */
+  std::string structure_config_file;
 
   /*!
-   * Creates interface for this module
+   * Creates interface for this composite component
    *
    * \param name Name of interface
    * \param share_ports Should ports in this interfaces be shared? (so that they can be accessed from other runtime environments)
    * \param extra_flags Any extra flags to assign to interface
+   * \param extra_flags Any extra flags to assign to all ports
    */
-  core::tPortGroup* CreateInterface(const std::string& name, bool share_ports, tFlags extra_flags = tFlags());
+  core::tPortGroup* CreateInterface(const std::string& name, bool share_ports, tFlags extra_interface_flags = tFlags(), tFlags default_port_flags = tFlags());
 
-  /*!
-   * (Automatically called)
-   * Checks and resets all changed flags of ports in specified port group
-   * and set custom API changed flags accordingly.
-   *
-   * This way, all changed flags can be reset automatically without the risk
-   * of missing a change
-   * (which could happen when resetting after Update()/Sense()/Control() call).
-   *
-   * \param port_group Port group to process
-   * \return Has any port changed since last call?
-   */
-  bool ProcessChangedFlags(tFrameworkElement& port_group);
-
-//----------------------------------------------------------------------
-// Private fields and methods
-//----------------------------------------------------------------------
-private:
-
-  /*! Introduced this helper class to remove ambiguities when derived classes add listeners to ports */
-  class tParameterChangeDetector
-  {
-    friend class tModuleBase;
-
-    /*! Changed flag that is set whenever a parameter change is detected */
-    volatile bool parameters_changed;
-
-    tParameterChangeDetector() : parameters_changed(true) {}
-
-  public:
-    /*! Implementation of tPortListenerRaw */
-    void OnPortChange(data_ports::tChangeContext& change_context);
-  };
-
-  /*! Changed flag that is set whenever a parameter change is detected */
-  tParameterChangeDetector parameters_changed;
-
-
-  /*! Called whenever parameters have changed */
-  virtual void OnParameterChange()
-  {}
+  virtual void OnStaticParameterChange() override;
+  virtual void PostChildInit() override;
 };
 
 //----------------------------------------------------------------------

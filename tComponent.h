@@ -19,30 +19,31 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
 //----------------------------------------------------------------------
-/*!\file    plugins/structure/tGroupBase.h
+/*!\file    plugins/structure/tComponent.h
  *
  * \author  Max Reichardt
  *
- * \date    2013-05-19
+ * \date    2014-03-19
  *
- * \brief   Contains tGroupBase
+ * \brief   Contains tComponent
  *
- * \b tGroupBase
+ * \b tComponent
  *
- * Base class for different types of groups -
- * with common functionality.
+ * Base class for all components (e.g. modules, groups)
+ * Contains common functionality
  *
  */
 //----------------------------------------------------------------------
-#ifndef __plugins__structure__tGroupBase_h__
-#define __plugins__structure__tGroupBase_h__
+#ifndef __plugins__structure__tComponent_h__
+#define __plugins__structure__tComponent_h__
 
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
 #include "core/port/tPortGroup.h"
-#include "plugins/parameters/tParameter.h"
-#include "plugins/runtime_construction/tFinstructableGroup.h"
+#include "plugins/parameters/tConfigFile.h"
+#include "plugins/parameters/tConfigNode.h"
+#include "plugins/runtime_construction/tStandardCreateModuleAction.h"
 
 //----------------------------------------------------------------------
 // Internal includes with ""
@@ -64,22 +65,13 @@ namespace structure
 //----------------------------------------------------------------------
 // Class declaration
 //----------------------------------------------------------------------
-//! Base class for groups
+//! Component base class
 /*!
- * Base class for different types of groups -
- * with common functionality.
+ * Base class for all components (e.g. modules, groups)
+ * Contains common functionality
  */
-class tGroupBase : public runtime_construction::tFinstructableGroup
+class tComponent : public core::tFrameworkElement
 {
-  /*! GetContainer function for tParameter */
-  tFrameworkElement& GetParameterParent();
-
-  /*! GetContainer function for tStaticParameter */
-  tFrameworkElement& GetThis()
-  {
-    return *this;
-  }
-
 //----------------------------------------------------------------------
 // Public methods and typedefs
 //----------------------------------------------------------------------
@@ -90,55 +82,9 @@ public:
    * \param name Name of module
    * \param structure_config_file XML
    * \param share_so_and_ci_ports Share sensor output and controller input ports so that they can be accessed from other runtime environments?
-   * \param extra_flags Any extra flags for group
+   * \param extra_flags Any extra flags for component
    */
-  tGroupBase(core::tFrameworkElement *parent, const std::string &name, const std::string &structure_config_file = "",
-             tFlags extra_flags = tFlags());
-
-  /**
-   * Parameter class to use in group.
-   *
-   * Constructors take a variadic argument list... just any properties you want to assign to parameter.
-   *
-   * Unlike tPort, port name and parent are usually determined automatically (however, only possible when port is direct class member).
-   * If this is not possible/desired, name needs to be provided as first constructor argument - parent as arbitrary one.
-   *
-   * A string as first parameter is interpreted as port name; Any other string as config entry
-   * A framework element pointer is interpreted as parent.
-   * tFrameworkElement::tFlags arguments are interpreted as flags.
-   * A tQueueSettings argument creates an input queue with the specified settings (not to be used with parameters)
-   * tBounds<T> are parameters's bounds.
-   * tUnit argument is parameters's unit.
-   * const T& is interpreted as parameters's default value.
-   * tPortCreationInfo<T> argument is copied. This is only allowed as first argument.
-   *
-   * This becomes a little tricky when T is a string type. There we have these rules:
-   * A String not provided as first argument is interpreted as default value.
-   * Any further string is interpreted as config entry.
-   */
-  template <typename T>
-  class tParameter : public tConveniencePort<parameters::tParameter<T>, tGroupBase, tFrameworkElement, &tGroupBase::GetParameterParent>
-  {
-  public:
-    template<typename ... ARGS>
-    explicit tParameter(const ARGS&... args)
-      : tConveniencePort<parameters::tParameter<T>, tGroupBase, tFrameworkElement, &tGroupBase::GetParameterParent>(args..., core::tFrameworkElement::tFlag::EMITS_DATA)
-    {
-      assert(this->GetWrapped()->GetParent()->NameEquals("Parameters"));
-    }
-
-    /*!
-     * Attach this parameter to another one.
-     * If this parameter is changed, the change is also propagated to the attached parameter.
-     */
-    void AttachTo(parameters::tParameter<T>& other)
-    {
-      this->GetWrapped()->ConnectTo(*other.GetWrapped());
-    }
-  };
-
-  template <typename T>
-  using tStaticParameter = tConveniencePort<parameters::tStaticParameter<T>, tGroupBase, core::tFrameworkElement, &tGroupBase::GetThis>;
+  tComponent(core::tFrameworkElement *parent, const std::string &name, tFlags extra_flags = tFlags());
 
   /*!
    * Checks the module's static parameters for changes
@@ -147,6 +93,37 @@ public:
    * (Not thread-safe: Should not be called in parallel to an active thread already executing the module.)
    */
   void CheckStaticParameters();
+
+  /*!
+   * \return Config file for module
+   */
+  parameters::tConfigFile* GetConfigFile() const
+  {
+    return parameters::tConfigFile::Find(*this);
+  }
+
+  /*!
+   * \param node Common parent config file node for all child parameter config entries (starting with '/' => absolute link - otherwise relative).
+   */
+  void SetConfigNode(const std::string& node)
+  {
+    parameters::tConfigNode::SetConfigNode(*this, node);
+  }
+
+
+  /*!
+   * When storing convenience ports in std::unique pointers, this class can be used as deleter so that
+   * actual wrapped port is also deleted.
+   */
+  class tPortDeleter
+  {
+  public:
+    void operator()(core::tPortWrapperBase* ptr) const
+    {
+      ptr->GetWrapped()->ManagedDelete();
+      delete ptr;
+    }
+  };
 
   // operator new is overloaded for auto-port naming feature
   void* operator new(size_t size);
@@ -157,17 +134,25 @@ public:
 //----------------------------------------------------------------------
 protected:
 
-  virtual ~tGroupBase();
+  virtual ~tComponent();
+
+
+  /*! GetContainer function for e.g. tParameter */
+  tFrameworkElement& GetParameterParent();
+
+  /*! GetContainer function for e.g. tStaticParameter */
+  tFrameworkElement& GetThis()
+  {
+    return *this;
+  }
 
   /*!
-   * Creates interface for this group
-   *
-   * \param name Name of interface
-   * \param share_ports Should ports in this interfaces be shared? (so that they can be accessed from other runtime environments)
-   * \param extra_flags Any extra flags to assign to interface
-   * \param extra_flags Any extra flags to assign to all ports
+   * \return Has framework element "Parameters" for aggregating parameters has been created?
    */
-  core::tPortGroup* CreateInterface(const std::string& name, bool share_ports, tFlags extra_interface_flags = tFlags(), tFlags default_port_flags = tFlags());
+  bool ParameterParentCreated()
+  {
+    return parameters;
+  }
 
 //----------------------------------------------------------------------
 // Private fields and methods
@@ -185,6 +170,7 @@ private:
 
   /*! Counter should be reset for every module class in type hierarchy. This helper variable is used to detect this. */
   const char* count_for_type;
+
 };
 
 //----------------------------------------------------------------------

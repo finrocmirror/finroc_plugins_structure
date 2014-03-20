@@ -47,7 +47,7 @@
 //----------------------------------------------------------------------
 // Internal includes with ""
 //----------------------------------------------------------------------
-#include "plugins/structure/tGroupBase.h"
+#include "plugins/structure/tCompositeComponent.h"
 
 //----------------------------------------------------------------------
 // Namespace declaration
@@ -70,7 +70,7 @@ namespace structure
  * Used to structure finroc applications.
  * Its contents can be edited and saved using finstruct.
  */
-class tGroup : public tGroupBase
+class tGroup : public tCompositeComponent
 {
 
 //----------------------------------------------------------------------

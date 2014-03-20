@@ -68,54 +68,21 @@ namespace structure
 //----------------------------------------------------------------------
 
 tModuleBase::tModuleBase(tFrameworkElement *parent, const std::string &name)
-  : tFrameworkElement(parent, name),
-    parameters(NULL),
-    parameters_changed(),
-    auto_name_port_count(0),
-    count_for_type(NULL)
+  : tComponent(parent, name),
+    parameters_changed()
 {
-  internal::AddModule(this);
-  if (!internal::FindParent(this, false))
-  {
-    FINROC_LOG_PRINT(ERROR, "Module ", GetQualifiedName(), " was not created using new().");
-    abort();
-  }
   core::tFrameworkElementTags::AddTag(*this, "module");
-}
-
-tModuleBase::~tModuleBase()
-{
-  internal::RemoveModule(this);
 }
 
 void tModuleBase::CheckParameters()
 {
-  if (parameters_changed.parameters_changed && parameters)
+  if (parameters_changed.parameters_changed && this->ParameterParentCreated())
   {
-    this->ProcessChangedFlags(*parameters);
+    this->ProcessChangedFlags(this->GetParameterParent());
     parameters_changed.parameters_changed = false;
     this->OnParameterChange();
   }
 }
-
-void tModuleBase::CheckStaticParameters()
-{
-  parameters::internal::tStaticParameterList::DoStaticParameterEvaluation(*this);
-}
-
-core::tFrameworkElement& tModuleBase::GetParameterParent()
-{
-  if (!parameters)
-  {
-    parameters = new tFrameworkElement(this, "Parameters");
-    if (IsReady())
-    {
-      parameters->Init();
-    }
-  }
-  return *parameters;
-}
-
 
 core::tPortGroup* tModuleBase::CreateInterface(const std::string& name, bool share_ports, tFlags extra_flags)
 {
@@ -151,19 +118,6 @@ bool tModuleBase::ProcessChangedFlags(core::tFrameworkElement& port_group)
     }
   }
   return any_changed;
-}
-
-void* tModuleBase::operator new(size_t size)
-{
-  void* result = ::operator new(size);
-  internal::AddMemoryBlock(result, size);
-  return result;
-}
-
-void* tModuleBase::operator new[](size_t size)
-{
-  assert(false && "Allocating (non-pointer) array of framework elements is not allowed.");
-  throw std::bad_alloc();
 }
 
 //----------------------------------------------------------------------
