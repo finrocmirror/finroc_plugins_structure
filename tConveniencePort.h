@@ -193,7 +193,7 @@ private:
   tConstructorParameters MakeCreationInfo(const A1& arg1, const ARest&... rest)
   {
     tConstructorParameters result;
-    if (data_ports::tIsString<A1>::value)
+    if (data_ports::IsString<A1>::value)
     {
       result = core::tPortWrapperBase::tConstructorArguments<tConstructorParameters>(arg1, rest...);
       if (result.name.length() == 0)
