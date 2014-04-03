@@ -103,9 +103,9 @@ public:
   }
 
   /**
-   * Port and parameter classes to use in module.
+   * Port classes to use in module.
    *
-   * Constructors take a variadic argument list... just any properties you want to assign to port/parameter.
+   * Constructors take a variadic argument list... just any properties you want to assign to port.
    *
    * Unlike tPort, port name and parent are usually determined automatically (however, only possible when port is direct class member).
    * If this is not possible/desired, name needs to be provided as first constructor argument - parent as arbitrary one.

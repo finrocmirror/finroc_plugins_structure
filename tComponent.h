@@ -41,6 +41,7 @@
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
 #include "core/port/tPortGroup.h"
+#include "plugins/data_ports/tOutputPort.h"
 #include "plugins/parameters/tConfigFile.h"
 #include "plugins/parameters/tConfigNode.h"
 #include "plugins/runtime_construction/tStandardCreateModuleAction.h"
@@ -72,10 +73,42 @@ namespace structure
  */
 class tComponent : public core::tFrameworkElement
 {
+  /*!
+   * GetContainer function for e.g. visualization ports
+   * (returns this component if no visualization ports are to be created)
+   */
+  tFrameworkElement& GetVisualizationParent();
+
 //----------------------------------------------------------------------
 // Public methods and typedefs
 //----------------------------------------------------------------------
 public:
+
+  /*!
+   * Level of detail for component visualization
+   *
+   * Defines for which level-of-detail settings (in e.g. finstruct) a port
+   * is suitable for visualization.
+   */
+  enum class tLevelOfDetail : int
+  {
+    LOW,    //<! Suitable for low setting (up to 80x60 pixel)
+    MID,    //<! Suitable for medium setting (up to 200x150 pixel)
+    HIGH,   //<! Suitable for high setting
+
+    ALL,    //<! Suitable for all levels
+    MORE,   //<! Suitable for high and medium setting
+    LESS    //<! Suitable for low and medium setting
+  };
+
+  /*!
+   * Can be passed to constructors of convenience port classes to not create a port
+   * (calling the default-constructor during component initialization, typically creates a port).
+   * Doing so, no port will be created and GetWrapped() will return nullptr.
+   * A port may be assigned later (note that name and parent need to be provided for construction).
+   */
+  static tFlag cDO_NOT_CREATE_NOW;
+
 
   /*!
    * \param parent Parent
@@ -110,6 +143,73 @@ public:
     parameters::tConfigNode::SetConfigNode(*this, node);
   }
 
+  /*!
+   * Defines that specified port can be used for component visualization.
+   * Must be called before port has been initialized
+   * (otherwise and error message is printed and call is ignored)
+   *
+   * \param port Port containing data for visualization
+   * \param level_of_detail Defines for which level of details port is suitable
+   */
+  static void SetVisualizationPort(core::tPortWrapperBase port, tLevelOfDetail level_of_detail);
+
+
+  /**
+   * Port classes for component visualization purposes only.
+   * If rrlib_component_visualization is not present, no port will be created.
+   * Before doing anything with a visualization port (apart from constructing),
+   * IsConnected() should be called to determine whether creating a visualization
+   * is necessary.
+   * IsConnected() will always return false, if no port was created.
+   *
+   * Constructor takes a variadic argument list... just any properties you want to assign to port.
+   *
+   * Unlike tPort, port name and parent are usually determined automatically (however, only possible when port is direct class member).
+   * If this is not possible/desired, name needs to be provided as first constructor argument - parent as arbitrary one.
+   *
+   * So...
+   *
+   * The first parameter defines for which level of details port is suitable
+   * A string as second parameter is interpreted as port name; Any other string as config entry
+   * A framework element pointer is interpreted as parent.
+   * tFrameworkElement::tFlags arguments are interpreted as flags.
+   * A tQueueSettings argument creates an input queue with the specified settings.
+   * tBounds<T> are port's bounds.
+   * tUnit argument is port's unit.
+   * const T& is interpreted as port's default value.
+   * tPortCreationInfo<T> argument is copied. This is only allowed as first argument.
+   *
+   * This becomes a little tricky when T is a string type. There we have these rules:
+   * A String not provided as second argument is interpreted as default value.
+   * Any further string is interpreted as config entry.
+   */
+  template <typename T>
+  class tVisualizationPort : public tConveniencePort<data_ports::tOutputPort<T>, tComponent, tFrameworkElement, &tComponent::GetVisualizationParent>
+  {
+    typedef tConveniencePort<data_ports::tOutputPort<T>, tComponent, tFrameworkElement, &tComponent::GetVisualizationParent> tBase;
+
+  public:
+    template<typename ... ARGS>
+    explicit tVisualizationPort(tLevelOfDetail level_of_detail, const ARGS&... args)
+      : tBase(create_component_visualization_ports ? tFlag::PORT : cDO_NOT_CREATE_NOW, args...)
+    {
+      if (create_component_visualization_ports)
+      {
+        SetVisualizationPort(*this, level_of_detail);
+      }
+    }
+
+    /*!
+     * \return Is anyone interested in visualization from this port? If not, port must not be used for publishing any data
+     */
+    inline bool IsConnected() const
+    {
+      if (tBase::GetWrapped())
+      {
+        return tBase::IsConnected();
+      }
+    }
+  };
 
   /*!
    * When storing convenience ports in std::unique pointers, this class can be used as deleter so that
@@ -171,6 +271,11 @@ private:
   /*! Counter should be reset for every module class in type hierarchy. This helper variable is used to detect this. */
   const char* count_for_type;
 
+  /*!
+   * Global setting as to whether component visualization ports should be created.
+   * Must be set at program startup - before components are created - to have an effect.
+   */
+  static bool create_component_visualization_ports;
 };
 
 //----------------------------------------------------------------------

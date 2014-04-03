@@ -32,6 +32,8 @@
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
+#include "rrlib/util/tTraceableException.h"
+#include "core/tFrameworkElementTags.h"
 
 //----------------------------------------------------------------------
 // Internal includes with ""
@@ -65,12 +67,14 @@ namespace structure
 //----------------------------------------------------------------------
 // Implementation
 //----------------------------------------------------------------------
+bool tComponent::create_component_visualization_ports = true;
+core::tFrameworkElement::tFlag tComponent::cDO_NOT_CREATE_NOW = core::tFrameworkElement::tFlag::DELETED;
 
 tComponent::tComponent(core::tFrameworkElement *parent, const std::string &name, tFlags extra_flags) :
   tFrameworkElement(parent, name, extra_flags),
-  parameters(NULL),
+  parameters(nullptr),
   auto_name_port_count(0),
-  count_for_type(NULL)
+  count_for_type(nullptr)
 {
   internal::AddModule(this);
   if (!internal::FindParent(this, false))
@@ -103,6 +107,53 @@ core::tFrameworkElement& tComponent::GetParameterParent()
   return *parameters;
 }
 
+core::tFrameworkElement& tComponent::GetVisualizationParent()
+{
+  if (!create_component_visualization_ports)
+  {
+    return *this;
+  }
+
+  core::tFrameworkElement* visualization = this->GetChild("Visualization");
+  if (!visualization)
+  {
+    visualization = new tFrameworkElement(this, "Visualization");
+    if (IsReady())
+    {
+      visualization->Init();
+    }
+  }
+  return *visualization;
+}
+
+void tComponent::SetVisualizationPort(core::tPortWrapperBase port, tLevelOfDetail level_of_detail)
+{
+  // Tags for ports - depending on level of detail
+  static const std::vector<std::string> cTAGS =
+  {
+    "visualization-low",
+    "visualization-mid",
+    "visualization-high",
+    "visualization-all",
+    "visualization-more",
+    "visualization-less"
+  };
+
+  if (!port.GetWrapped())
+  {
+    throw rrlib::util::tTraceableException<std::runtime_error>("Port wrapper does not contain port");
+  }
+  else if (port.IsReady())
+  {
+    FINROC_LOG_PRINT_STATIC(ERROR, "Port '", port.GetWrapped()->GetQualifiedName(), "' has already been initialized. Ignoring SetVisualizationPort() call.");
+    return;
+  }
+
+  if (create_component_visualization_ports)
+  {
+    core::tFrameworkElementTags::AddTag(*port.GetWrapped(), cTAGS[static_cast<int>(level_of_detail)]);
+  }
+}
 
 void* tComponent::operator new(size_t size)
 {
