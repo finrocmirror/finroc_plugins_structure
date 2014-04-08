@@ -66,13 +66,18 @@ namespace structure
 // Implementation
 //----------------------------------------------------------------------
 
-static runtime_construction::tStandardCreateModuleAction<tThreadContainer> cCREATE_ACTION_1("ThreadContainer");
+static runtime_construction::tStandardCreateModuleAction<tThreadContainer<>> cCREATE_ACTION_1("ThreadContainer");
+static runtime_construction::tStandardCreateModuleAction<tThreadContainer<tGroup>> cCREATE_ACTION_2("ThreadContainer<Group>");
+
+// This create action is basically the same as the first, but preferred as it is more explicit (we have the first for backward-compatibility)
+static runtime_construction::tStandardCreateModuleAction<tThreadContainer<tSenseControlGroup>> cCREATE_ACTION_3("ThreadContainer<SenseControlGroup>");
 
 //----------------------------------------------------------------------
 // End of namespace declaration
 //----------------------------------------------------------------------
 }
 
+template class scheduling::tThreadContainerElement<structure::tGroup>;
 template class scheduling::tThreadContainerElement<structure::tSenseControlGroup>;
 
 }

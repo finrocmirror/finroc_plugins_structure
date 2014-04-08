@@ -90,11 +90,7 @@ int main(int argc, char **argv)
   finroc::structure::InstallCrashHandler();
   finroc::structure::ConnectTCPPeer(basename(argv[0]));
 
-  finroc::structure::tThreadContainer *main_thread = new finroc::structure::tThreadContainer(
-    &finroc::core::tRuntimeEnvironment::GetInstance(), cMAIN_THREAD_CONTAINER_NAME, "", true, make_all_port_links_unique ? tFlags(tFlag::GLOBALLY_UNIQUE_LINK) : tFlags()); // TODO: Put part xml here?
-  main_thread->InitiallyShowInTools();
-
-  InitMainGroup(main_thread, remaining_arguments);
+  InitMainGroup(remaining_arguments);
 
   return finroc::structure::InitializeAndRunMainLoop(basename(argv[0]));
 }

@@ -69,13 +69,12 @@ namespace structure
 // Implementation
 //----------------------------------------------------------------------
 
-tModule::tModule(tFrameworkElement *parent, const std::string &name, bool share_output_ports, bool share_input_ports)
+tModule::tModule(tFrameworkElement *parent, const std::string &name, bool share_ports)
   : tModuleBase(parent, name),
 
     input(NULL),
     output(NULL),
-    share_output_ports(share_output_ports),
-    share_input_ports(share_input_ports),
+    share_ports(share_ports),
     update_task(*this),
     input_changed(true)
 {

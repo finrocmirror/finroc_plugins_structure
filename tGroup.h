@@ -130,8 +130,8 @@ public:
 public:
 
   tGroup(core::tFrameworkElement *parent, const std::string &name,
-         const std::string &structure_config_file = "",
-         bool share_output_ports = false, bool share_input_ports = false, tFlags extra_flags = tFlags());
+         const std::string &structure_config_file = "", bool share_ports = false,
+         tFlags extra_flags = tFlags());
 
   /*!
    * Get interface (or "port group") by name
