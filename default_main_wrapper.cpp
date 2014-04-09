@@ -90,7 +90,7 @@ int main(int argc, char **argv)
   finroc::structure::InstallCrashHandler();
   finroc::structure::ConnectTCPPeer(basename(argv[0]));
 
-  InitMainGroup(remaining_arguments);
+  CreateMainGroup(remaining_arguments);
 
   return finroc::structure::InitializeAndRunMainLoop(basename(argv[0]));
 }

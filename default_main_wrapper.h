@@ -64,7 +64,7 @@ extern bool make_all_port_links_unique;
 //----------------------------------------------------------------------
 
 void StartUp();
-void InitMainGroup(const std::vector<std::string> &remaining_arguments);
+void CreateMainGroup(const std::vector<std::string> &remaining_arguments);
 
 
 #endif

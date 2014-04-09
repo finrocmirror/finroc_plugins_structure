@@ -78,6 +78,10 @@ public:
 
   tModule(core::tFrameworkElement *parent, const std::string &name, bool share_ports = false);
 
+  tModule(core::tFrameworkElement *parent, const std::string &name, bool share_ports, bool outdated_second_share_parameter) __attribute__((deprecated)) :
+    tModule(parent, name, share_ports | outdated_second_share_parameter)
+  {}
+
   /*!
    * \return Parent port group of all inputs
    */
