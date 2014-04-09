@@ -96,7 +96,8 @@ public:
   }
 
   /*!
-   * Constructor to cope with any
+   * Constructor to cope with any other base class constructors
+   * FIXME: Existence of this constructor causes a segfault in gcc if e.g. only the first argument of the first constructor is provided
    */
   template <typename ... TArgs>
   tTopLevelThreadContainer(const TArgs &... args, typename std::enable_if<sizeof...(args) >= 4, bool >::type port_links_are_unique = true) :
