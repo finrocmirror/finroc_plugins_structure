@@ -42,7 +42,7 @@
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
 #include "rrlib/getopt/parser.h"
-#include "plugins/structure/tThreadContainer.h"
+#include "plugins/structure/tTopLevelThreadContainer.h"
 
 //----------------------------------------------------------------------
 // Internal includes with ""
@@ -56,7 +56,6 @@ typedef finroc::core::tFrameworkElement::tFlags tFlags;
 extern const std::string cPROGRAM_DESCRIPTION;
 extern const std::string cCOMMAND_LINE_ARGUMENTS;
 extern const std::string cADDITIONAL_HELP_TEXT;
-extern const std::string cMAIN_THREAD_CONTAINER_NAME;
 
 extern bool make_all_port_links_unique;
 
@@ -65,7 +64,7 @@ extern bool make_all_port_links_unique;
 //----------------------------------------------------------------------
 
 void StartUp();
-void InitMainGroup(finroc::structure::tThreadContainer *main_thread, const std::vector<std::string> &remaining_arguments);
+void CreateMainGroup(const std::vector<std::string> &remaining_arguments);
 
 
 #endif

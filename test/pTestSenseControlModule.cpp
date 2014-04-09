@@ -65,7 +65,6 @@ using finroc::structure::test::mTestSenseControlModule;
 const std::string cPROGRAM_DESCRIPTION = "Test program for sense-control modules";
 const std::string cCOMMAND_LINE_ARGUMENTS = "";
 const std::string cADDITIONAL_HELP_TEXT = "";
-const std::string cMAIN_THREAD_CONTAINER_NAME = "Main Thread";
 bool make_all_port_links_unique = true;
 
 //----------------------------------------------------------------------
@@ -81,8 +80,11 @@ void StartUp()
 //----------------------------------------------------------------------
 // InitMainGroup
 //----------------------------------------------------------------------
-void InitMainGroup(finroc::structure::tThreadContainer *main_thread, const std::vector<std::string> &remaining_arguments)
+void CreateMainGroup(const std::vector<std::string> &remaining_arguments)
 {
+  finroc::structure::tTopLevelThreadContainer<>* main_thread =
+    new finroc::structure::tTopLevelThreadContainer<>("Main Thread");
+
   mTestSenseControlModule *test_module = new mTestSenseControlModule(main_thread);
   test_module->Init();
 

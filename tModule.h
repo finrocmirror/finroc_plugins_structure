@@ -76,7 +76,11 @@ class tModule : public tModuleBase
 //----------------------------------------------------------------------
 public:
 
-  tModule(core::tFrameworkElement *parent, const std::string &name, bool share_output_ports = false, bool share_input_ports = false);
+  tModule(core::tFrameworkElement *parent, const std::string &name, bool share_ports = false);
+
+  tModule(core::tFrameworkElement *parent, const std::string &name, bool share_ports, bool outdated_second_share_parameter) __attribute__((deprecated)) :
+    tModule(parent, name, share_ports | outdated_second_share_parameter)
+  {}
 
   /*!
    * \return Parent port group of all inputs
@@ -85,7 +89,7 @@ public:
   {
     if (!input)
     {
-      input = CreateInterface("Input", share_input_ports);
+      input = CreateInterface("Input", share_ports);
     }
     return *input;
   }
@@ -97,7 +101,7 @@ public:
   {
     if (!output)
     {
-      output = CreateInterface("Output", share_output_ports);
+      output = CreateInterface("Output", share_ports);
     }
     return *output;
   }
@@ -160,11 +164,8 @@ private:
   finroc::core::tPortGroup *input;
   finroc::core::tPortGroup *output;
 
-  /*! Should output ports be shared? */
-  bool share_output_ports;
-
-  /*! Should input ports be shared? */
-  bool share_input_ports;
+  /*! Should ports be shared? */
+  bool share_ports;
 
   /*! Task that calls Update() regularly */
   class UpdateTask : public rrlib::thread::tTask

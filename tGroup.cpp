@@ -81,11 +81,11 @@ const std::vector<tStaticInterfaceInfo>& cSTATIC_INTERFACE_INFO_GROUP =
 //----------------------------------------------------------------------
 tGroup::tGroup(tFrameworkElement *parent, const std::string &name,
                const std::string &structure_config_file,
-               bool share_output_ports, bool share_input_ports, tFlags extra_flags) :
+               bool share_ports, tFlags extra_flags) :
   tCompositeComponent(parent, name, structure_config_file, extra_flags)
 {
   interface_array.fill(NULL);
-  this->EmplaceAnnotation<runtime_construction::tEditableInterfaces>(cSTATIC_INTERFACE_INFO_GROUP, interface_array.begin(), share_input_ports | (share_output_ports << 1));
+  this->EmplaceAnnotation<runtime_construction::tEditableInterfaces>(cSTATIC_INTERFACE_INFO_GROUP, interface_array.begin(), share_ports | (share_ports << 1));
 }
 
 core::tPortGroup& tGroup::GetInterface(tInterfaceEnumeration desired_interface)
