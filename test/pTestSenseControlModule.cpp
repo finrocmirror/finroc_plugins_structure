@@ -78,7 +78,7 @@ void StartUp()
 {}
 
 //----------------------------------------------------------------------
-// InitMainGroup
+// CreateMainGroup
 //----------------------------------------------------------------------
 void CreateMainGroup(const std::vector<std::string> &remaining_arguments)
 {

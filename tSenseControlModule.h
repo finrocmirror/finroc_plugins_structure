@@ -208,10 +208,10 @@ protected:
 private:
 
   /*! Module's interfaces */
-  finroc::core::tPortGroup *sensor_input;
-  finroc::core::tPortGroup *sensor_output;
-  finroc::core::tPortGroup *controller_input;
-  finroc::core::tPortGroup *controller_output;
+  core::tPortGroup *sensor_input;
+  core::tPortGroup *sensor_output;
+  core::tPortGroup *controller_input;
+  core::tPortGroup *controller_output;
 
   /*! Share sensor output and controller input ports so that they can be accessed from other runtime environments? */
   bool share_so_and_ci_ports;

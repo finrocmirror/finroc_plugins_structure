@@ -111,7 +111,7 @@ std::mutex main_thread_wait_mutex;
 std::condition_variable main_thread_wait_variable;
 
 #ifdef _LIB_FINROC_PLUGINS_TCP_PRESENT_
-finroc::tcp::tPeer *tcp_peer;
+tcp::tPeer *tcp_peer;
 #endif
 
 //----------------------------------------------------------------------
@@ -157,7 +157,7 @@ bool OptionsHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
   if (parameter_config->IsActive())
   {
     const std::string &file = rrlib::getopt::EvaluateValue(parameter_config);
-    if (!finroc::core::FinrocFileExists(file))
+    if (!core::FinrocFileExists(file))
     {
       FINROC_LOG_PRINT(ERROR, "Could not find specified config file ", file);
       return false;
@@ -166,7 +166,7 @@ bool OptionsHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
     {
       FINROC_LOG_PRINT(DEBUG, "Loading config file ", file);
     }
-    finroc::core::tRuntimeEnvironment::GetInstance().AddAnnotation(*new finroc::parameters::tConfigFile(file));
+    core::tRuntimeEnvironment::GetInstance().AddAnnotation(*new parameters::tConfigFile(file));
   }
 
   // pause
@@ -301,7 +301,7 @@ void ConnectTCPPeer(const std::string &peer_name)
 #ifdef _LIB_FINROC_PLUGINS_TCP_PRESENT_
   // Create and connect TCP peer
   tcp::tOptions::GetDefaultOptions().peer_name = peer_name;
-  tcp_peer = new finroc::tcp::tPeer();
+  tcp_peer = new tcp::tPeer();
   tcp_peer->Init();
   try
   {
@@ -319,16 +319,16 @@ void ConnectTCPPeer(const std::string &peer_name)
 //----------------------------------------------------------------------
 int InitializeAndRunMainLoop(const std::string &program_name)
 {
-  finroc::core::tRuntimeEnvironment &runtime_environment = finroc::core::tRuntimeEnvironment::GetInstance();
+  core::tRuntimeEnvironment &runtime_environment = core::tRuntimeEnvironment::GetInstance();
 
-  typedef finroc::core::tFrameworkElement::tFlag tFlag;
+  typedef core::tFrameworkElement::tFlag tFlag;
 
   // Have any top-level framework elements containing threads already been created?
   // In this case, we won't create an extra thread container (finstructed part does not need one for example)
-  std::vector<finroc::core::tFrameworkElement*> executables;
+  std::vector<core::tFrameworkElement*> executables;
   for (auto it = runtime_environment.ChildrenBegin(); it != runtime_environment.ChildrenEnd(); ++it)
   {
-    if (it->GetAnnotation<finroc::scheduling::tExecutionControl>() && (it->GetFlag(tFlag::FINSTRUCTABLE_GROUP) || it->GetFlag(tFlag::EDGE_AGGREGATOR)))
+    if (it->GetAnnotation<scheduling::tExecutionControl>() && (it->GetFlag(tFlag::FINSTRUCTABLE_GROUP) || it->GetFlag(tFlag::EDGE_AGGREGATOR)))
     {
       executables.push_back(&(*it));
     }
@@ -336,7 +336,7 @@ int InitializeAndRunMainLoop(const std::string &program_name)
 
   for (size_t i = 0; i < executables.size(); i++)
   {
-    finroc::core::tFrameworkElement* fe = executables[i];
+    core::tFrameworkElement* fe = executables[i];
     if (!fe->IsReady())
     {
       fe->Init();
@@ -352,14 +352,14 @@ int InitializeAndRunMainLoop(const std::string &program_name)
 
   for (size_t i = 0; i < executables.size(); i++)
   {
-    finroc::core::tFrameworkElement* fe = executables[i];
+    core::tFrameworkElement* fe = executables[i];
     if (pause_at_startup)
     {
-      finroc::scheduling::tExecutionControl::PauseAll(*fe); // Shouldn't be necessary, but who knows what people might implement
+      scheduling::tExecutionControl::PauseAll(*fe); // Shouldn't be necessary, but who knows what people might implement
     }
     else
     {
-      finroc::scheduling::tExecutionControl::StartAll(*fe);
+      scheduling::tExecutionControl::StartAll(*fe);
       FINROC_LOG_PRINT(USER, "Finroc program '", program_name, "' is now running.");
     }
   }
@@ -376,7 +376,7 @@ int InitializeAndRunMainLoop(const std::string &program_name)
 
   // In many cases this is not necessary.
   // However, doing this before static deinitialization can avoid issues with external libraries and thread container threads still running.
-  finroc::core::tRuntimeEnvironment::Shutdown();
+  core::tRuntimeEnvironment::Shutdown();
 
   return EXIT_SUCCESS;
 }

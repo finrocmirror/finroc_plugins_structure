@@ -69,7 +69,7 @@ static runtime_construction::tStandardCreateModuleAction<mTestSenseControlModule
 //----------------------------------------------------------------------
 // Implementation
 //----------------------------------------------------------------------
-mTestSenseControlModule::mTestSenseControlModule(finroc::core::tFrameworkElement *parent, const std::string &name)
+mTestSenseControlModule::mTestSenseControlModule(core::tFrameworkElement *parent, const std::string &name)
   : tSenseControlModule(parent, name),
     counter(0)
 {}

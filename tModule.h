@@ -161,8 +161,8 @@ protected:
 private:
 
   /*! Module's interfaces */
-  finroc::core::tPortGroup *input;
-  finroc::core::tPortGroup *output;
+  core::tPortGroup *input;
+  core::tPortGroup *output;
 
   /*! Should ports be shared? */
   bool share_ports;

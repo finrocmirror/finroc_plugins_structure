@@ -187,7 +187,7 @@ private:
    * Pointers to group's interfaces
    * Initially, no interface exists and all pointers are NULL.
    */
-  std::array<finroc::core::tPortGroup*, eINTERFACE_DIMENSION> interface_array;
+  std::array<core::tPortGroup*, eINTERFACE_DIMENSION> interface_array;
 
   /*!
    * \param desired_interface Interface to obtain.
