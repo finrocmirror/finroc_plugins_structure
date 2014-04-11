@@ -13,6 +13,7 @@
       tSenseControlGroup.cpp
       tSenseControlModule.cpp
       tThreadContainer.cpp
+      tTopLevelThreadContainer.h
     </sources>
   </finrocplugin>
 
