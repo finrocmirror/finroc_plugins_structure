@@ -92,13 +92,13 @@ public:
    */
   enum class tLevelOfDetail : int
   {
-    LOW,    //<! Suitable for low setting (up to 80x60 pixel)
-    MID,    //<! Suitable for medium setting (up to 200x150 pixel)
-    HIGH,   //<! Suitable for high setting
+    LOW,          //<! Suitable for low setting (up to 80x60 pixel)
+    MID,          //<! Suitable for medium setting (up to 200x150 pixel)
+    HIGH,         //<! Suitable for high setting (max. details)
 
-    ALL,    //<! Suitable for all levels
-    MORE,   //<! Suitable for high and medium setting
-    LESS    //<! Suitable for low and medium setting
+    ALL,          //<! Suitable for all levels
+    MID_AND_HIGH, //<! Suitable for high and medium setting
+    LOW_AND_MID   //<! Suitable for low and medium setting
   };
 
   /*!
@@ -155,9 +155,14 @@ public:
 
 
   /**
-   * Port classes for component visualization purposes only.
-   * If rrlib_component_visualization is not present, no port will be created.
-   * Before doing anything with a visualization port (apart from constructing),
+   * Port class for component visualization purposes only.
+   *
+   * The first template parameter T is the data type of the port and should be a
+   * data type that finstruct can visualize (e.g. tImage oder tCanvas).
+   * The seconds template parameter defines for which level of details the port is suitable
+   *
+   * If create_component_visualization_ports is false, no port will be created.
+   * So before doing anything with a visualization port (apart from constructing),
    * IsConnected() should be called to determine whether creating a visualization
    * is necessary.
    * IsConnected() will always return false, if no port was created.
@@ -169,7 +174,6 @@ public:
    *
    * So...
    *
-   * The first parameter defines for which level of details port is suitable
    * A string as second parameter is interpreted as port name; Any other string as config entry
    * A framework element pointer is interpreted as parent.
    * tFrameworkElement::tFlags arguments are interpreted as flags.
@@ -183,19 +187,19 @@ public:
    * A String not provided as second argument is interpreted as default value.
    * Any further string is interpreted as config entry.
    */
-  template <typename T>
-  class tVisualizationPort : public tConveniencePort<data_ports::tOutputPort<T>, tComponent, tFrameworkElement, &tComponent::GetVisualizationParent>
+  template <typename T, tLevelOfDetail Tlevel_of_detail>
+  class tVisualizationOutput : public tConveniencePort<data_ports::tOutputPort<T>, tComponent, tFrameworkElement, &tComponent::GetVisualizationParent>
   {
     typedef tConveniencePort<data_ports::tOutputPort<T>, tComponent, tFrameworkElement, &tComponent::GetVisualizationParent> tBase;
 
   public:
     template<typename ... ARGS>
-    explicit tVisualizationPort(tLevelOfDetail level_of_detail, const ARGS&... args)
+    explicit tVisualizationOutput(const ARGS&... args)
       : tBase(create_component_visualization_ports ? tFlag::PORT : cDO_NOT_CREATE_NOW, args...)
     {
       if (create_component_visualization_ports)
       {
-        SetVisualizationPort(*this, level_of_detail);
+        SetVisualizationPort(*this, Tlevel_of_detail);
       }
     }
 
@@ -239,6 +243,9 @@ protected:
 
   /*! GetContainer function for e.g. tParameter */
   tFrameworkElement& GetParameterParent();
+
+  /*! GetContainer function for services */
+  tFrameworkElement& GetServicesParent();
 
   /*! GetContainer function for e.g. tStaticParameter */
   tFrameworkElement& GetThis()

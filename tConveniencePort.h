@@ -82,7 +82,6 @@ namespace structure
 template <typename TPort, typename TElement, typename TContainer, TContainer& (TElement::*GET_CONTAINER)()>
 class tConveniencePort : public TPort
 {
-  typedef typename TPort::tDataType tDataType;
   typedef typename TPort::tConstructorParameters tConstructorParameters;
 
 //----------------------------------------------------------------------
@@ -113,8 +112,8 @@ public:
    * A String not provided as first argument is interpreted as default value.
    * Any further string is interpreted as config entry.
    */
-  template<typename A1, typename ... ARest>
-  tConveniencePort(const A1& arg1, const ARest&... rest) : TPort(MakeCreationInfo(arg1, rest...)) {}
+  template<typename T1, typename ... TRest>
+  explicit tConveniencePort(T1&& arg1, TRest&&... rest) : TPort(MakeCreationInfo(std::forward<T1>(arg1), std::forward<TRest>(rest)...)) {}
 
   /*!
    * (relevant for input ports and parameters only)
@@ -190,8 +189,11 @@ private:
    * Create port creation info for this convenience port (template constructor)
    */
   template<typename A1, typename ... ARest>
-  tConstructorParameters MakeCreationInfo(const A1& arg1, const ARest&... rest)
+  tConstructorParameters MakeCreationInfo(A1&& arg1, ARest&&... rest)
   {
+    static_assert(!std::is_base_of<core::tPortWrapperBase, A1>::value, "No ports may be passed to this method");
+    static_assert(!std::is_base_of<tConveniencePort, A1>::value, "No ports may be passed to this method");
+
     tConstructorParameters result;
     if (data_ports::IsString<A1>::value)
     {

@@ -45,6 +45,10 @@
 #include "plugins/data_ports/tOutputPort.h"
 #include "plugins/parameters/tParameter.h"
 #include "plugins/parameters/tStaticParameter.h"
+#ifdef _LIB_FINROC_PLUGINS_RPC_PORTS_PRESENT_
+#include "plugins/rpc_ports/tClientPort.h"
+#include "plugins/rpc_ports/tServerPort.h"
+#endif
 
 //----------------------------------------------------------------------
 // Internal includes with ""
@@ -89,9 +93,9 @@ public:
                       tFlags extra_flags = tFlags());
 
   /**
-   * Parameter class to use in composite component.
+   * Port and parameter class to use in composite components.
    *
-   * Constructors take a variadic argument list... just any properties you want to assign to parameter.
+   * Constructors take a variadic argument list... just any properties you want to assign to port/parameter.
    *
    * Unlike tPort, port name and parent are usually determined automatically (however, only possible when port is direct class member).
    * If this is not possible/desired, name needs to be provided as first constructor argument - parent as arbitrary one.
@@ -109,6 +113,14 @@ public:
    * A String not provided as first argument is interpreted as default value.
    * Any further string is interpreted as config entry.
    */
+#ifdef _LIB_FINROC_PLUGINS_RPC_PORTS_PRESENT_
+  template <typename T>
+  using tServer = tConveniencePort<rpc_ports::tServerPort<T>, tComponent, tFrameworkElement, &tCompositeComponent::GetServicesParent>;
+
+  template <typename T>
+  using tClient = tConveniencePort<rpc_ports::tClientPort<T>, tComponent, tFrameworkElement, &tCompositeComponent::GetServicesParent>;
+#endif
+
   template <typename T>
   class tParameter : public tConveniencePort<parameters::tParameter<T>, tComponent, tFrameworkElement, &tCompositeComponent::GetParameterParent>
   {

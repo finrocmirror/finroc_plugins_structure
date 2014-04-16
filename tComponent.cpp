@@ -107,6 +107,20 @@ core::tFrameworkElement& tComponent::GetParameterParent()
   return *parameters;
 }
 
+core::tFrameworkElement& tComponent::GetServicesParent()
+{
+  core::tFrameworkElement* services = this->GetChild("Services");
+  if (!services)
+  {
+    services = new tFrameworkElement(this, "Services");
+    if (IsReady())
+    {
+      services->Init();
+    }
+  }
+  return *services;
+}
+
 core::tFrameworkElement& tComponent::GetVisualizationParent()
 {
   if (!create_component_visualization_ports)
