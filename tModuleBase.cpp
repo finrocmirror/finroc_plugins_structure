@@ -98,6 +98,20 @@ core::tPortGroup* tModuleBase::CreateInterface(const std::string& name, bool sha
   return new core::tPortGroup(this, name, tFlag::INTERFACE | extra_flags, share_ports ? tFlags(tFlag::SHARED) : tFlags());
 }
 
+core::tPortGroup& tModuleBase::GetProfilingPortGroup()
+{
+  core::tFrameworkElement* port_group = this->GetChild("Profiling");
+  if (!port_group)
+  {
+    port_group = new core::tPortGroup(this, "Profiling", tFlags(), tFlags());
+    if (IsReady())
+    {
+      port_group->Init();
+    }
+  }
+  return static_cast<core::tPortGroup&>(*port_group);
+}
+
 void tModuleBase::tParameterChangeDetector::OnPortChange(data_ports::tChangeContext& change_context)
 {
   parameters_changed = true;

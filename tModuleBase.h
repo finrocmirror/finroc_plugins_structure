@@ -130,6 +130,11 @@ public:
   template <typename T>
   using tStaticParameter = tConveniencePort<parameters::tStaticParameter<T>, tComponent, core::tFrameworkElement, &tComponent::GetThis>;
 
+  /*!
+   * \return Port group with profiling ports. Created with first call to this function.
+   */
+  core::tPortGroup& GetProfilingPortGroup();
+
 //----------------------------------------------------------------------
 // Protected methods
 //----------------------------------------------------------------------

@@ -94,7 +94,13 @@ void tSenseControlModule::PostChildInit()
   tFrameworkElement* controller_task_parent = controller_input ? controller_input : (controller_output ? controller_output : NULL);
   if (controller_task_parent)
   {
-    controller_task_parent->AddAnnotation(*new scheduling::tPeriodicFrameworkElementTask(this->controller_input, this->controller_output, this->control_task));
+    data_ports::tOutputPort<rrlib::time::tDuration> execution_duration;
+    if (scheduling::IsProfilingEnabled())
+    {
+      execution_duration = data_ports::tOutputPort<rrlib::time::tDuration>(&GetProfilingPortGroup(), "Control() Duration");
+      execution_duration.Init();
+    }
+    controller_task_parent->AddAnnotation(*new scheduling::tPeriodicFrameworkElementTask(this->controller_input, this->controller_output, this->control_task, execution_duration));
   }
   else
   {
@@ -104,7 +110,13 @@ void tSenseControlModule::PostChildInit()
   tFrameworkElement* sensor_task_parent = sensor_input ? sensor_input : (sensor_output ? sensor_output : NULL);
   if (sensor_task_parent)
   {
-    sensor_task_parent->AddAnnotation(*new scheduling::tPeriodicFrameworkElementTask(this->sensor_input, this->sensor_output, this->sense_task));
+    data_ports::tOutputPort<rrlib::time::tDuration> execution_duration;
+    if (scheduling::IsProfilingEnabled())
+    {
+      execution_duration = data_ports::tOutputPort<rrlib::time::tDuration>(&GetProfilingPortGroup(), "Control() Duration");
+      execution_duration.Init();
+    }
+    sensor_task_parent->AddAnnotation(*new scheduling::tPeriodicFrameworkElementTask(this->sensor_input, this->sensor_output, this->sense_task, execution_duration));
   }
   else
   {

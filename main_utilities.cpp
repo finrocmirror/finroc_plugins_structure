@@ -53,6 +53,7 @@ extern "C"
 #include "core/tRuntimeEnvironment.h"
 #include "plugins/parameters/tConfigFile.h"
 #include "plugins/scheduling/tExecutionControl.h"
+#include "plugins/scheduling/scheduling.h"
 
 #ifdef _LIB_FINROC_PLUGINS_TCP_PRESENT_
 #include "plugins/tcp/tPeer.h"
@@ -238,6 +239,13 @@ bool OptionsHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
     }
   }
 
+  // profiling
+  rrlib::getopt::tOption profiling(name_to_option_map.at("profiling"));
+  if (profiling->IsActive())
+  {
+    scheduling::SetProfilingEnabled(true);
+  }
+
   return true;
 }
 
@@ -275,6 +283,7 @@ void RegisterCommonOptions()
   rrlib::getopt::AddValue("crash-handler", 0, "Enable/disable crash handler (default: 'on' in debug mode - 'off' in release mode).", &OptionsHandler);
   rrlib::getopt::AddFlag("pause", 0, "Pause program at startup", &OptionsHandler);
   rrlib::getopt::AddFlag("port-links-are-not-unique", 0, "Port links in this part are not unique in P2P network (=> host name is prepended in GUI, for instance).", &OptionsHandler);
+  rrlib::getopt::AddFlag("profiling", 0, "Enables profiling (creates additional ports with profiling information)", &OptionsHandler);
 }
 
 //----------------------------------------------------------------------

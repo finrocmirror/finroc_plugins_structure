@@ -86,7 +86,13 @@ tModule::~tModule()
 void tModule::PostChildInit()
 {
   CheckStaticParameters(); // evaluate static parameters before we create the task
-  this->AddAnnotation(*new scheduling::tPeriodicFrameworkElementTask(this->input, this->output, this->update_task));
+  data_ports::tOutputPort<rrlib::time::tDuration> execution_duration;
+  if (scheduling::IsProfilingEnabled())
+  {
+    execution_duration = data_ports::tOutputPort<rrlib::time::tDuration>(&GetProfilingPortGroup(), "Update() Duration");
+    execution_duration.Init();
+  }
+  this->AddAnnotation(*new scheduling::tPeriodicFrameworkElementTask(this->input, this->output, this->update_task, execution_duration));
 }
 
 tModule::UpdateTask::UpdateTask(tModule& module)
