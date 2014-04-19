@@ -113,7 +113,7 @@ void tSenseControlModule::PostChildInit()
     data_ports::tOutputPort<rrlib::time::tDuration> execution_duration;
     if (scheduling::IsProfilingEnabled())
     {
-      execution_duration = data_ports::tOutputPort<rrlib::time::tDuration>(&GetProfilingPortGroup(), "Control() Duration");
+      execution_duration = data_ports::tOutputPort<rrlib::time::tDuration>(&GetProfilingPortGroup(), "Sense() Duration");
       execution_duration.Init();
     }
     sensor_task_parent->AddAnnotation(*new scheduling::tPeriodicFrameworkElementTask(this->sensor_input, this->sensor_output, this->sense_task, execution_duration));
