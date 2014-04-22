@@ -212,6 +212,7 @@ public:
       {
         return tBase::IsConnected();
       }
+      return false;
     }
   };
 
