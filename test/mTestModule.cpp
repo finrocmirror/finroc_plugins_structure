@@ -90,12 +90,12 @@ mTestModule::~mTestModule()
 void mTestModule::Update()
 {
   this->output_signal.Publish(this->counter);
-  FINROC_LOG_PRINT(DEBUG, this->counter);
+  FINROC_LOG_PRINT(DEBUG, this->counter, " ", rrlib::time::ToIsoString(rrlib::time::Now()));
   this->counter++;
 
   if (this->input_signal.HasChanged())
   {
-    FINROC_LOG_PRINT(USER, "Received input signal: ", this->input_signal.Get());
+    FINROC_LOG_PRINT(USER, "Received input signal: ", this->input_signal.Get(), " ", rrlib::time::ToIsoString(rrlib::time::Now()));
   }
 }
 

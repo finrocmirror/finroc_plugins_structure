@@ -159,7 +159,7 @@ public:
    *
    * The first template parameter T is the data type of the port and should be a
    * data type that finstruct can visualize (e.g. tImage oder tCanvas).
-   * The seconds template parameter defines for which level of details the port is suitable
+   * The seconds template parameter defines for which level of details the port is suitable.
    *
    * If create_component_visualization_ports is false, no port will be created.
    * So before doing anything with a visualization port (apart from constructing),
@@ -174,7 +174,7 @@ public:
    *
    * So...
    *
-   * A string as second parameter is interpreted as port name; Any other string as config entry
+   * A string as first parameter is interpreted as port name; Any other string as config entry
    * A framework element pointer is interpreted as parent.
    * tFrameworkElement::tFlags arguments are interpreted as flags.
    * A tQueueSettings argument creates an input queue with the specified settings.
@@ -184,7 +184,7 @@ public:
    * tPortCreationInfo<T> argument is copied. This is only allowed as first argument.
    *
    * This becomes a little tricky when T is a string type. There we have these rules:
-   * A String not provided as second argument is interpreted as default value.
+   * A String not provided as first argument is interpreted as default value.
    * Any further string is interpreted as config entry.
    */
   template <typename T, tLevelOfDetail Tlevel_of_detail>
@@ -195,7 +195,7 @@ public:
   public:
     template<typename ... ARGS>
     explicit tVisualizationOutput(const ARGS&... args)
-      : tBase(create_component_visualization_ports ? tFlag::PORT : cDO_NOT_CREATE_NOW, args...)
+      : tBase(args..., create_component_visualization_ports ? tFlag::PORT : cDO_NOT_CREATE_NOW)
     {
       if (create_component_visualization_ports)
       {
