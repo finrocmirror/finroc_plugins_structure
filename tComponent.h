@@ -217,6 +217,15 @@ public:
   };
 
   /*!
+   * Globally sets whether dedicated component visualization outputs (tVisualizationOutput)
+   * should be created (enabled by default).
+   * Must be set at program startup - before components are created - to have an effect.
+   *
+   * \param enabled Whether to create visualization outputs
+   */
+  static void SetComponentVisualizationEnabled(bool enabled);
+
+  /*!
    * When storing convenience ports in std::unique pointers, this class can be used as deleter so that
    * actual wrapped port is also deleted.
    */
@@ -280,7 +289,8 @@ private:
   const char* count_for_type;
 
   /*!
-   * Global setting as to whether component visualization ports should be created.
+   * Global setting as to whether dedicated component visualization outputs (tVisualizationOutput)
+   * should be created.
    * Must be set at program startup - before components are created - to have an effect.
    */
   static bool create_component_visualization_ports;

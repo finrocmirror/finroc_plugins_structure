@@ -140,6 +140,11 @@ core::tFrameworkElement& tComponent::GetVisualizationParent()
   return *visualization;
 }
 
+void tComponent::SetComponentVisualizationEnabled(bool enabled)
+{
+  create_component_visualization_ports = enabled;
+}
+
 void tComponent::SetVisualizationPort(core::tPortWrapperBase port, tLevelOfDetail level_of_detail)
 {
   // Tags for ports - depending on level of detail

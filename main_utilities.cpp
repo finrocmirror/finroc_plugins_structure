@@ -64,6 +64,8 @@ extern "C"
 //----------------------------------------------------------------------
 // Internal includes with ""
 //----------------------------------------------------------------------
+#include "plugins/structure/tComponent.h"
+
 extern bool make_all_port_links_unique;
 
 //----------------------------------------------------------------------
@@ -246,6 +248,13 @@ bool OptionsHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
     scheduling::SetProfilingEnabled(true);
   }
 
+  // component visualization
+  rrlib::getopt::tOption disable_component_visualization(name_to_option_map.at("disable-component-visualization"));
+  if (disable_component_visualization->IsActive())
+  {
+    tComponent::SetComponentVisualizationEnabled(false);
+  }
+
   return true;
 }
 
@@ -284,6 +293,7 @@ void RegisterCommonOptions()
   rrlib::getopt::AddFlag("pause", 0, "Pause program at startup", &OptionsHandler);
   rrlib::getopt::AddFlag("port-links-are-not-unique", 0, "Port links in this part are not unique in P2P network (=> host name is prepended in GUI, for instance).", &OptionsHandler);
   rrlib::getopt::AddFlag("profiling", 0, "Enables profiling (creates additional ports with profiling information)", &OptionsHandler);
+  rrlib::getopt::AddFlag("disable-component-visualization", 0, "Disables component visualization (no dedicated visualization ports will be created)", &OptionsHandler);
 }
 
 //----------------------------------------------------------------------
