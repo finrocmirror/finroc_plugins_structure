@@ -112,7 +112,9 @@ bool enable_crash_handler = true;
 // We do not use stuff from rrlib_thread, because we have the rare case that in signal handler
 // waiting thread does something else, which is problematic with respect to enforcing lock order
 std::mutex main_thread_wait_mutex;
+#ifndef RRLIB_SINGLE_THREADED
 std::condition_variable main_thread_wait_variable;
+#endif
 
 #ifdef _LIB_FINROC_PLUGINS_TCP_PRESENT_
 tcp::tPeer *tcp_peer;
@@ -131,7 +133,9 @@ void HandleSignalSIGINT(int signal)
     FINROC_LOG_PRINT(USER, "\nCaught SIGINT. Exiting...");
     run_main_loop = false;
     std::unique_lock<std::mutex> l(main_thread_wait_mutex);
+#ifndef RRLIB_SINGLE_THREADED
     main_thread_wait_variable.notify_all();
+#endif
 
     if (definitions::cSINGLE_THREADED && scheduling::tThreadContainerThread::CurrentThread())
     {
@@ -271,6 +275,7 @@ bool OptionsHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
 //----------------------------------------------------------------------
 bool InstallSignalHandler()
 {
+#if __linux__
   struct sigaction signal_action;
   signal_action.sa_handler = HandleSignalSIGINT;
   sigemptyset(&signal_action.sa_mask);
@@ -281,6 +286,9 @@ bool InstallSignalHandler()
     perror("Could not install signal handler");
     return false;
   }
+#else
+  signal(SIGINT, HandleSignalSIGINT);
+#endif
 
   return true;
 }
@@ -400,7 +408,11 @@ int InitializeAndRunMainLoop(const std::string &program_name)
       std::unique_lock<std::mutex> l(main_thread_wait_mutex);
       while (run_main_loop)
       {
+#ifndef RRLIB_SINGLE_THREADED
         main_thread_wait_variable.wait_for(l, std::chrono::seconds(10));
+#else
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+#endif
       }
     }
   }
