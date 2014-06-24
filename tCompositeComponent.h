@@ -49,6 +49,12 @@
 #include "plugins/rpc_ports/tClientPort.h"
 #include "plugins/rpc_ports/tServerPort.h"
 #endif
+#ifdef _LIB_FINROC_PLUGINS_RUNTIME_CONSTRUCTION_PRESENT_
+#include "plugins/runtime_construction/tEditableInterfaces.h"
+#else
+#include "plugins/runtime_construction/tInterfaces.h"
+#endif
+
 
 //----------------------------------------------------------------------
 // Internal includes with ""
@@ -81,6 +87,12 @@ class tCompositeComponent : public tComponent
 // Public methods and typedefs
 //----------------------------------------------------------------------
 public:
+
+#ifdef _LIB_FINROC_PLUGINS_RUNTIME_CONSTRUCTION_PRESENT_
+  typedef runtime_construction::tEditableInterfaces tInterfaces;
+#else
+  typedef runtime_construction::tInterfaces tInterfaces;
+#endif
 
   /*!
    * \param parent Parent

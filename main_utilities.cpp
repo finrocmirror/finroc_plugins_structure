@@ -54,6 +54,7 @@ extern "C"
 #include "plugins/parameters/tConfigFile.h"
 #include "plugins/scheduling/tExecutionControl.h"
 #include "plugins/scheduling/scheduling.h"
+#include "plugins/scheduling/tThreadContainerThread.h"
 
 #ifdef _LIB_FINROC_PLUGINS_TCP_PRESENT_
 #include "plugins/tcp/tPeer.h"
@@ -131,6 +132,11 @@ void HandleSignalSIGINT(int signal)
     run_main_loop = false;
     std::unique_lock<std::mutex> l(main_thread_wait_mutex);
     main_thread_wait_variable.notify_all();
+
+    if (definitions::cSINGLE_THREADED && scheduling::tThreadContainerThread::CurrentThread())
+    {
+      scheduling::tThreadContainerThread::CurrentThread()->StopThread();
+    }
   }
   else if (call_count < 5)
   {
@@ -385,10 +391,17 @@ int InitializeAndRunMainLoop(const std::string &program_name)
 
   run_main_loop = true;
   {
-    std::unique_lock<std::mutex> l(main_thread_wait_mutex);
-    while (run_main_loop)
+    if (definitions::cSINGLE_THREADED && scheduling::tThreadContainerThread::CurrentThread())
     {
-      main_thread_wait_variable.wait_for(l, std::chrono::seconds(10));
+      scheduling::tThreadContainerThread::CurrentThread()->Run();
+    }
+    else
+    {
+      std::unique_lock<std::mutex> l(main_thread_wait_mutex);
+      while (run_main_loop)
+      {
+        main_thread_wait_variable.wait_for(l, std::chrono::seconds(10));
+      }
     }
   }
   FINROC_LOG_PRINT(DEBUG, "Left main loop");

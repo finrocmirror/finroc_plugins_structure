@@ -38,7 +38,6 @@
 //----------------------------------------------------------------------
 // Internal includes with ""
 //----------------------------------------------------------------------
-#include "plugins/runtime_construction/tEditableInterfaces.h"
 
 //----------------------------------------------------------------------
 // Debugging
@@ -67,7 +66,7 @@ namespace structure
 
 static runtime_construction::tStandardCreateModuleAction<tGroup> cCREATE_ACTION_FOR_GROUP("Group");
 
-typedef runtime_construction::tEditableInterfaces::tStaticInterfaceInfo tStaticInterfaceInfo;
+typedef tCompositeComponent::tInterfaces::tStaticInterfaceInfo tStaticInterfaceInfo;
 typedef core::tFrameworkElement::tFlag tFlag;
 
 const std::vector<tStaticInterfaceInfo>& cSTATIC_INTERFACE_INFO_GROUP =
@@ -85,14 +84,14 @@ tGroup::tGroup(tFrameworkElement *parent, const std::string &name,
   tCompositeComponent(parent, name, structure_config_file, extra_flags)
 {
   interface_array.fill(NULL);
-  this->EmplaceAnnotation<runtime_construction::tEditableInterfaces>(cSTATIC_INTERFACE_INFO_GROUP, interface_array.begin(), share_ports | (share_ports << 1));
+  this->EmplaceAnnotation<tInterfaces>(cSTATIC_INTERFACE_INFO_GROUP, interface_array.begin(), share_ports | (share_ports << 1));
 }
 
 core::tPortGroup& tGroup::GetInterface(tInterfaceEnumeration desired_interface)
 {
   if (!interface_array[desired_interface])
   {
-    runtime_construction::tEditableInterfaces* editable_interfaces = this->GetAnnotation<runtime_construction::tEditableInterfaces>();
+    tInterfaces* editable_interfaces = this->GetAnnotation<tInterfaces>();
     editable_interfaces->CreateInterface(this, desired_interface, IsReady());
   }
   return *interface_array[desired_interface];

@@ -38,7 +38,6 @@
 //----------------------------------------------------------------------
 // Internal includes with ""
 //----------------------------------------------------------------------
-#include "plugins/runtime_construction/tEditableInterfaces.h"
 
 //----------------------------------------------------------------------
 // Debugging
@@ -67,7 +66,7 @@ namespace structure
 
 static runtime_construction::tStandardCreateModuleAction<tSenseControlGroup> cCREATE_ACTION_FOR_SENSE_CONTROL_GROUP("SenseControlGroup");
 
-typedef runtime_construction::tEditableInterfaces::tStaticInterfaceInfo tStaticInterfaceInfo;
+typedef tCompositeComponent::tInterfaces::tStaticInterfaceInfo tStaticInterfaceInfo;
 typedef core::tFrameworkElement::tFlag tFlag;
 
 const std::vector<tStaticInterfaceInfo>& cSTATIC_INTERFACE_INFO_SENSE_CONTROL_GROUP =
@@ -87,14 +86,14 @@ tSenseControlGroup::tSenseControlGroup(tFrameworkElement *parent, const std::str
   tCompositeComponent(parent, name, structure_config_file, extra_flags)
 {
   interface_array.fill(NULL);
-  this->EmplaceAnnotation<runtime_construction::tEditableInterfaces>(cSTATIC_INTERFACE_INFO_SENSE_CONTROL_GROUP, interface_array.begin(), share_so_and_ci_ports ? 6 : 0); // 6 => bits 2 and 3 are set (Sensor Output and Controller Input)
+  this->EmplaceAnnotation<tInterfaces>(cSTATIC_INTERFACE_INFO_SENSE_CONTROL_GROUP, interface_array.begin(), share_so_and_ci_ports ? 6 : 0); // 6 => bits 2 and 3 are set (Sensor Output and Controller Input)
 }
 
 core::tPortGroup& tSenseControlGroup::GetInterface(tInterfaceEnumeration desired_interface)
 {
   if (!interface_array[desired_interface])
   {
-    runtime_construction::tEditableInterfaces* editable_interfaces = this->GetAnnotation<runtime_construction::tEditableInterfaces>();
+    tInterfaces* editable_interfaces = this->GetAnnotation<tInterfaces>();
     editable_interfaces->CreateInterface(this, desired_interface, IsReady());
   }
   return *interface_array[desired_interface];

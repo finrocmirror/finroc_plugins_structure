@@ -32,7 +32,9 @@
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
+#ifdef _LIB_FINROC_PLUGINS_RUNTIME_CONSTRUCTION_PRESENT_
 #include "plugins/runtime_construction/tFinstructable.h"
+#endif
 
 //----------------------------------------------------------------------
 // Internal includes with ""
@@ -80,8 +82,10 @@ tCompositeComponent::tCompositeComponent(core::tFrameworkElement *parent, const 
     core::tFrameworkElementTags::AddTag(*this, "finstructable structure file: " + this->structure_config_file);
   }
 
+#ifdef _LIB_FINROC_PLUGINS_RUNTIME_CONSTRUCTION_PRESENT_
   // Create annotation to make composite component finstructable
   this->EmplaceAnnotation<runtime_construction::tFinstructable>(this->structure_config_file);
+#endif
 }
 
 core::tPortGroup* tCompositeComponent::CreateInterface(const std::string& name, bool share_ports, tFlags extra_flags, tFlags default_port_flags)
@@ -102,6 +106,7 @@ void tCompositeComponent::OnStaticParameterChange()
     if (this->structure_config_file.length() > 0)
     {
       //if (this.childCount() == 0) { // TODO: original intension: changing xml files to mutliple existing ones in finstruct shouldn't load all of them
+#ifdef _LIB_FINROC_PLUGINS_RUNTIME_CONSTRUCTION_PRESENT_
       if (core::FinrocFileExists(this->structure_config_file))
       {
         this->GetAnnotation<runtime_construction::tFinstructable>()->LoadXml();
@@ -110,6 +115,7 @@ void tCompositeComponent::OnStaticParameterChange()
       {
         FINROC_LOG_PRINT(DEBUG, "Cannot find XML file ", this->structure_config_file, ". Creating empty group. You may edit and save this group using finstruct.");
       }
+#endif
     }
   }
 }
@@ -120,10 +126,12 @@ void tCompositeComponent::PostChildInit()
   {
     if (this->structure_config_file.length() > 0)
     {
+#ifdef _LIB_FINROC_PLUGINS_RUNTIME_CONSTRUCTION_PRESENT_
       if (core::FinrocFileExists(this->structure_config_file))
       {
         this->GetAnnotation<runtime_construction::tFinstructable>()->LoadXml();
       }
+#endif
     }
   }
 }
