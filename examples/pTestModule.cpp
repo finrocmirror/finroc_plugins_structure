@@ -19,24 +19,31 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
 //----------------------------------------------------------------------
-/*!\file    plugins/structure/test/mTestModule.cpp
+/*!\file    plugins/structure/examples/pTestModule.cpp
  *
  * \author  Tobias Foehst
+ * \author  Bernd-Helge Schaefer
  * \author  Max Reichardt
  *
  * \date    2012-12-02
  *
+ * \b pTestModule
+ *
+ * Simple test program for plain modules
+ *
  */
 //----------------------------------------------------------------------
-#include "plugins/structure/test/mTestModule.h"
+#include "plugins/structure/default_main_wrapper.h"
 
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
+#include <chrono>
 
 //----------------------------------------------------------------------
 // Internal includes with ""
 //----------------------------------------------------------------------
+#include "plugins/structure/examples/mTestModule.h"
 
 //----------------------------------------------------------------------
 // Debugging
@@ -48,60 +55,37 @@
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
-// Namespace declaration
-//----------------------------------------------------------------------
-namespace finroc
-{
-namespace structure
-{
-namespace test
-{
-
-//----------------------------------------------------------------------
 // Forward declarations / typedefs / enums
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
 // Const values
 //----------------------------------------------------------------------
-static runtime_construction::tStandardCreateModuleAction<mTestModule> cCREATE_ACTION("TestModule");
+const std::string cPROGRAM_DESCRIPTION = "Test for main wrapper";
+const std::string cCOMMAND_LINE_ARGUMENTS = "";
+const std::string cADDITIONAL_HELP_TEXT = "";
+bool make_all_port_links_unique = true;
 
 //----------------------------------------------------------------------
 // Implementation
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
-// mTestModule constructor
+// StartUp
 //----------------------------------------------------------------------
-mTestModule::mTestModule(core::tFrameworkElement *parent, const std::string &name) :
-  tModule(parent, name),
-  counter(0)
+void StartUp()
 {}
 
 //----------------------------------------------------------------------
-// mTestModule destructor
+// CreateMainGroup
 //----------------------------------------------------------------------
-mTestModule::~mTestModule()
-{}
-
-//----------------------------------------------------------------------
-// mTestModule Update
-//----------------------------------------------------------------------
-void mTestModule::Update()
+void CreateMainGroup(const std::vector<std::string> &remaining_arguments)
 {
-  this->output_signal.Publish(this->counter);
-  FINROC_LOG_PRINT(DEBUG, this->counter, " ", rrlib::time::ToIsoString(rrlib::time::Now()));
-  this->counter++;
+  finroc::structure::tTopLevelThreadContainer<>* main_thread =
+    new finroc::structure::tTopLevelThreadContainer<>("Main Thread", __FILE__".xml", true, make_all_port_links_unique);
 
-  if (this->input_signal.HasChanged())
-  {
-    FINROC_LOG_PRINT(USER, "Received input signal: ", this->input_signal.Get(), " ", rrlib::time::ToIsoString(rrlib::time::Now()));
-  }
-}
+  finroc::structure::examples::mTestModule *test_module = new finroc::structure::examples::mTestModule(main_thread);
+  test_module->Init();
 
-//----------------------------------------------------------------------
-// End of namespace declaration
-//----------------------------------------------------------------------
-}
-}
+  main_thread->SetCycleTime(500);
 }

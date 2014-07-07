@@ -19,25 +19,16 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
 //----------------------------------------------------------------------
-/*!\file    plugins/structure/test/mTestModule.h
+/*!\file    plugins/structure/examples/mTestModule.cpp
  *
  * \author  Tobias Foehst
  * \author  Max Reichardt
  *
  * \date    2012-12-02
  *
- * \brief   Contains mTestModule
- *
- * \b mTestModule
- *
- * A simple module for test program
- *
  */
 //----------------------------------------------------------------------
-#ifndef __plugins__structure__test__mTestModule_h__
-#define __plugins__structure__test__mTestModule_h__
-
-#include "plugins/structure/tModule.h"
+#include "plugins/structure/examples/mTestModule.h"
 
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
@@ -48,13 +39,22 @@
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
+// Debugging
+//----------------------------------------------------------------------
+#include <cassert>
+
+//----------------------------------------------------------------------
+// Namespace usage
+//----------------------------------------------------------------------
+
+//----------------------------------------------------------------------
 // Namespace declaration
 //----------------------------------------------------------------------
 namespace finroc
 {
 namespace structure
 {
-namespace test
+namespace examples
 {
 
 //----------------------------------------------------------------------
@@ -62,49 +62,42 @@ namespace test
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
-// Class declaration
+// Const values
 //----------------------------------------------------------------------
-//! Simple module
-/*!
- * A simple module for test program
- */
-class mTestModule : public structure::tModule
+static runtime_construction::tStandardCreateModuleAction<mTestModule> cCREATE_ACTION("TestModule");
+
+//----------------------------------------------------------------------
+// Implementation
+//----------------------------------------------------------------------
+
+//----------------------------------------------------------------------
+// mTestModule constructor
+//----------------------------------------------------------------------
+mTestModule::mTestModule(core::tFrameworkElement *parent, const std::string &name) :
+  tModule(parent, name),
+  counter(0)
+{}
+
+//----------------------------------------------------------------------
+// mTestModule destructor
+//----------------------------------------------------------------------
+mTestModule::~mTestModule()
+{}
+
+//----------------------------------------------------------------------
+// mTestModule Update
+//----------------------------------------------------------------------
+void mTestModule::Update()
 {
+  this->output_signal.Publish(this->counter);
+  FINROC_LOG_PRINT(DEBUG, this->counter, " ", rrlib::time::ToIsoString(rrlib::time::Now()));
+  this->counter++;
 
-//----------------------------------------------------------------------
-// Ports (These are the only variables that may be declared public)
-//----------------------------------------------------------------------
-public:
-
-  /** Numeric input port */
-  tInput<double> input_signal;
-
-  /** Numeric output port */
-  tOutput<double> output_signal;
-
-//----------------------------------------------------------------------
-// Public methods and typedefs
-//----------------------------------------------------------------------
-public:
-
-  mTestModule(core::tFrameworkElement *parent, const std::string &name = "TestModule");
-
-//----------------------------------------------------------------------
-// Private fields and methods
-//----------------------------------------------------------------------
-private:
-
-  int counter;
-
-  /*! Destructor
-   *
-   * The destructor of modules is declared private to avoid accidental deletion. Deleting
-   * modules is already handled by the framework.
-   */
-  ~mTestModule();
-
-  virtual void Update() override;
-};
+  if (this->input_signal.HasChanged())
+  {
+    FINROC_LOG_PRINT(USER, "Received input signal: ", this->input_signal.Get(), " ", rrlib::time::ToIsoString(rrlib::time::Now()));
+  }
+}
 
 //----------------------------------------------------------------------
 // End of namespace declaration
@@ -112,7 +105,3 @@ private:
 }
 }
 }
-
-
-
-#endif

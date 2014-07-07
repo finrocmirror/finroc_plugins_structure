@@ -19,74 +19,100 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
 //----------------------------------------------------------------------
-/*!\file    plugins/structure/test/pTestSenseControlModule.cpp
+/*!\file    plugins/structure/examples/mTestModule.h
  *
  * \author  Tobias Foehst
- * \author  Bernd-Helge Schaefer
  * \author  Max Reichardt
  *
  * \date    2012-12-02
  *
- * \b pTestSenseControlModule
+ * \brief   Contains mTestModule
  *
- * Simple test program for SenseControlModule
+ * \b mTestModule
+ *
+ * A simple module for test program
  *
  */
 //----------------------------------------------------------------------
-#include "plugins/structure/default_main_wrapper.h"
+#ifndef __plugins__structure__examples__mTestModule_h__
+#define __plugins__structure__examples__mTestModule_h__
+
+#include "plugins/structure/tModule.h"
 
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
-#include <chrono>
 
 //----------------------------------------------------------------------
 // Internal includes with ""
 //----------------------------------------------------------------------
-#include "plugins/structure/test/mTestSenseControlModule.h"
 
 //----------------------------------------------------------------------
-// Debugging
+// Namespace declaration
 //----------------------------------------------------------------------
-#include <cassert>
-
-//----------------------------------------------------------------------
-// Namespace usage
-//----------------------------------------------------------------------
-using finroc::structure::test::mTestSenseControlModule;
+namespace finroc
+{
+namespace structure
+{
+namespace examples
+{
 
 //----------------------------------------------------------------------
 // Forward declarations / typedefs / enums
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
-// Const values
+// Class declaration
 //----------------------------------------------------------------------
-const std::string cPROGRAM_DESCRIPTION = "Test program for sense-control modules";
-const std::string cCOMMAND_LINE_ARGUMENTS = "";
-const std::string cADDITIONAL_HELP_TEXT = "";
-bool make_all_port_links_unique = true;
-
-//----------------------------------------------------------------------
-// Implementation
-//----------------------------------------------------------------------
-
-//----------------------------------------------------------------------
-// StartUp
-//----------------------------------------------------------------------
-void StartUp()
-{}
-
-//----------------------------------------------------------------------
-// CreateMainGroup
-//----------------------------------------------------------------------
-void CreateMainGroup(const std::vector<std::string> &remaining_arguments)
+//! Simple module
+/*!
+ * A simple module for test program
+ */
+class mTestModule : public structure::tModule
 {
-  finroc::structure::tTopLevelThreadContainer<>* main_thread =
-    new finroc::structure::tTopLevelThreadContainer<>("Main Thread", __FILE__".xml", true, make_all_port_links_unique);
 
-  mTestSenseControlModule *test_module = new mTestSenseControlModule(main_thread);
-  test_module->Init();
+//----------------------------------------------------------------------
+// Ports (These are the only variables that may be declared public)
+//----------------------------------------------------------------------
+public:
 
-  main_thread->SetCycleTime(2000);
+  /** Numeric input port */
+  tInput<double> input_signal;
+
+  /** Numeric output port */
+  tOutput<double> output_signal;
+
+//----------------------------------------------------------------------
+// Public methods and typedefs
+//----------------------------------------------------------------------
+public:
+
+  mTestModule(core::tFrameworkElement *parent, const std::string &name = "TestModule");
+
+//----------------------------------------------------------------------
+// Private fields and methods
+//----------------------------------------------------------------------
+private:
+
+  int counter;
+
+  /*! Destructor
+   *
+   * The destructor of modules is declared private to avoid accidental deletion. Deleting
+   * modules is already handled by the framework.
+   */
+  ~mTestModule();
+
+  virtual void Update() override;
+};
+
+//----------------------------------------------------------------------
+// End of namespace declaration
+//----------------------------------------------------------------------
 }
+}
+}
+
+
+
+#endif

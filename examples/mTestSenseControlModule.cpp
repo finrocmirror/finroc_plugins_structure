@@ -19,25 +19,16 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
 //----------------------------------------------------------------------
-/*!\file    plugins/structure/test/mTestSenseControlModule.h
+/*!\file    plugins/structure/examples/mTestSenseControlModule.cpp
  *
  * \author  Tobias Foehst
  * \author  Max Reichardt
  *
  * \date    2012-12-02
  *
- * \brief   Contains mTestSenseControlModule
- *
- * \b mTestSenseControlModule
- *
- * Simple SenseControlModule for test program
- *
  */
 //----------------------------------------------------------------------
-#ifndef __plugins__structure__test__mTestSenseControlModule_h__
-#define __plugins__structure__test__mTestSenseControlModule_h__
-
-#include "plugins/structure/tSenseControlModule.h"
+#include "plugins/structure/examples/mTestSenseControlModule.h"
 
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
@@ -48,13 +39,22 @@
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
+// Debugging
+//----------------------------------------------------------------------
+#include <cassert>
+
+//----------------------------------------------------------------------
+// Namespace usage
+//----------------------------------------------------------------------
+
+//----------------------------------------------------------------------
 // Namespace declaration
 //----------------------------------------------------------------------
 namespace finroc
 {
 namespace structure
 {
-namespace test
+namespace examples
 {
 
 //----------------------------------------------------------------------
@@ -62,49 +62,31 @@ namespace test
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
-// Class declaration
+// Const values
 //----------------------------------------------------------------------
-//! Simple test module
-/*!
- * Simple SenseControlModule for test program
- */
-class mTestSenseControlModule : public structure::tSenseControlModule
+static runtime_construction::tStandardCreateModuleAction<mTestSenseControlModule> cCREATE_ACTION("TestSenseControlModule");
+
+//----------------------------------------------------------------------
+// Implementation
+//----------------------------------------------------------------------
+mTestSenseControlModule::mTestSenseControlModule(core::tFrameworkElement *parent, const std::string &name)
+  : tSenseControlModule(parent, name),
+    counter(0)
+{}
+
+mTestSenseControlModule::~mTestSenseControlModule()
+{}
+
+void mTestSenseControlModule::Control()
 {
+  this->co_signal_2.Publish(this->counter);
+  FINROC_LOG_PRINT(DEBUG, this->counter);
+  this->counter++;
+}
 
-//----------------------------------------------------------------------
-// Ports (These are the only variables that may be declared public)
-//----------------------------------------------------------------------
-public:
+void mTestSenseControlModule::Sense()
+{}
 
-  tControllerInput<int> ci_signal_1;
-  tControllerOutput<int> co_signal_2;
-  tSensorInput<int> si_signal_3;
-  tSensorOutput<int> so_signal_4;
-
-//----------------------------------------------------------------------
-// Public methods and typedefs
-//----------------------------------------------------------------------
-public:
-
-  mTestSenseControlModule(core::tFrameworkElement *parent, const std::string &name = "TestSenseControlModule");
-
-//----------------------------------------------------------------------
-// Private fields and methods
-//----------------------------------------------------------------------
-private:
-
-  int counter;
-
-  /*! Destructor
-   *
-   * The destructor of modules is declared private to avoid accidental deletion. Deleting
-   * modules is already handled by the framework.
-   */
-  ~mTestSenseControlModule();
-
-  virtual void Sense() override;
-  virtual void Control() override;
-};
 
 //----------------------------------------------------------------------
 // End of namespace declaration
@@ -112,7 +94,3 @@ private:
 }
 }
 }
-
-
-
-#endif

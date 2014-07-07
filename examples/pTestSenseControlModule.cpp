@@ -19,7 +19,7 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
 //----------------------------------------------------------------------
-/*!\file    plugins/structure/test/pTestModule.cpp
+/*!\file    plugins/structure/examples/pTestSenseControlModule.cpp
  *
  * \author  Tobias Foehst
  * \author  Bernd-Helge Schaefer
@@ -27,9 +27,9 @@
  *
  * \date    2012-12-02
  *
- * \b pTestModule
+ * \b pTestSenseControlModule
  *
- * Simple test program for plain modules
+ * Simple test program for SenseControlModule
  *
  */
 //----------------------------------------------------------------------
@@ -43,7 +43,7 @@
 //----------------------------------------------------------------------
 // Internal includes with ""
 //----------------------------------------------------------------------
-#include "plugins/structure/test/mTestModule.h"
+#include "plugins/structure/examples/mTestSenseControlModule.h"
 
 //----------------------------------------------------------------------
 // Debugging
@@ -53,7 +53,6 @@
 //----------------------------------------------------------------------
 // Namespace usage
 //----------------------------------------------------------------------
-using namespace finroc::structure::test;
 
 //----------------------------------------------------------------------
 // Forward declarations / typedefs / enums
@@ -62,7 +61,7 @@ using namespace finroc::structure::test;
 //----------------------------------------------------------------------
 // Const values
 //----------------------------------------------------------------------
-const std::string cPROGRAM_DESCRIPTION = "Test for main wrapper";
+const std::string cPROGRAM_DESCRIPTION = "Test program for sense-control modules";
 const std::string cCOMMAND_LINE_ARGUMENTS = "";
 const std::string cADDITIONAL_HELP_TEXT = "";
 bool make_all_port_links_unique = true;
@@ -85,8 +84,8 @@ void CreateMainGroup(const std::vector<std::string> &remaining_arguments)
   finroc::structure::tTopLevelThreadContainer<>* main_thread =
     new finroc::structure::tTopLevelThreadContainer<>("Main Thread", __FILE__".xml", true, make_all_port_links_unique);
 
-  mTestModule *test_module = new mTestModule(main_thread);
+  finroc::structure::examples::mTestSenseControlModule *test_module = new finroc::structure::examples::mTestSenseControlModule(main_thread);
   test_module->Init();
 
-  main_thread->SetCycleTime(500);
+  main_thread->SetCycleTime(2000);
 }

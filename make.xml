@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <targets>
 
-  <finrocplugin>
+  <library>
     <sources>
       internal/**
       tComponent.cpp
@@ -15,38 +15,38 @@
       tThreadContainer.cpp
       tTopLevelThreadContainer.h
     </sources>
-  </finrocplugin>
+  </library>
 
-  <finrocplugin name="main_utilities">
+  <library name="main_utilities">
     <sources>
       main_utilities.cpp
     </sources>
-  </finrocplugin>
+  </library>
 
-  <finrocplugin name="main_wrapper">
+  <library name="main_wrapper">
     <sources>
       default_main_wrapper.cpp
     </sources>
-  </finrocplugin>
+  </library>
   
-  <finroclibrary name="test_modules">
+  <library name="test_modules">
     <sources>
-      test/mTestSenseControlModule.cpp
-      test/mTestModule.cpp
+      examples/mTestSenseControlModule.cpp
+      examples/mTestModule.cpp
     </sources>
-  </finroclibrary>
+  </library>
 
-  <testprogram name="sense_control_module">
+  <program name="simple_sense_control_module">
     <sources>
-      test/pTestSenseControlModule.cpp
+      examples/pTestSenseControlModule.cpp
     </sources>
-  </testprogram>
+  </program>
 
-  <testprogram name="module">
+  <program name="simple_module">
     <sources>
-      test/pTestModule.cpp
+      examples/pTestModule.cpp
     </sources>
-  </testprogram>
+  </program>
   
   
 </targets>
