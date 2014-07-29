@@ -52,6 +52,7 @@ extern "C"
 #include "core/file_lookup.h"
 #include "core/tRuntimeEnvironment.h"
 #include "plugins/parameters/tConfigFile.h"
+#include "plugins/parameters/tConfigurablePlugin.h"
 #include "plugins/scheduling/tExecutionControl.h"
 #include "plugins/scheduling/scheduling.h"
 #include "plugins/scheduling/tThreadContainerThread.h"
@@ -179,6 +180,7 @@ bool OptionsHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
     {
       FINROC_LOG_PRINT(DEBUG, "Loading config file ", file);
     }
+    parameters::tConfigurablePlugin::SetConfigFile(file);
     core::tRuntimeEnvironment::GetInstance().AddAnnotation(*new parameters::tConfigFile(file));
   }
 
