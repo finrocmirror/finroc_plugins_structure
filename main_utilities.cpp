@@ -121,17 +121,18 @@ std::condition_variable main_thread_wait_variable;
 tcp::tPeer *tcp_peer;
 #endif
 
-//----------------------------------------------------------------------
-// HandleSignalSIGINT
-//----------------------------------------------------------------------
-void HandleSignalSIGINT(int signal)
+/*!
+ * Shuts down program cleanly by stopping all threads and deleting all framework elements.
+ *
+ * \return True if function is called for the first time
+ */
+bool Shutdown(const char* signal_name)
 {
   static int call_count = 0; // How many time has function been called?
-  assert(signal == SIGINT);
   call_count++;
   if (call_count == 1)
   {
-    FINROC_LOG_PRINT(USER, "\nCaught SIGINT. Exiting...");
+    FINROC_LOG_PRINT(USER, "\nCaught ", signal_name, ". Exiting...");
     run_main_loop = false;
     std::unique_lock<std::mutex> l(main_thread_wait_mutex);
 #ifndef RRLIB_SINGLE_THREADED
@@ -142,14 +143,39 @@ void HandleSignalSIGINT(int signal)
     {
       scheduling::tThreadContainerThread::CurrentThread()->StopThread();
     }
+    return true;
   }
-  else if (call_count < 5)
+  return false;
+}
+
+//----------------------------------------------------------------------
+// HandleSignalSIGINT
+//----------------------------------------------------------------------
+void HandleSignalSIGINT(int signal)
+{
+  static int call_count = 0; // How many time has function been called?
+  assert(signal == SIGINT);
+  call_count++;
+  if ((!Shutdown("SIGINT")) && call_count < 5)
   {
     FINROC_LOG_PRINT(USER, "\nCaught SIGINT again. Unfortunately, the program still has not terminated. Program will be aborted at fifth SIGINT.");
   }
-  else
+  else if (call_count >= 5)
   {
     FINROC_LOG_PRINT(USER, "\nCaught SIGINT for the fifth time. Aborting program.");
+    abort();
+  }
+}
+
+//----------------------------------------------------------------------
+// HandleSignalSIGINT
+//----------------------------------------------------------------------
+void HandleSignalSIGTERM(int signal)
+{
+  assert(signal == SIGTERM);
+  if (!Shutdown("SIGTERM"))
+  {
+    FINROC_LOG_PRINT(USER, "\nCaught SIGTERM while shutting down. Aborting program.");
     abort();
   }
 }
@@ -288,8 +314,17 @@ bool InstallSignalHandler()
     perror("Could not install signal handler");
     return false;
   }
+
+  signal_action.sa_handler = HandleSignalSIGTERM;
+  if (sigaction(SIGTERM, &signal_action, NULL) != 0)
+  {
+    perror("Could not install signal handler");
+    return false;
+  }
+
 #else
   signal(SIGINT, HandleSignalSIGINT);
+  signal(SIGTERM, HandleSignalSIGTERM);
 #endif
 
   return true;
