@@ -89,11 +89,9 @@ public:
   mTestSenseControlModule(core::tFrameworkElement *parent, const std::string &name = "TestSenseControlModule");
 
 //----------------------------------------------------------------------
-// Private fields and methods
+// Protected methods
 //----------------------------------------------------------------------
-private:
-
-  int counter;
+protected:
 
   /*! Destructor
    *
@@ -101,6 +99,13 @@ private:
    * modules is already handled by the framework.
    */
   ~mTestSenseControlModule();
+
+//----------------------------------------------------------------------
+// Private fields and methods
+//----------------------------------------------------------------------
+private:
+
+  int counter;
 
   virtual void Sense() override;
   virtual void Control() override;

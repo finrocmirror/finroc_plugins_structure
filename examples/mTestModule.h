@@ -90,11 +90,9 @@ public:
   mTestModule(core::tFrameworkElement *parent, const std::string &name = "TestModule");
 
 //----------------------------------------------------------------------
-// Private fields and methods
+// Protected methods
 //----------------------------------------------------------------------
-private:
-
-  int counter;
+protected:
 
   /*! Destructor
    *
@@ -102,6 +100,13 @@ private:
    * modules is already handled by the framework.
    */
   ~mTestModule();
+
+//----------------------------------------------------------------------
+// Private fields and methods
+//----------------------------------------------------------------------
+private:
+
+  int counter;
 
   virtual void Update() override;
 };

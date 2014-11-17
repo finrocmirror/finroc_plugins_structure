@@ -75,18 +75,23 @@ public:
   m%%NAME%%(core::tFrameworkElement *parent, const std::string &name = "%%NAME%%");
 
 //----------------------------------------------------------------------
+// Protected methods
+//----------------------------------------------------------------------
+protected:
+
+  /*! Destructor
+   *
+   * The destructor of modules is declared protected to avoid accidental deletion. Deleting
+   * modules is already handled by the framework.
+   */
+  ~m%%NAME%%();
+
+//----------------------------------------------------------------------
 // Private fields and methods
 //----------------------------------------------------------------------
 private:
 
   Here is the right place for your variables. Replace this line by your declarations!
-
-  /*! Destructor
-   *
-   * The destructor of modules is declared private to avoid accidental deletion. Deleting
-   * modules is already handled by the framework.
-   */
-  ~m%%NAME%%();
 
   virtual void OnStaticParameterChange() override;   Might be needed to process static parameters. Delete otherwise!
 
