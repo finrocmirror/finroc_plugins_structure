@@ -136,6 +136,38 @@ public:
   }
 
   /*!
+   * Components may have a std::vector of ports in their interfaces.
+   * This is a convenience method for adjusting the number of ports in such vectors.
+   * If the number of ports is equals to the 'number_of_ports' parameters, nothing is done.
+   * If the number of ports is greater than the 'number_of_ports' parameters, ports at the back are deleted until the vector has the desired size.
+   * If the number of ports is smaller than the 'number_of_ports' parameters, ports at the back are appended.
+   * Ports are named: <common_prefix><start_index><common_postfix>, <common_prefix><start_index + 1><common_postfix>, ..., <common_prefix><start_index + number_of_ports - 1><common_postfix>
+   *
+   * \param port_vector Port vector to resize
+   * \param number_of_ports Number of ports the vector should have
+   * \param common_prefix Common prefix of all ports names (see port naming above; add a pending space if you like to have a space between prefix and space)
+   * \param start_index Number in name of first port in vector (incremented for each further port)
+   * \param start_index Common postfix of all ports names (see port naming above; could be e.g. ']')
+   */
+  template <typename TPort>
+  void ResizePortVector(std::vector<TPort>& port_vector, int number_of_ports, const std::string& common_prefix, size_t start_index = 1, const std::string& common_postfix = "")
+  {
+    while (port_vector.size() > number_of_ports)
+    {
+      port_vector.rbegin()->GetWrapped()->ManagedDelete();
+      port_vector.pop_back();
+    }
+    while (port_vector.size() < number_of_ports)
+    {
+      size_t port_index = port_vector.size() + start_index;
+      std::stringstream stream;
+      stream << common_prefix << port_index << common_postfix;
+      port_vector.push_back(TPort(stream.str(), this));
+      port_vector.back().Init();
+    }
+  }
+
+  /*!
    * \param node Common parent config file node for all child parameter config entries (starting with '/' => absolute link - otherwise relative).
    */
   void SetConfigNode(const std::string& node)
