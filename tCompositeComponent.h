@@ -47,6 +47,7 @@
 #include "plugins/parameters/tStaticParameter.h"
 #ifdef _LIB_FINROC_PLUGINS_RPC_PORTS_PRESENT_
 #include "plugins/rpc_ports/tClientPort.h"
+#include "plugins/rpc_ports/tProxyPort.h"
 #include "plugins/rpc_ports/tServerPort.h"
 #endif
 #ifdef _LIB_FINROC_PLUGINS_RUNTIME_CONSTRUCTION_PRESENT_
@@ -105,19 +106,40 @@ public:
                       tFlags extra_flags = tFlags());
 
   /**
-   * Port and parameter class to use in composite components.
+   * RPC port classes to use in composite components.
+   * Usually, RPC ports in composite components simply forward RPC ports of inner components.
+   * If, however, a composite component shall process RPCs directly, the Tend_point template parameter has to be set to true.
    *
    * Constructors take a variadic argument list... just any properties you want to assign to port/parameter.
    *
    * Unlike tPort, port name and parent are usually determined automatically (however, only possible when port is direct class member).
    * If this is not possible/desired, name needs to be provided as first constructor argument - parent as arbitrary one.
    *
-   * A string as first parameter is interpreted as port name; Any other string as config entry
+   * A string is interpreted as port name.
    * A framework element pointer is interpreted as parent.
    * tFrameworkElement::tFlags arguments are interpreted as flags.
-   * A tQueueSettings argument creates an input queue with the specified settings (not to be used with parameters)
-   * tBounds<T> are parameters's bounds.
-   * tUnit argument is parameters's unit.
+   * tPortCreationInfo<T> argument is copied. This is only allowed as first argument.
+   */
+#ifdef _LIB_FINROC_PLUGINS_RPC_PORTS_PRESENT_
+  template <typename T, bool Tend_point = false>
+  using tServer = tConveniencePort<typename std::conditional<Tend_point, rpc_ports::tServerPort<T>, rpc_ports::tProxyPort<T, true>>::type, tComponent, tFrameworkElement, &tCompositeComponent::GetServicesParent>;
+
+  template <typename T, bool Tend_point = false>
+  using tClient = tConveniencePort<typename std::conditional<Tend_point, rpc_ports::tClientPort<T>, rpc_ports::tProxyPort<T, false>>::type, tComponent, tFrameworkElement, &tCompositeComponent::GetServicesParent>;
+#endif
+
+  /**
+   * Parameter classes to use in composite components.
+   *
+   * Constructors take a variadic argument list... just any properties you want to assign to port/parameter.
+   *
+   * Parameter name and parent are usually determined automatically (however, only possible when parameter is direct class member).
+   * If this is not possible/desired, name needs to be provided as first constructor argument - parent as arbitrary one.
+   *
+   * A string as first parameter is interpreted as parameter name; Any other string as config entry
+   * A framework element pointer is interpreted as parent.
+   * tFrameworkElement::tFlags arguments are interpreted as flags.
+   * tBounds<T> are parameters' bounds.
    * const T& is interpreted as parameters's default value.
    * tPortCreationInfo<T> argument is copied. This is only allowed as first argument.
    *
@@ -125,14 +147,6 @@ public:
    * A String not provided as first argument is interpreted as default value.
    * Any further string is interpreted as config entry.
    */
-#ifdef _LIB_FINROC_PLUGINS_RPC_PORTS_PRESENT_
-  template <typename T>
-  using tServer = tConveniencePort<rpc_ports::tServerPort<T>, tComponent, tFrameworkElement, &tCompositeComponent::GetServicesParent>;
-
-  template <typename T>
-  using tClient = tConveniencePort<rpc_ports::tClientPort<T>, tComponent, tFrameworkElement, &tCompositeComponent::GetServicesParent>;
-#endif
-
   template <typename T>
   class tParameter : public tConveniencePort<parameters::tParameter<T>, tComponent, tFrameworkElement, &tCompositeComponent::GetParameterParent>
   {

@@ -86,25 +86,17 @@ public:
   tModuleBase(core::tFrameworkElement *parent, const std::string &name);
 
   /**
-   * Port and parameter classes to use in modules.
+   * RPC port classes to use in modules.
    *
    * Constructors take a variadic argument list... just any properties you want to assign to port/parameter.
    *
    * Unlike tPort, port name and parent are usually determined automatically (however, only possible when port is direct class member).
    * If this is not possible/desired, name needs to be provided as first constructor argument - parent as arbitrary one.
    *
-   * A string as first parameter is interpreted as port name; Any other string as config entry
+   * A string is interpreted as port name.
    * A framework element pointer is interpreted as parent.
    * tFrameworkElement::tFlags arguments are interpreted as flags.
-   * A tQueueSettings argument creates an input queue with the specified settings (not to be used with parameters)
-   * tBounds<T> are parameters's bounds.
-   * tUnit argument is parameters's unit.
-   * const T& is interpreted as parameters's default value.
    * tPortCreationInfo<T> argument is copied. This is only allowed as first argument.
-   *
-   * This becomes a little tricky when T is a string type. There we have these rules:
-   * A String not provided as first argument is interpreted as default value.
-   * Any further string is interpreted as config entry.
    */
 #ifdef _LIB_FINROC_PLUGINS_RPC_PORTS_PRESENT_
   template <typename T>
@@ -114,6 +106,25 @@ public:
   using tClient = tConveniencePort<rpc_ports::tClientPort<T>, tComponent, tFrameworkElement, &tModuleBase::GetServicesParent>;
 #endif
 
+  /**
+   * Parameter classes to use in modules.
+   *
+   * Constructors take a variadic argument list... just any properties you want to assign to port/parameter.
+   *
+   * Parameter name and parent are usually determined automatically (however, only possible when parameter is direct class member).
+   * If this is not possible/desired, name needs to be provided as first constructor argument - parent as arbitrary one.
+   *
+   * A string as first parameter is interpreted as parameter name; Any other string as config entry
+   * A framework element pointer is interpreted as parent.
+   * tFrameworkElement::tFlags arguments are interpreted as flags.
+   * tBounds<T> are parameters' bounds.
+   * const T& is interpreted as parameters's default value.
+   * tPortCreationInfo<T> argument is copied. This is only allowed as first argument.
+   *
+   * This becomes a little tricky when T is a string type. There we have these rules:
+   * A String not provided as first argument is interpreted as default value.
+   * Any further string is interpreted as config entry.
+   */
   template <typename T>
   class tParameter : public tConveniencePort<parameters::tParameter<T>, tComponent, tFrameworkElement, &tModuleBase::GetParameterParent>
   {
