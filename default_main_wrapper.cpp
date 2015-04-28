@@ -34,6 +34,7 @@
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
 #include <cstdlib>
+#include <libgen.h>
 
 #include "core/tRuntimeEnvironment.h"
 
