@@ -132,7 +132,7 @@ bool Shutdown(const char* signal_name)
   call_count++;
   if (call_count == 1)
   {
-    FINROC_LOG_PRINT(USER, "\nCaught ", signal_name, ". Exiting...");
+    FINROC_LOG_PRINT_STATIC(USER, "\nCaught ", signal_name, ". Exiting...");
     run_main_loop = false;
     std::unique_lock<std::mutex> l(main_thread_wait_mutex);
 #ifndef RRLIB_SINGLE_THREADED
@@ -158,11 +158,11 @@ void HandleSignalSIGINT(int signal)
   call_count++;
   if ((!Shutdown("SIGINT")) && call_count < 5)
   {
-    FINROC_LOG_PRINT(USER, "\nCaught SIGINT again. Unfortunately, the program still has not terminated. Program will be aborted at fifth SIGINT.");
+    FINROC_LOG_PRINT_STATIC(USER, "\nCaught SIGINT again. Unfortunately, the program still has not terminated. Program will be aborted at fifth SIGINT.");
   }
   else if (call_count >= 5)
   {
-    FINROC_LOG_PRINT(USER, "\nCaught SIGINT for the fifth time. Aborting program.");
+    FINROC_LOG_PRINT_STATIC(USER, "\nCaught SIGINT for the fifth time. Aborting program.");
     abort();
   }
 }
@@ -175,7 +175,7 @@ void HandleSignalSIGTERM(int signal)
   assert(signal == SIGTERM);
   if (!Shutdown("SIGTERM"))
   {
-    FINROC_LOG_PRINT(USER, "\nCaught SIGTERM while shutting down. Aborting program.");
+    FINROC_LOG_PRINT_STATIC(USER, "\nCaught SIGTERM while shutting down. Aborting program.");
     abort();
   }
 }
@@ -199,12 +199,12 @@ bool OptionsHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
     const std::string &file = rrlib::getopt::EvaluateValue(parameter_config);
     if (!core::FinrocFileExists(file))
     {
-      FINROC_LOG_PRINT(ERROR, "Could not find specified config file ", file);
+      FINROC_LOG_PRINT_STATIC(ERROR, "Could not find specified config file ", file);
       return false;
     }
     else
     {
-      FINROC_LOG_PRINT(DEBUG, "Loading config file ", file);
+      FINROC_LOG_PRINT_STATIC(DEBUG, "Loading config file ", file);
     }
     parameters::tConfigurablePlugin::SetConfigFile(file);
     core::tRuntimeEnvironment::GetInstance().AddAnnotation(*new parameters::tConfigFile(file));
@@ -222,11 +222,11 @@ bool OptionsHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
     int port = atoi(rrlib::getopt::EvaluateValue(port_option).c_str());
     if (port < 1 || port > 65535)
     {
-      FINROC_LOG_PRINT(ERROR, "Invalid port '", port, "'. Using default: ", tcp::tOptions::GetDefaultOptions().preferred_server_port);
+      FINROC_LOG_PRINT_STATIC(ERROR, "Invalid port '", port, "'. Using default: ", tcp::tOptions::GetDefaultOptions().preferred_server_port);
     }
     else
     {
-      FINROC_LOG_PRINT(DEBUG, "Listening on user defined port ", port, ".");
+      FINROC_LOG_PRINT_STATIC(DEBUG, "Listening on user defined port ", port, ".");
       tcp::tOptions::GetDefaultOptions().preferred_server_port = port;
     }
 #endif
@@ -245,7 +245,7 @@ bool OptionsHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
   {
 #ifdef _LIB_FINROC_PLUGINS_TCP_PRESENT_
     tcp::tOptions::GetDefaultOptions().connect_to.push_back(rrlib::getopt::EvaluateValue(connect_option));
-    FINROC_LOG_PRINT(DEBUG, "Connecting to ", rrlib::getopt::EvaluateValue(connect_option));
+    FINROC_LOG_PRINT_STATIC(DEBUG, "Connecting to ", rrlib::getopt::EvaluateValue(connect_option));
 #endif
   }
 
@@ -255,7 +255,7 @@ bool OptionsHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
   {
 #ifdef _LIB_FINROC_PLUGINS_TCP_PRESENT_
     tcp::tOptions::GetDefaultOptions().server_listen_address = rrlib::getopt::EvaluateValue(listen_address_option);
-    FINROC_LOG_PRINT(DEBUG, "Listening on ", tcp::tOptions::GetDefaultOptions().server_listen_address);
+    FINROC_LOG_PRINT_STATIC(DEBUG, "Listening on ", tcp::tOptions::GetDefaultOptions().server_listen_address);
 #endif
   }
 
@@ -274,7 +274,7 @@ bool OptionsHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
     }
     else
     {
-      FINROC_LOG_PRINT(ERROR, "Option --crash-handler needs be either 'on' or 'off' (not '", s, "').");
+      FINROC_LOG_PRINT_STATIC(ERROR, "Option --crash-handler needs be either 'on' or 'off' (not '", s, "').");
       return false;
     }
   }
@@ -357,7 +357,7 @@ void InstallCrashHandler()
   {
     if (!rrlib::crash_handler::InstallCrashHandler())
     {
-      FINROC_LOG_PRINT(ERROR, "Error installing crash handler. Crashes will simply terminate the program.");
+      FINROC_LOG_PRINT_STATIC(ERROR, "Error installing crash handler. Crashes will simply terminate the program.");
     }
   }
 #endif
@@ -379,7 +379,7 @@ void ConnectTCPPeer(const std::string &peer_name)
   }
   catch (const std::exception& e1)
   {
-    FINROC_LOG_PRINT(WARNING, "Error connecting Peer: ", e1);
+    FINROC_LOG_PRINT_STATIC(WARNING, "Error connecting Peer: ", e1);
   }
 #endif
 }
@@ -430,7 +430,7 @@ int InitializeAndRunMainLoop(const std::string &program_name)
     else
     {
       scheduling::tExecutionControl::StartAll(*fe);
-      FINROC_LOG_PRINT(USER, "Finroc program '", program_name, "' is now running.");
+      FINROC_LOG_PRINT_STATIC(USER, "Finroc program '", program_name, "' is now running.");
     }
   }
 
@@ -453,7 +453,7 @@ int InitializeAndRunMainLoop(const std::string &program_name)
       }
     }
   }
-  FINROC_LOG_PRINT(DEBUG, "Left main loop");
+  FINROC_LOG_PRINT_STATIC(DEBUG, "Left main loop");
 
   // In many cases this is not necessary.
   // However, doing this before static deinitialization can avoid issues with external libraries and thread container threads still running.

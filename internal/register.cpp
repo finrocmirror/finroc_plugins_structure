@@ -100,7 +100,7 @@ static std::vector<tModulePorts>& GetModuleTypeRegister()
 void AddMemoryBlock(void* address, size_t size)
 {
   rrlib::thread::tLock lock(GetMutex());
-  FINROC_LOG_PRINT(DEBUG_VERBOSE_1, "Adding memory block at ", address, " with size ", size);
+  FINROC_LOG_PRINT_STATIC(DEBUG_VERBOSE_1, "Adding memory block at ", address, " with size ", size);
   tInstantiatedModule m = {(char*)address, size, NULL };
   GetRegister().push_back(m);
 }
@@ -108,7 +108,7 @@ void AddMemoryBlock(void* address, size_t size)
 void AddModule(core::tFrameworkElement* module)
 {
   rrlib::thread::tLock lock(GetMutex());
-  FINROC_LOG_PRINT(DEBUG_VERBOSE_1, "Adding module ", module, "...");
+  FINROC_LOG_PRINT_STATIC(DEBUG_VERBOSE_1, "Adding module ", module, "...");
   std::vector<tInstantiatedModule>& reg = GetRegister();
   void* ptr = module;
   for (int i = reg.size() - 1; i >= 0; i--) // reverse direction, because relevant module usually is at the end (the most recently added)
@@ -116,7 +116,7 @@ void AddModule(core::tFrameworkElement* module)
     if (ptr >= reg[i].address && ptr < reg[i].address + reg[i].size)
     {
       assert(reg[i].module == NULL);
-      FINROC_LOG_PRINT(DEBUG_VERBOSE_1, "Module resides in memory block ", reg[i].address);
+      FINROC_LOG_PRINT_STATIC(DEBUG_VERBOSE_1, "Module resides in memory block ", reg[i].address);
       reg[i].module = module;
     }
   }
@@ -125,7 +125,7 @@ void AddModule(core::tFrameworkElement* module)
 void RemoveModule(core::tFrameworkElement* module)
 {
   rrlib::thread::tLock lock(GetMutex());
-  FINROC_LOG_PRINT(DEBUG_VERBOSE_1, "Removing module ", module);
+  FINROC_LOG_PRINT_STATIC(DEBUG_VERBOSE_1, "Removing module ", module);
   std::vector<tInstantiatedModule>& reg = GetRegister();
   for (int i = reg.size() - 1; i >= 0; i--) // reverse direction, because relevant module is possibly rather at the end
   {
@@ -151,7 +151,7 @@ core::tFrameworkElement* FindParent(void* ptr, bool abort_if_not_found)
   }
   if (abort_if_not_found)
   {
-    FINROC_LOG_PRINT(ERROR, "Could not find parent for port (or parameter). Please provide port name as first and parent as second constructor parameter for all ports that are not plain module/group class members (e.g. pushed in a std::vector).");
+    FINROC_LOG_PRINT_STATIC(ERROR, "Could not find parent for port (or parameter). Please provide port name as first and parent as second constructor parameter for all ports that are not plain module/group class members (e.g. pushed in a std::vector).");
     abort();
   }
   return NULL;

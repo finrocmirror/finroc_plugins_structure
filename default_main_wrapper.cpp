@@ -75,7 +75,7 @@ int main(int argc, char **argv)
 {
   if (!finroc::structure::InstallSignalHandler())
   {
-    FINROC_LOG_PRINT(ERROR, "Error installing signal handler. Exiting...");
+    FINROC_LOG_PRINT_STATIC(ERROR, "Error installing signal handler. Exiting...");
     return EXIT_FAILURE;
   }
 
