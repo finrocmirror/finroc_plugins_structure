@@ -86,7 +86,7 @@ tSenseControlGroup::tSenseControlGroup(tFrameworkElement *parent, const std::str
   tCompositeComponent(parent, name, structure_config_file, extra_flags)
 {
   interface_array.fill(NULL);
-  this->EmplaceAnnotation<tInterfaces>(cSTATIC_INTERFACE_INFO_SENSE_CONTROL_GROUP, interface_array.begin(), share_so_and_ci_ports ? 6 : 0); // 6 => bits 2 and 3 are set (Sensor Output and Controller Input)
+  this->EmplaceAnnotation<tInterfaces>(cSTATIC_INTERFACE_INFO_SENSE_CONTROL_GROUP, interface_array.begin(), share_so_and_ci_ports ? 15 : 0); // 6 => bits 2 and 3 are set (Sensor Output and Controller Input)
 }
 
 core::tPortGroup& tSenseControlGroup::GetInterface(tInterfaceEnumeration desired_interface)
