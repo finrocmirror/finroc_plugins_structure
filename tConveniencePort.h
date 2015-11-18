@@ -104,7 +104,6 @@ public:
    * tFrameworkElement::tFlags arguments are interpreted as flags.
    * A tQueueSettings argument creates an input queue with the specified settings.
    * tBounds<T> are port's bounds.
-   * tUnit argument is port's unit.
    * const T& is interpreted as port's default value.
    * tConstructorParameters argument is copied.
    *
