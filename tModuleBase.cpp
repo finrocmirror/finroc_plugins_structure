@@ -84,7 +84,7 @@ void tModuleBase::CheckParameters()
   }
 }
 
-core::tPortGroup* tModuleBase::CreateInterface(const std::string& name, bool share_ports, tFlags extra_flags)
+core::tPortGroup* tModuleBase::CreateInterface(const std::string& name, bool share_ports, tFlags extra_flags, tFlags default_port_flags)
 {
   if (IsReady())
   {
@@ -95,7 +95,7 @@ core::tPortGroup* tModuleBase::CreateInterface(const std::string& name, bool sha
     }
     FINROC_LOG_PRINT(WARNING, "Interface ", name, " created after module has been initialized. Data dependencies via this interface will not be considered for scheduling. Call Get", name_without_space, "s() in constructor or OnStaticParameterChange() to avoid this.");
   }
-  return new core::tPortGroup(this, name, tFlag::INTERFACE | extra_flags, share_ports ? tFlags(tFlag::SHARED) : tFlags());
+  return new core::tPortGroup(this, name, tFlag::INTERFACE | extra_flags, default_port_flags | (share_ports ? tFlags(tFlag::SHARED) : tFlags()));
 }
 
 core::tPortGroup& tModuleBase::GetProfilingPortGroup()

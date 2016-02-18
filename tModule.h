@@ -89,7 +89,7 @@ public:
   {
     if (!input)
     {
-      input = CreateInterface("Input", share_ports);
+      input = CreateInterface("Input", share_ports, tFlags(), data_ports::cDEFAULT_INPUT_PORT_FLAGS);
     }
     return *input;
   }
@@ -101,7 +101,7 @@ public:
   {
     if (!output)
     {
-      output = CreateInterface("Output", share_ports);
+      output = CreateInterface("Output", share_ports, tFlags(), data_ports::cDEFAULT_OUTPUT_PORT_FLAGS);
     }
     return *output;
   }
