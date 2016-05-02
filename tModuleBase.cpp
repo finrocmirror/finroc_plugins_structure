@@ -62,6 +62,7 @@ namespace structure
 //----------------------------------------------------------------------
 // Const values
 //----------------------------------------------------------------------
+static constexpr uint cMANDATORY_PORT_FLAGS_FOR_CHANGED_CHECK = (core::tFrameworkElementFlag::READY | core::tFrameworkElementFlag::PUSH_STRATEGY).Raw();
 
 //----------------------------------------------------------------------
 // Implementation
@@ -141,7 +142,7 @@ bool tModuleBase::ProcessChangedFlags(core::tFrameworkElement& port_group)
   bool any_changed = false;
   for (auto it = port_group.ChildPortsBegin(); it != port_group.ChildPortsEnd(); ++it)
   {
-    if (it->IsReady() || (!this->IsReady()))
+    if ((it->GetAllFlags().Raw() & cMANDATORY_PORT_FLAGS_FOR_CHANGED_CHECK) == cMANDATORY_PORT_FLAGS_FOR_CHANGED_CHECK || (!this->IsReady()))
     {
       bool changed = static_cast<data_ports::common::tAbstractDataPort&>(*it).HasChanged();
       static_cast<data_ports::common::tAbstractDataPort&>(*it).ResetChanged();
