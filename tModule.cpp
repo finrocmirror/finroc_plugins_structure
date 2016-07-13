@@ -60,21 +60,24 @@ namespace structure
 //----------------------------------------------------------------------
 // Forward declarations / typedefs / enums
 //----------------------------------------------------------------------
+typedef core::tFrameworkElement::tFlags tFlags;
 
 //----------------------------------------------------------------------
 // Const values
 //----------------------------------------------------------------------
+
+const tComponent::tInterfaceInfo tModule::cINPUT_INTERFACE_INFO = { "Input", tFlags(), data_ports::cDEFAULT_INPUT_PORT_FLAGS };
+const tComponent::tInterfaceInfo tModule::cOUTPUT_INTERFACE_INFO = { "Output", tFlags(), data_ports::cDEFAULT_OUTPUT_PORT_FLAGS };
 
 //----------------------------------------------------------------------
 // Implementation
 //----------------------------------------------------------------------
 
 tModule::tModule(tFrameworkElement *parent, const std::string &name, bool share_ports)
-  : tModuleBase(parent, name),
+  : tModuleBase(parent, name, tFlags(), share_ports),
 
-    input(NULL),
-    output(NULL),
-    share_ports(share_ports),
+    input(nullptr),
+    output(nullptr),
     update_task(*this),
     input_changed(true)
 {
@@ -85,14 +88,13 @@ tModule::~tModule()
 
 void tModule::PostChildInit()
 {
-  CheckStaticParameters(); // evaluate static parameters before we create the task
   data_ports::tOutputPort<rrlib::time::tDuration> execution_duration;
   if (scheduling::IsProfilingEnabled())
   {
-    execution_duration = data_ports::tOutputPort<rrlib::time::tDuration>(&GetProfilingPortGroup(), "Update() Duration");
+    execution_duration = data_ports::tOutputPort<rrlib::time::tDuration>(&GetProfilingInterface(), "Update() Duration");
     execution_duration.Init();
   }
-  this->AddAnnotation(*new scheduling::tPeriodicFrameworkElementTask(this->input, this->output, this->update_task, execution_duration));
+  this->AddAnnotation(*new scheduling::tPeriodicFrameworkElementTask(&this->GetInputs(), &this->GetOutputs(), this->update_task, execution_duration));
 }
 
 tModule::UpdateTask::UpdateTask(tModule& module)

@@ -59,6 +59,8 @@ namespace structure
 //----------------------------------------------------------------------
 // Forward declarations / typedefs / enums
 //----------------------------------------------------------------------
+typedef core::tFrameworkElement::tFlag tFlag;
+typedef core::tFrameworkElement::tFlags tFlags;
 
 //----------------------------------------------------------------------
 // Const values
@@ -66,14 +68,8 @@ namespace structure
 
 static runtime_construction::tStandardCreateModuleAction<tGroup> cCREATE_ACTION_FOR_GROUP("Group");
 
-typedef tCompositeComponent::tInterfaces::tStaticInterfaceInfo tStaticInterfaceInfo;
-typedef core::tFrameworkElement::tFlag tFlag;
-
-const std::vector<tStaticInterfaceInfo>& cSTATIC_INTERFACE_INFO_GROUP =
-{
-  tStaticInterfaceInfo { "Input", tFlag::INTERFACE, tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA | tFlag::PUSH_STRATEGY, runtime_construction::tPortCreateOption::SHARED },
-  tStaticInterfaceInfo { "Output", tFlag::INTERFACE, tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA | tFlag::OUTPUT_PORT | tFlag::PUSH_STRATEGY, runtime_construction::tPortCreateOption::SHARED },
-};
+const tComponent::tInterfaceInfo tGroup::cINPUT_INTERFACE_INFO = { "Input", tFlags(), tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA | tFlag::PUSH_STRATEGY };
+const tComponent::tInterfaceInfo tGroup::cOUTPUT_INTERFACE_INFO = { "Output", tFlags(), tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA | tFlag::OUTPUT_PORT | tFlag::PUSH_STRATEGY };
 
 //----------------------------------------------------------------------
 // Implementation
@@ -81,33 +77,14 @@ const std::vector<tStaticInterfaceInfo>& cSTATIC_INTERFACE_INFO_GROUP =
 tGroup::tGroup(tFrameworkElement *parent, const std::string &name,
                const std::string &structure_config_file,
                bool share_ports, tFlags extra_flags) :
-  tCompositeComponent(parent, name, structure_config_file, extra_flags)
+  tCompositeComponent(parent, name, structure_config_file, extra_flags, share_ports)
 {
-  interface_array.fill(NULL);
-  this->EmplaceAnnotation<tInterfaces>(cSTATIC_INTERFACE_INFO_GROUP, interface_array.begin(), share_ports | (share_ports << 1));
+#ifdef _LIB_FINROC_PLUGINS_RUNTIME_CONSTRUCTION_PRESENT_
+  runtime_construction::tEditableInterfaces::AddInterface(GetOutputs(), runtime_construction::tPortCreateOption::SHARED, true);
+  runtime_construction::tEditableInterfaces::AddInterface(GetInputs(), runtime_construction::tPortCreateOption::SHARED, true);
+#endif
 }
 
-core::tPortGroup& tGroup::GetInterface(tInterfaceEnumeration desired_interface)
-{
-  if (!interface_array[desired_interface])
-  {
-    tInterfaces* editable_interfaces = this->GetAnnotation<tInterfaces>();
-    editable_interfaces->CreateInterface(this, desired_interface, IsReady());
-  }
-  return *interface_array[desired_interface];
-}
-
-core::tPortGroup& tGroup::GetInterface(const std::string& interface_name)
-{
-  for (size_t i = 0; i < cSTATIC_INTERFACE_INFO_GROUP.size(); i++)
-  {
-    if (interface_name.compare(cSTATIC_INTERFACE_INFO_GROUP[i].name) == 0)
-    {
-      return GetInterface(static_cast<tInterfaceEnumeration>(i));
-    }
-  }
-  throw std::runtime_error("No interface with name '" + interface_name + "' is meant to be added to a group.");
-}
 
 //----------------------------------------------------------------------
 // End of namespace declaration

@@ -63,6 +63,7 @@ namespace structure
 //----------------------------------------------------------------------
 // Const values
 //----------------------------------------------------------------------
+const tComponent::tInterfaceInfo tComponent::cPROFILING_INTERFACE_INFO = { "Profiling", core::tFrameworkElementFlags(), data_ports::cDEFAULT_OUTPUT_PORT_FLAGS };
 
 //----------------------------------------------------------------------
 // Implementation
@@ -72,7 +73,6 @@ core::tFrameworkElement::tFlag tComponent::cDO_NOT_CREATE_NOW = core::tFramework
 
 tComponent::tComponent(core::tFrameworkElement *parent, const std::string &name, tFlags extra_flags) :
   tFrameworkElement(parent, name, extra_flags),
-  parameters(nullptr),
   auto_name_port_count(0),
   count_for_type(nullptr)
 {
@@ -94,50 +94,28 @@ void tComponent::CheckStaticParameters()
   parameters::internal::tStaticParameterList::DoStaticParameterEvaluation(*this);
 }
 
-core::tFrameworkElement& tComponent::GetParameterParent()
+tInterface& tComponent::CreateInterface(const tInterfaceInfo& interface_info, bool shared_ports)
 {
-  if (!parameters)
+  tInterface* result = new tInterface(this, interface_info.name, interface_info.extra_interface_flags | tFlag::INTERFACE, interface_info.default_port_flags | (shared_ports ? tFlag::SHARED : tFlag::PORT));
+  if (IsReady())
   {
-    parameters = new tFrameworkElement(this, "Parameters");
-    if (IsReady())
-    {
-      parameters->Init();
-    }
+    result->Init();
   }
-  return *parameters;
+  return *result;
 }
 
-core::tFrameworkElement& tComponent::GetServicesParent()
+tInterface& tComponent::GetInterface(const tInterfaceInfo& interface_info, bool shared_ports)
 {
-  core::tFrameworkElement* services = this->GetChild("Services");
-  if (!services)
+  core::tFrameworkElement* interface = this->GetChild(interface_info.name);
+  if (!interface)
   {
-    services = new tFrameworkElement(this, "Services");
-    if (IsReady())
-    {
-      services->Init();
-    }
+    return CreateInterface(interface_info, shared_ports);
   }
-  return *services;
-}
-
-core::tFrameworkElement& tComponent::GetVisualizationParent()
-{
-  if (!create_component_visualization_ports)
+  if (!interface->GetFlag(tFlag::INTERFACE))
   {
-    return *this;
+    throw std::runtime_error(interface->GetQualifiedName() + " is no interface");
   }
-
-  core::tFrameworkElement* visualization = this->GetChild("Visualization");
-  if (!visualization)
-  {
-    visualization = new tFrameworkElement(this, "Visualization");
-    if (IsReady())
-    {
-      visualization->Init();
-    }
-  }
-  return *visualization;
+  return static_cast<tInterface&>(*interface);
 }
 
 void tComponent::SetComponentVisualizationEnabled(bool enabled)

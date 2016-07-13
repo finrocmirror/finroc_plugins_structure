@@ -89,51 +89,35 @@ public:
   tSenseControlModule(core::tFrameworkElement *parent, const std::string &name, bool share_so_and_ci_ports = false);
 
   /*!
-   * \return Parent port group of all sensor inputs
+   * \return Controller Input Interface
    */
-  inline core::tPortGroup& GetSensorInputs()
+  inline tInterface& GetControllerInputs()
   {
-    if (!sensor_input)
-    {
-      sensor_input = CreateInterface("Sensor Input", false, tFlag::SENSOR_DATA, data_ports::cDEFAULT_INPUT_PORT_FLAGS);
-    }
-    return *sensor_input;
+    return GetInterface(controller_input, cCONTROLLER_INPUT_INTERFACE_INFO, GetFlag(tFlag::SHARED));
   }
 
   /*!
-   * \return Parent port group of all sensor outputs
+   * \return Controller Output Interface
    */
-  inline core::tPortGroup& GetSensorOutputs()
+  inline tInterface& GetControllerOutputs()
   {
-    if (!sensor_output)
-    {
-      sensor_output = CreateInterface("Sensor Output", share_so_and_ci_ports, tFlag::SENSOR_DATA, data_ports::cDEFAULT_OUTPUT_PORT_FLAGS);
-    }
-    return *sensor_output;
+    return GetInterface(controller_output, cCONTROLLER_OUTPUT_INTERFACE_INFO, false);
   }
 
   /*!
-   * \return Parent port group of all controller inputs
+   * \return Sensor Input Interface
    */
-  inline core::tPortGroup& GetControllerInputs()
+  inline tInterface& GetSensorInputs()
   {
-    if (!controller_input)
-    {
-      controller_input = CreateInterface("Controller Input", share_so_and_ci_ports, tFlag::CONTROLLER_DATA, data_ports::cDEFAULT_INPUT_PORT_FLAGS);
-    }
-    return *controller_input;
+    return GetInterface(sensor_input, cSENSOR_INPUT_INTERFACE_INFO, false);
   }
 
   /*!
-   * \return Parent port group of all controller outputs
+   * \return Sensor Output Interface
    */
-  inline core::tPortGroup& GetControllerOutputs()
+  inline tInterface& GetSensorOutputs()
   {
-    if (!controller_output)
-    {
-      controller_output = CreateInterface("Controller Output", false, tFlag::CONTROLLER_DATA, data_ports::cDEFAULT_OUTPUT_PORT_FLAGS);
-    }
-    return *controller_output;
+    return GetInterface(sensor_output, cSENSOR_OUTPUT_INTERFACE_INFO, GetFlag(tFlag::SHARED));
   }
 
   /**
@@ -170,11 +154,17 @@ public:
   template <typename T>
   using tSensorOutput = tConveniencePort<data_ports::tOutputPort<T>, tSenseControlModule, core::tPortGroup, &tSenseControlModule::GetSensorOutputs>;
 
+
+  /*! Static interface info on data port interfaces */
+  static const tInterfaceInfo cSENSOR_INPUT_INTERFACE_INFO, cSENSOR_OUTPUT_INTERFACE_INFO, cCONTROLLER_INPUT_INTERFACE_INFO, cCONTROLLER_OUTPUT_INTERFACE_INFO;
+
 //----------------------------------------------------------------------
-// Protected destructor (framework elements have their own memory management and are deleted with ManagedDelete)
+// Protected fields and methods
 //----------------------------------------------------------------------
 protected:
 
+
+  /*! Protected destructor (framework elements have their own memory management and are deleted with ManagedDelete) */
   virtual ~tSenseControlModule();
 
   /*!
@@ -207,13 +197,10 @@ protected:
 private:
 
   /*! Module's interfaces */
-  core::tPortGroup *sensor_input;
-  core::tPortGroup *sensor_output;
-  core::tPortGroup *controller_input;
-  core::tPortGroup *controller_output;
-
-  /*! Share sensor output and controller input ports so that they can be accessed from other runtime environments? */
-  bool share_so_and_ci_ports;
+  tInterface *sensor_input;
+  tInterface *sensor_output;
+  tInterface *controller_input;
+  tInterface *controller_output;
 
   /*! Task that calls Control() regularly */
   class ControlTask : public rrlib::thread::tTask

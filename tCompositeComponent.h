@@ -52,10 +52,7 @@
 #endif
 #ifdef _LIB_FINROC_PLUGINS_RUNTIME_CONSTRUCTION_PRESENT_
 #include "plugins/runtime_construction/tEditableInterfaces.h"
-#else
-#include "plugins/runtime_construction/tInterfaces.h"
 #endif
-
 
 //----------------------------------------------------------------------
 // Internal includes with ""
@@ -89,21 +86,31 @@ class tCompositeComponent : public tComponent
 //----------------------------------------------------------------------
 public:
 
-#ifdef _LIB_FINROC_PLUGINS_RUNTIME_CONSTRUCTION_PRESENT_
-  typedef runtime_construction::tEditableInterfaces tInterfaces;
-#else
-  typedef runtime_construction::tInterfaces tInterfaces;
-#endif
-
   /*!
    * \param parent Parent
-   * \param name Name of module
-   * \param structure_config_file XML
-   * \param share_so_and_ci_ports Share sensor output and controller input ports so that they can be accessed from other runtime environments?
-   * \param extra_flags Any extra flags for group
+   * \param name Name of component
+   * \param structure_config_file Structure config XML file
+   * \param extra_flags Any extra flags for component
+   * \param share_ports Share ports in interfaces so that they can be connected to remote components?
    */
   tCompositeComponent(core::tFrameworkElement *parent, const std::string &name, const std::string &structure_config_file = "",
-                      tFlags extra_flags = tFlags());
+                      tFlags extra_flags = tFlags(), bool share_ports = false);
+
+  /*!
+   * \return Returns 'Parameters' interface of this component
+   */
+  inline tInterface& GetParameters()
+  {
+    return GetInterface(cPARAMETERS_INTERFACE_INFO, false);
+  }
+
+  /*!
+   * \return Returns 'Services' interface of this component
+   */
+  inline tInterface& GetServices()
+  {
+    return GetInterface(cSERVICES_INTERFACE_INFO, GetFlag(tFlag::SHARED));
+  }
 
   /**
    * RPC port classes to use in composite components.
@@ -122,10 +129,10 @@ public:
    */
 #ifdef _LIB_FINROC_PLUGINS_RPC_PORTS_PRESENT_
   template <typename T, bool Tend_point = false>
-  using tServer = tConveniencePort<typename std::conditional<Tend_point, rpc_ports::tServerPort<T>, rpc_ports::tProxyPort<T, true>>::type, tComponent, tFrameworkElement, &tCompositeComponent::GetServicesParent>;
+  using tServer = tConveniencePort<typename std::conditional<Tend_point, rpc_ports::tServerPort<T>, rpc_ports::tProxyPort<T, true>>::type, tCompositeComponent, tInterface, &tCompositeComponent::GetServices>;
 
   template <typename T, bool Tend_point = false>
-  using tClient = tConveniencePort<typename std::conditional<Tend_point, rpc_ports::tClientPort<T>, rpc_ports::tProxyPort<T, false>>::type, tComponent, tFrameworkElement, &tCompositeComponent::GetServicesParent>;
+  using tClient = tConveniencePort<typename std::conditional<Tend_point, rpc_ports::tClientPort<T>, rpc_ports::tProxyPort<T, false>>::type, tCompositeComponent, tInterface, &tCompositeComponent::GetServices>;
 #endif
 
   /**
@@ -148,12 +155,12 @@ public:
    * Any further string is interpreted as config entry.
    */
   template <typename T>
-  class tParameter : public tConveniencePort<parameters::tParameter<T>, tComponent, tFrameworkElement, &tCompositeComponent::GetParameterParent>
+  class tParameter : public tConveniencePort<parameters::tParameter<T>, tCompositeComponent, tInterface, &tCompositeComponent::GetParameters>
   {
   public:
     template<typename ... ARGS>
     explicit tParameter(const ARGS&... args)
-      : tConveniencePort<parameters::tParameter<T>, tComponent, tFrameworkElement, &tCompositeComponent::GetParameterParent>(args..., core::tFrameworkElement::tFlag::EMITS_DATA)
+      : tConveniencePort<parameters::tParameter<T>, tCompositeComponent, tInterface, &tCompositeComponent::GetParameters>(args..., core::tFrameworkElement::tFlag::EMITS_DATA)
     {
       assert(this->GetWrapped()->GetParent()->NameEquals("Parameters"));
     }
@@ -178,26 +185,26 @@ public:
    */
   std::unique_ptr<tStaticParameter<std::string>> structure_config_file_parameter;
 
+  /*! Static interface info on common interfaces of composite components */
+  static const tInterfaceInfo cVISUALIZATION_INTERFACE_INFO, cSERVICES_INTERFACE_INFO, cPARAMETERS_INTERFACE_INFO;
+
 //----------------------------------------------------------------------
 // Protected fields and methods
 //----------------------------------------------------------------------
 protected:
 
+  virtual core::tFrameworkElement& GetVisualizationParent() override;
+  virtual void OnStaticParameterChange() override;
+  virtual void PostChildInit() override;
+
+//----------------------------------------------------------------------
+// Private fields and methods
+//----------------------------------------------------------------------
+private:
+
   /*! Local variable with current XML file to use - reference to this is passed to tFinstructable */
   std::string structure_config_file;
 
-  /*!
-   * Creates interface for this composite component
-   *
-   * \param name Name of interface
-   * \param share_ports Should ports in this interfaces be shared? (so that they can be accessed from other runtime environments)
-   * \param extra_flags Any extra flags to assign to interface
-   * \param extra_flags Any extra flags to assign to all ports
-   */
-  core::tPortGroup* CreateInterface(const std::string& name, bool share_ports, tFlags extra_interface_flags = tFlags(), tFlags default_port_flags = tFlags());
-
-  virtual void OnStaticParameterChange() override;
-  virtual void PostChildInit() override;
 };
 
 //----------------------------------------------------------------------

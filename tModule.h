@@ -83,27 +83,19 @@ public:
   {}
 
   /*!
-   * \return Parent port group of all inputs
+   * \return Input interface
    */
-  inline core::tPortGroup& GetInputs()
+  inline tInterface& GetInputs()
   {
-    if (!input)
-    {
-      input = CreateInterface("Input", share_ports, tFlags(), data_ports::cDEFAULT_INPUT_PORT_FLAGS);
-    }
-    return *input;
+    return GetInterface(input, cINPUT_INTERFACE_INFO, GetFlag(tFlag::SHARED));
   }
 
   /*!
-   * \return Parent port group of all outputs
+   * \return Output interface
    */
-  inline core::tPortGroup& GetOutputs()
+  inline tInterface& GetOutputs()
   {
-    if (!output)
-    {
-      output = CreateInterface("Output", share_ports, tFlags(), data_ports::cDEFAULT_OUTPUT_PORT_FLAGS);
-    }
-    return *output;
+    return GetInterface(output, cOUTPUT_INTERFACE_INFO, GetFlag(tFlag::SHARED));
   }
 
   /**
@@ -134,8 +126,11 @@ public:
   template <typename T>
   using tOutput = tConveniencePort<data_ports::tOutputPort<T>, tModule, core::tPortGroup, &tModule::GetOutputs>;
 
+  /*! Static interface info on data port interfaces */
+  static const tInterfaceInfo cOUTPUT_INTERFACE_INFO, cINPUT_INTERFACE_INFO;
+
 //----------------------------------------------------------------------
-// Protected destructor (framework elements have their own memory management and are deleted with ManagedDelete)
+// Protected fields and methods
 //----------------------------------------------------------------------
 protected:
 
@@ -160,11 +155,8 @@ protected:
 private:
 
   /*! Module's interfaces */
-  core::tPortGroup *input;
-  core::tPortGroup *output;
-
-  /*! Should ports be shared? */
-  bool share_ports;
+  tInterface *input;
+  tInterface *output;
 
   /*! Task that calls Update() regularly */
   class UpdateTask : public rrlib::thread::tTask

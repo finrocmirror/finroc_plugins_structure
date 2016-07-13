@@ -60,22 +60,27 @@ namespace structure
 //----------------------------------------------------------------------
 // Forward declarations / typedefs / enums
 //----------------------------------------------------------------------
+typedef core::tFrameworkElement::tFlags tFlags;
 
 //----------------------------------------------------------------------
 // Const values
 //----------------------------------------------------------------------
+
+const tComponent::tInterfaceInfo tSenseControlModule::cSENSOR_INPUT_INTERFACE_INFO = { "Sensor Input", tFlag::SENSOR_DATA, data_ports::cDEFAULT_INPUT_PORT_FLAGS };
+const tComponent::tInterfaceInfo tSenseControlModule::cSENSOR_OUTPUT_INTERFACE_INFO = { "Sensor Output", tFlag::SENSOR_DATA, data_ports::cDEFAULT_OUTPUT_PORT_FLAGS };
+const tComponent::tInterfaceInfo tSenseControlModule::cCONTROLLER_INPUT_INTERFACE_INFO = { "Controller Input", tFlag::CONTROLLER_DATA, data_ports::cDEFAULT_INPUT_PORT_FLAGS };
+const tComponent::tInterfaceInfo tSenseControlModule::cCONTROLLER_OUTPUT_INTERFACE_INFO = { "Controller Output", tFlag::CONTROLLER_DATA, data_ports::cDEFAULT_OUTPUT_PORT_FLAGS };
 
 //----------------------------------------------------------------------
 // Implementation
 //----------------------------------------------------------------------
 
 tSenseControlModule::tSenseControlModule(tFrameworkElement *parent, const std::string &name, bool share_so_and_ci_ports)
-  : tModuleBase(parent, name),
-    sensor_input(NULL),
-    sensor_output(NULL),
-    controller_input(NULL),
-    controller_output(NULL),
-    share_so_and_ci_ports(share_so_and_ci_ports),
+  : tModuleBase(parent, name, tFlags(), share_so_and_ci_ports),
+    sensor_input(nullptr),
+    sensor_output(nullptr),
+    controller_input(nullptr),
+    controller_output(nullptr),
     sense_task(*this),
     control_task(*this),
     sensor_input_changed(true),
@@ -90,37 +95,24 @@ tSenseControlModule::~tSenseControlModule()
 
 void tSenseControlModule::PostChildInit()
 {
-  CheckStaticParameters(); // evaluate static parameters before we create the tasks
-  tFrameworkElement* controller_task_parent = controller_input ? controller_input : (controller_output ? controller_output : NULL);
-  if (controller_task_parent)
   {
     data_ports::tOutputPort<rrlib::time::tDuration> execution_duration;
     if (scheduling::IsProfilingEnabled())
     {
-      execution_duration = data_ports::tOutputPort<rrlib::time::tDuration>(&GetProfilingPortGroup(), "Control() Duration");
+      execution_duration = data_ports::tOutputPort<rrlib::time::tDuration>(&GetProfilingInterface(), "Control() Duration");
       execution_duration.Init();
     }
-    controller_task_parent->AddAnnotation(*new scheduling::tPeriodicFrameworkElementTask(this->controller_input, this->controller_output, this->control_task, execution_duration));
-  }
-  else
-  {
-    FINROC_LOG_PRINT(WARNING, "Module has no controller interfaces. Control() will not be called!");
+    GetControllerInputs().AddAnnotation(*new scheduling::tPeriodicFrameworkElementTask(&GetControllerInputs(), &GetControllerOutputs(), this->control_task, execution_duration));
   }
 
-  tFrameworkElement* sensor_task_parent = sensor_input ? sensor_input : (sensor_output ? sensor_output : NULL);
-  if (sensor_task_parent)
   {
     data_ports::tOutputPort<rrlib::time::tDuration> execution_duration;
     if (scheduling::IsProfilingEnabled())
     {
-      execution_duration = data_ports::tOutputPort<rrlib::time::tDuration>(&GetProfilingPortGroup(), "Sense() Duration");
+      execution_duration = data_ports::tOutputPort<rrlib::time::tDuration>(&GetProfilingInterface(), "Sense() Duration");
       execution_duration.Init();
     }
-    sensor_task_parent->AddAnnotation(*new scheduling::tPeriodicFrameworkElementTask(this->sensor_input, this->sensor_output, this->sense_task, execution_duration));
-  }
-  else
-  {
-    FINROC_LOG_PRINT(WARNING, "Module has no sensor interfaces. Sense() will not be called!");
+    GetSensorInputs().AddAnnotation(*new scheduling::tPeriodicFrameworkElementTask(&GetSensorInputs(), &GetSensorOutputs(), this->sense_task, execution_duration));
   }
 }
 

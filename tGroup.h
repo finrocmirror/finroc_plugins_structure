@@ -79,19 +79,19 @@ class tGroup : public tCompositeComponent
 public:
 
   /*!
-   * \return Parent port group of all inputs
+   * \return Input interface
    */
-  inline core::tPortGroup& GetInputs()
+  inline tInterface& GetInputs()
   {
-    return GetInterface(eINTERFACE_INPUT);
+    return GetInterface(cINPUT_INTERFACE_INFO, GetFlag(tFlag::SHARED));
   }
 
   /*!
-   * \return Parent port group of all outputs
+   * \return Output interface
    */
-  inline core::tPortGroup& GetOutputs()
+  inline tInterface& GetOutputs()
   {
-    return GetInterface(eINTERFACE_OUTPUT);
+    return GetInterface(cOUTPUT_INTERFACE_INFO, GetFlag(tFlag::SHARED));
   }
 
   /**
@@ -123,6 +123,9 @@ public:
   template <typename T>
   using tOutput = tConveniencePort<data_ports::tProxyPort<T, true>, tGroup, core::tPortGroup, &tGroup::GetOutputs>;
 
+  /*! Static interface info on data port interfaces */
+  static const tInterfaceInfo cOUTPUT_INTERFACE_INFO, cINPUT_INTERFACE_INFO;
+
 //----------------------------------------------------------------------
 // Public methods and typedefs
 //----------------------------------------------------------------------
@@ -138,40 +141,6 @@ public:
     tGroup(parent, name, structure_config_file, share_ports | outdated_second_share_parameter, extra_flags)
   {}
 
-
-  /*!
-   * Get interface (or "port group") by name
-   *
-   * \param Interface name
-   * \return Interface with specified name (e.g. "Output")
-   * \throw std::runtime_error if no interface with this name can be obtained
-   */
-  core::tPortGroup& GetInterface(const std::string& interface_name);
-
-//----------------------------------------------------------------------
-// Private fields and methods
-//----------------------------------------------------------------------
-private:
-
-  /*! Enum for more elegant internal handling of the group's interfaces */
-  enum tInterfaceEnumeration
-  {
-    eINTERFACE_INPUT,
-    eINTERFACE_OUTPUT,
-    eINTERFACE_DIMENSION
-  };
-
-  /*!
-   * Pointers to group's interfaces
-   * Initially, no interface exists and all pointers are NULL.
-   */
-  std::array<core::tPortGroup*, eINTERFACE_DIMENSION> interface_array;
-
-  /*!
-   * \param desired_interface Interface to obtain.
-   * \return Interface. Will be created if it does not exist yet.
-   */
-  core::tPortGroup& GetInterface(tInterfaceEnumeration desired_interface);
 };
 
 //----------------------------------------------------------------------

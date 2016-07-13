@@ -64,12 +64,17 @@ namespace structure
 //----------------------------------------------------------------------
 static constexpr uint cMANDATORY_PORT_FLAGS_FOR_CHANGED_CHECK = (core::tFrameworkElementFlag::READY | core::tFrameworkElementFlag::PUSH_STRATEGY).Raw();
 
+const tComponent::tInterfaceInfo tModuleBase::cVISUALIZATION_INTERFACE_INFO = { "Visualization", core::tFrameworkElementFlags(), data_ports::cDEFAULT_OUTPUT_PORT_FLAGS };
+const tComponent::tInterfaceInfo tModuleBase::cSERVICES_INTERFACE_INFO = { "Services", core::tFrameworkElementFlags(), core::tFrameworkElementFlags() };
+const tComponent::tInterfaceInfo tModuleBase::cPARAMETERS_INTERFACE_INFO = { "Parameters", core::tFrameworkElementFlags(), data_ports::cDEFAULT_INPUT_PORT_FLAGS };
+
 //----------------------------------------------------------------------
 // Implementation
 //----------------------------------------------------------------------
 
-tModuleBase::tModuleBase(tFrameworkElement *parent, const std::string &name)
-  : tComponent(parent, name),
+tModuleBase::tModuleBase(tFrameworkElement *parent, const std::string &name, tFlags extra_flags, bool share_ports)
+  : tComponent(parent, name, extra_flags | (share_ports ? tFlags(tFlag::SHARED) : tFlags())),
+    parameters_interface(nullptr),
     parameters_changed()
 {
   core::tFrameworkElementTags::AddTag(*this, "module");
@@ -77,40 +82,12 @@ tModuleBase::tModuleBase(tFrameworkElement *parent, const std::string &name)
 
 void tModuleBase::CheckParameters()
 {
-  if (parameters_changed.parameters_changed && this->ParameterParentCreated())
+  if (parameters_changed.parameters_changed && parameters_interface)
   {
-    this->ProcessChangedFlags(this->GetParameterParent());
+    this->ProcessChangedFlags(*parameters_interface);
     parameters_changed.parameters_changed = false;
     this->OnParameterChange();
   }
-}
-
-core::tPortGroup* tModuleBase::CreateInterface(const std::string& name, bool share_ports, tFlags extra_flags, tFlags default_port_flags)
-{
-  if (IsReady())
-  {
-    std::string name_without_space = name;
-    if (name.find(' ') != std::string::npos)
-    {
-      name_without_space.erase(name.find(' '), 1);
-    }
-    FINROC_LOG_PRINT(WARNING, "Interface ", name, " created after module has been initialized. Data dependencies via this interface will not be considered for scheduling. Call Get", name_without_space, "s() in constructor or OnStaticParameterChange() to avoid this.");
-  }
-  return new core::tPortGroup(this, name, tFlag::INTERFACE | extra_flags, default_port_flags | (share_ports ? tFlags(tFlag::SHARED) : tFlags()));
-}
-
-core::tPortGroup& tModuleBase::GetProfilingPortGroup()
-{
-  core::tFrameworkElement* port_group = this->GetChild("Profiling");
-  if (!port_group)
-  {
-    port_group = new core::tPortGroup(this, "Profiling", tFlags(), tFlags());
-    if (IsReady())
-    {
-      port_group->Init();
-    }
-  }
-  return static_cast<core::tPortGroup&>(*port_group);
 }
 
 void tModuleBase::tParameterChangeDetector::OnPortChange(data_ports::tChangeContext& change_context)
@@ -133,6 +110,15 @@ bool tModuleBase::ProcessChangedFlags(core::tFrameworkElement& port_group)
     }
   }
   return any_changed;
+}
+
+core::tFrameworkElement& tModuleBase::GetVisualizationParent()
+{
+  if (CreateComponentVisualizationPorts())
+  {
+    return GetInterface(cVISUALIZATION_INTERFACE_INFO, false);
+  }
+  return *this;
 }
 
 //----------------------------------------------------------------------

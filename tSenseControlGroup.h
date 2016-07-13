@@ -92,45 +92,36 @@ public:
                      bool share_so_and_ci_ports = false, tFlags extra_flags = tFlags());
 
   /*!
-   * \return Parent port group of all controller inputs
+   * \return Controller Input Interface
    */
-  inline core::tPortGroup& GetControllerInputs()
+  inline tInterface& GetControllerInputs()
   {
-    return GetInterface(eINTERFACE_CONTROLLER_INPUT);
+    return GetInterface(cCONTROLLER_INPUT_INTERFACE_INFO, GetFlag(tFlag::SHARED));
   }
 
   /*!
-   * \return Parent port group of all controller outputs
+   * \return Controller Output Interface
    */
-  inline core::tPortGroup& GetControllerOutputs()
+  inline tInterface& GetControllerOutputs()
   {
-    return GetInterface(eINTERFACE_CONTROLLER_OUTPUT);
+    return GetInterface(cCONTROLLER_OUTPUT_INTERFACE_INFO, false);
   }
 
   /*!
-   * \return Parent port group of all sensor inputs
+   * \return Sensor Input Interface
    */
-  inline core::tPortGroup& GetSensorInputs()
+  inline tInterface& GetSensorInputs()
   {
-    return GetInterface(eINTERFACE_SENSOR_INPUT);
+    return GetInterface(cSENSOR_INPUT_INTERFACE_INFO, false);
   }
 
   /*!
-   * \return Parent port group of all sensor outputs
+   * \return Sensor Output Interface
    */
-  inline core::tPortGroup& GetSensorOutputs()
+  inline tInterface& GetSensorOutputs()
   {
-    return GetInterface(eINTERFACE_SENSOR_OUTPUT);
+    return GetInterface(cSENSOR_OUTPUT_INTERFACE_INFO, GetFlag(tFlag::SHARED));
   }
-
-  /*!
-   * Get interface (or "port group") by name
-   *
-   * \param Interface name
-   * \return Interface with specified name (e.g. "Sensor Output")
-   * \throw std::runtime_error if no interface with this name can be obtained
-   */
-  core::tPortGroup& GetInterface(const std::string& interface_name);
 
   /**
    * Port classes to use in group.
@@ -167,32 +158,10 @@ public:
   template <typename T>
   using tSensorOutput = tConveniencePort<data_ports::tProxyPort<T, true>, tSenseControlGroup, core::tPortGroup, &tSenseControlGroup::GetSensorOutputs>;
 
-//----------------------------------------------------------------------
-// Private fields and methods
-//----------------------------------------------------------------------
-private:
 
-  /*! Enum for more elegant internal handling of the group's interfaces */
-  enum tInterfaceEnumeration
-  {
-    eINTERFACE_SENSOR_INPUT,
-    eINTERFACE_SENSOR_OUTPUT,
-    eINTERFACE_CONTROLLER_INPUT,
-    eINTERFACE_CONTROLLER_OUTPUT,
-    eINTERFACE_DIMENSION
-  };
+  /*! Static interface info on data port interfaces */
+  static const tInterfaceInfo cSENSOR_INPUT_INTERFACE_INFO, cSENSOR_OUTPUT_INTERFACE_INFO, cCONTROLLER_INPUT_INTERFACE_INFO, cCONTROLLER_OUTPUT_INTERFACE_INFO;
 
-  /*!
-   * Pointers to group's interfaces
-   * Initially, no interface exists and all pointers are NULL.
-   */
-  std::array<core::tPortGroup*, eINTERFACE_DIMENSION> interface_array;
-
-  /*!
-   * \param desired_interface Interface to obtain.
-   * \return Interface. Will be created if it does not exist yet.
-   */
-  core::tPortGroup& GetInterface(tInterfaceEnumeration desired_interface);
 };
 
 //----------------------------------------------------------------------

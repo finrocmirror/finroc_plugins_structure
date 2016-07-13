@@ -63,6 +63,9 @@ namespace structure
 // Forward declarations / typedefs / enums
 //----------------------------------------------------------------------
 
+/*! Typedef for component interfaces */
+typedef core::tPortGroup tInterface;
+
 //----------------------------------------------------------------------
 // Class declaration
 //----------------------------------------------------------------------
@@ -77,12 +80,15 @@ class tComponent : public core::tFrameworkElement
    * GetContainer function for e.g. visualization ports
    * (returns this component if no visualization ports are to be created)
    */
-  tFrameworkElement& GetVisualizationParent();
+  virtual core::tFrameworkElement& GetVisualizationParent() = 0;
 
 //----------------------------------------------------------------------
 // Public methods and typedefs
 //----------------------------------------------------------------------
 public:
+
+  /*! Typedefs for convenvience for subclasses in different namespaces */
+  typedef finroc::structure::tInterface tInterface;
 
   /*!
    * Level of detail for component visualization
@@ -113,8 +119,6 @@ public:
   /*!
    * \param parent Parent
    * \param name Name of module
-   * \param structure_config_file XML
-   * \param share_so_and_ci_ports Share sensor output and controller input ports so that they can be accessed from other runtime environments?
    * \param extra_flags Any extra flags for component
    */
   tComponent(core::tFrameworkElement *parent, const std::string &name, tFlags extra_flags = tFlags());
@@ -128,11 +132,27 @@ public:
   void CheckStaticParameters();
 
   /*!
+   * \return Global setting as to whether dedicated component visualization outputs (tVisualizationOutput) should be created.
+   */
+  static bool CreateComponentVisualizationPorts()
+  {
+    return create_component_visualization_ports;
+  }
+
+  /*!
    * \return Config file for module
    */
   parameters::tConfigFile* GetConfigFile() const
   {
     return parameters::tConfigFile::Find(*this);
+  }
+
+  /*!
+   * \return Returns profiling interface
+   */
+  tInterface& GetProfilingInterface()
+  {
+    return GetInterface(cPROFILING_INTERFACE_INFO, false);
   }
 
   /*!
@@ -270,36 +290,67 @@ public:
     }
   };
 
+  /*!
+   * Construction information on interface
+   */
+  struct tInterfaceInfo
+  {
+    /*! Interface name */
+    const char* name;
+
+    /*! Any extra flags to assign to interface */
+    core::tFrameworkElement::tFlags extra_interface_flags;
+
+    /*! Any extra flags to assign to all ports */
+    core::tFrameworkElement::tFlags default_port_flags;
+  };
+
+  /*!
+   * Returns specified interface - creates it if this has not been done already.
+   *
+   * \param interface_variable Variable that stores pointer to interface
+   * \param interface_info Construction information on interface (typically stored in static variable)
+   * \param shared_ports Should all ports in interface be shared?
+   */
+  inline tInterface& GetInterface(tInterface*& interface_variable, const tInterfaceInfo& interface_info, bool shared_ports)
+  {
+    if (!interface_variable)
+    {
+      interface_variable = &CreateInterface(interface_info, shared_ports);
+    }
+    return *interface_variable;
+  }
+
+  /*!
+   * Returns specified interface - creates it if this has not been done already.
+   * (This variant looks up interface by string, which is more expensive, but often not critical)
+   *
+   * \param interface_info Construction information on interface (typically stored in static variable)
+   * \param shared_ports Should all ports in interface be shared?
+   */
+  tInterface& GetInterface(const tInterfaceInfo& interface_info, bool shared_ports);
+
+  /*! Static info on profiling interface */
+  static const tInterfaceInfo cPROFILING_INTERFACE_INFO;
+
+
   // operator new is overloaded for auto-port naming feature
   void* operator new(size_t size);
   void* operator new[](size_t size); // not allowed
 
 //----------------------------------------------------------------------
-// Protected destructor (framework elements have their own memory management and are deleted with ManagedDelete)
+//
 //----------------------------------------------------------------------
 protected:
 
+  /*! Protected destructor (framework elements have their own memory management and are deleted with ManagedDelete) */
   virtual ~tComponent();
 
-
-  /*! GetContainer function for e.g. tParameter */
-  tFrameworkElement& GetParameterParent();
-
-  /*! GetContainer function for services */
-  tFrameworkElement& GetServicesParent();
 
   /*! GetContainer function for e.g. tStaticParameter */
   tFrameworkElement& GetThis()
   {
     return *this;
-  }
-
-  /*!
-   * \return Has framework element "Parameters" for aggregating parameters has been created?
-   */
-  bool ParameterParentCreated()
-  {
-    return parameters;
   }
 
 //----------------------------------------------------------------------
@@ -309,9 +360,6 @@ private:
 
   template <typename TPort, typename TElement, typename TContainer, TContainer& (TElement::*GET_CONTAINER)()>
   friend class tConveniencePort;
-
-  /*! Element aggregating parameters */
-  core::tFrameworkElement* parameters;
 
   /*! Number of ports already created that have auto-generated names */
   int auto_name_port_count;
@@ -325,6 +373,14 @@ private:
    * Must be set at program startup - before components are created - to have an effect.
    */
   static bool create_component_visualization_ports;
+
+  /*!
+   * Creates interface
+   *
+   * \param interface_info Construction information on interface (typically stored in static variable)
+   * \param shared_ports Should all ports in interface be shared?
+   */
+  virtual tInterface& CreateInterface(const tInterfaceInfo& interface_info, bool shared_ports);
 };
 
 //----------------------------------------------------------------------

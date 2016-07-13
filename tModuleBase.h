@@ -77,13 +77,34 @@ namespace structure
 class tModuleBase : public tComponent
 {
 
-
 //----------------------------------------------------------------------
 // Public methods and typedefs
 //----------------------------------------------------------------------
 public:
 
-  tModuleBase(core::tFrameworkElement *parent, const std::string &name);
+  /*!
+   * \param parent Parent
+   * \param name Name of component
+   * \param extra_flags Any extra flags for component
+   * \param share_ports Share ports in interfaces so that they can be connected to remote components?
+   */
+  tModuleBase(core::tFrameworkElement *parent, const std::string &name, tFlags extra_flags = tFlags(), bool share_ports = false);
+
+  /*!
+   * \return Returns 'Parameters' interface of this component
+   */
+  inline tInterface& GetParameters()
+  {
+    return GetInterface(parameters_interface, cPARAMETERS_INTERFACE_INFO, false);
+  }
+
+  /*!
+   * \return Returns 'Services' interface of this component
+   */
+  inline tInterface& GetServices()
+  {
+    return GetInterface(cSERVICES_INTERFACE_INFO, GetFlag(tFlag::SHARED));
+  }
 
   /**
    * RPC port classes to use in modules.
@@ -100,10 +121,10 @@ public:
    */
 #ifdef _LIB_FINROC_PLUGINS_RPC_PORTS_PRESENT_
   template <typename T>
-  using tServer = tConveniencePort<rpc_ports::tServerPort<T>, tComponent, tFrameworkElement, &tModuleBase::GetServicesParent>;
+  using tServer = tConveniencePort<rpc_ports::tServerPort<T>, tModuleBase, tInterface, &tModuleBase::GetServices>;
 
   template <typename T>
-  using tClient = tConveniencePort<rpc_ports::tClientPort<T>, tComponent, tFrameworkElement, &tModuleBase::GetServicesParent>;
+  using tClient = tConveniencePort<rpc_ports::tClientPort<T>, tModuleBase, tInterface, &tModuleBase::GetServices>;
 #endif
 
   /**
@@ -126,12 +147,12 @@ public:
    * Any further string is interpreted as config entry.
    */
   template <typename T>
-  class tParameter : public tConveniencePort<parameters::tParameter<T>, tComponent, tFrameworkElement, &tModuleBase::GetParameterParent>
+  class tParameter : public tConveniencePort<parameters::tParameter<T>, tModuleBase, tInterface, &tModuleBase::GetParameters>
   {
   public:
     template<typename ... ARGS>
     explicit tParameter(const ARGS&... args)
-      : tConveniencePort<parameters::tParameter<T>, tComponent, tFrameworkElement, &tModuleBase::GetParameterParent>(args...)
+      : tConveniencePort<parameters::tParameter<T>, tModuleBase, tInterface, &tModuleBase::GetParameters>(args...)
     {
       if (this->GetWrapped())
       {
@@ -144,10 +165,8 @@ public:
   template <typename T>
   using tStaticParameter = tConveniencePort<parameters::tStaticParameter<T>, tComponent, core::tFrameworkElement, &tComponent::GetThis>;
 
-  /*!
-   * \return Port group with profiling ports. Created with first call to this function.
-   */
-  core::tPortGroup& GetProfilingPortGroup();
+  /*! Static interface info on common interfaces of composite components */
+  static const tInterfaceInfo cVISUALIZATION_INTERFACE_INFO, cSERVICES_INTERFACE_INFO, cPARAMETERS_INTERFACE_INFO;
 
 //----------------------------------------------------------------------
 // Protected methods
@@ -160,16 +179,6 @@ protected:
    * Calls OnParameterChange() if a parameter change was detected and resets change flag
    */
   void CheckParameters();
-
-  /*!
-   * Creates interface for this module
-   *
-   * \param name Name of interface
-   * \param share_ports Should ports in this interfaces be shared? (so that they can be accessed from other runtime environments)
-   * \param extra_flags Any extra flags to assign to interface
-   * \param default_port_flags Default flags for ports in this interface
-   */
-  core::tPortGroup* CreateInterface(const std::string& name, bool share_ports, tFlags extra_flags = tFlags(), tFlags default_port_flags = tFlags());
 
   /*!
    * (Automatically called)
@@ -185,10 +194,15 @@ protected:
    */
   bool ProcessChangedFlags(tFrameworkElement& port_group);
 
+  virtual core::tFrameworkElement& GetVisualizationParent() override;
+
 //----------------------------------------------------------------------
 // Private fields and methods
 //----------------------------------------------------------------------
 private:
+
+  /*! Stores pointer to parameters interface */
+  tInterface* parameters_interface;
 
   /*! Introduced this helper class to remove ambiguities when derived classes add listeners to ports */
   class tParameterChangeDetector
@@ -207,7 +221,6 @@ private:
 
   /*! Changed flag that is set whenever a parameter change is detected */
   tParameterChangeDetector parameters_changed;
-
 
   /*! Called whenever parameters have changed */
   virtual void OnParameterChange()
