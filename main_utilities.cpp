@@ -57,8 +57,11 @@ extern "C"
 #include "plugins/scheduling/scheduling.h"
 #include "plugins/scheduling/tThreadContainerThread.h"
 
+#ifdef _LIB_FINROC_PLUGINS_NETWORK_TRANSPORT_GENERIC_PROTOCOL_PRESENT_
+#include "plugins/network_transport/generic_protocol/tLocalRuntimeInfo.h"
+#endif
 #ifdef _LIB_FINROC_PLUGINS_TCP_PRESENT_
-#include "plugins/tcp/tPeer.h"
+#include "plugins/tcp/tTCPPlugin.h"
 #endif
 
 #include "rrlib/getopt/parser.h"
@@ -115,10 +118,6 @@ bool enable_crash_handler = true;
 std::mutex main_thread_wait_mutex;
 #ifndef RRLIB_SINGLE_THREADED
 std::condition_variable main_thread_wait_variable;
-#endif
-
-#ifdef _LIB_FINROC_PLUGINS_TCP_PRESENT_
-tcp::tPeer *tcp_peer;
 #endif
 
 /*!
@@ -222,12 +221,12 @@ bool OptionsHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
     int port = atoi(rrlib::getopt::EvaluateValue(port_option).c_str());
     if (port < 1 || port > 65535)
     {
-      FINROC_LOG_PRINT_STATIC(ERROR, "Invalid port '", port, "'. Using default: ", tcp::tOptions::GetDefaultOptions().preferred_server_port);
+      FINROC_LOG_PRINT_STATIC(ERROR, "Invalid port '", port, "'. Using default: ", tcp::tTCPPlugin::GetInstance().par_preferred_server_port.Get());
     }
     else
     {
       FINROC_LOG_PRINT_STATIC(DEBUG, "Listening on user defined port ", port, ".");
-      tcp::tOptions::GetDefaultOptions().preferred_server_port = port;
+      tcp::tTCPPlugin::GetInstance().par_preferred_server_port.Set(port);
     }
 #endif
   }
@@ -244,7 +243,7 @@ bool OptionsHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
   if (connect_option->IsActive())
   {
 #ifdef _LIB_FINROC_PLUGINS_TCP_PRESENT_
-    tcp::tOptions::GetDefaultOptions().connect_to.push_back(rrlib::getopt::EvaluateValue(connect_option));
+    tcp::tTCPPlugin::GetInstance().AddRuntimeToConnectTo(rrlib::getopt::EvaluateValue(connect_option));
     FINROC_LOG_PRINT_STATIC(DEBUG, "Connecting to ", rrlib::getopt::EvaluateValue(connect_option));
 #endif
   }
@@ -254,8 +253,8 @@ bool OptionsHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
   if (listen_address_option->IsActive())
   {
 #ifdef _LIB_FINROC_PLUGINS_TCP_PRESENT_
-    tcp::tOptions::GetDefaultOptions().server_listen_address = rrlib::getopt::EvaluateValue(listen_address_option);
-    FINROC_LOG_PRINT_STATIC(DEBUG, "Listening on ", tcp::tOptions::GetDefaultOptions().server_listen_address);
+    tcp::tTCPPlugin::GetInstance().par_server_listen_address.Set(rrlib::getopt::EvaluateValue(listen_address_option));
+    FINROC_LOG_PRINT_STATIC(DEBUG, "Listening on ", tcp::tTCPPlugin::GetInstance().par_server_listen_address.Get());
 #endif
   }
 
@@ -366,21 +365,10 @@ void InstallCrashHandler()
 //----------------------------------------------------------------------
 // ConnectTCPPeer
 //----------------------------------------------------------------------
-void ConnectTCPPeer(const std::string &peer_name)
+void SetRuntimeName(const std::string &name)
 {
-#ifdef _LIB_FINROC_PLUGINS_TCP_PRESENT_
-  // Create and connect TCP peer
-  tcp::tOptions::GetDefaultOptions().peer_name = peer_name;
-  tcp_peer = new tcp::tPeer();
-  tcp_peer->Init();
-  try
-  {
-    tcp_peer->Connect();
-  }
-  catch (const std::exception& e1)
-  {
-    FINROC_LOG_PRINT_STATIC(WARNING, "Error connecting Peer: ", e1);
-  }
+#ifdef _LIB_FINROC_PLUGINS_NETWORK_TRANSPORT_GENERIC_PROTOCOL_PRESENT_
+  network_transport::generic_protocol::tLocalRuntimeInfo::SetName(name);
 #endif
 }
 
@@ -413,11 +401,8 @@ int InitializeAndRunMainLoop(const std::string &program_name)
     }
   }
 
-#ifdef _LIB_FINROC_PLUGINS_TCP_PRESENT_
-  if (tcp_peer->IsReady())
-  {
-    tcp_peer->StartServingStructure();
-  }
+#ifdef _LIB_FINROC_PLUGINS_NETWORK_TRANSPORT_GENERIC_PROTOCOL_PRESENT_
+  network_transport::generic_protocol::tLocalRuntimeInfo::StartServingStructure();
 #endif
 
   for (size_t i = 0; i < executables.size(); i++)

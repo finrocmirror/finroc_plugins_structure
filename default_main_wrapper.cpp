@@ -89,7 +89,7 @@ int main(int argc, char **argv)
   std::vector<std::string> remaining_arguments = rrlib::getopt::ProcessCommandLine(argc, argv, cPROGRAM_DESCRIPTION, cCOMMAND_LINE_ARGUMENTS, cADDITIONAL_HELP_TEXT);
 
   finroc::structure::InstallCrashHandler();
-  finroc::structure::ConnectTCPPeer(basename(argv[0]));
+  finroc::structure::SetRuntimeName(basename(argv[0]));
 
   CreateMainGroup(remaining_arguments);
 

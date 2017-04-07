@@ -62,7 +62,7 @@ namespace structure
 bool InstallSignalHandler();
 void RegisterCommonOptions();
 void InstallCrashHandler();
-void ConnectTCPPeer(const std::string &peer_name);
+void SetRuntimeName(const std::string &name);
 int InitializeAndRunMainLoop(const std::string &program_name);
 
 //----------------------------------------------------------------------
