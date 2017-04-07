@@ -124,7 +124,7 @@ void tCompositeComponent::OnStaticParameterChange()
   }
 }
 
-void tCompositeComponent::PostChildInit()
+void tCompositeComponent::OnInitialization()
 {
   if (!structure_config_file_parameter)
   {

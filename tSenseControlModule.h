@@ -189,7 +189,7 @@ protected:
     return controller_input_changed;
   }
 
-  virtual void PostChildInit() override;
+  virtual void OnInitialization() override;
 
 //----------------------------------------------------------------------
 // Private fields and methods

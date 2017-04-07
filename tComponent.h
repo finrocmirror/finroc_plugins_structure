@@ -89,6 +89,8 @@ public:
 
   /*! Typedefs for convenvience for subclasses in different namespaces */
   typedef finroc::structure::tInterface tInterface;
+  typedef core::tConnectionFlag tConnectionFlag;
+  typedef core::tConnectionFlags tConnectionFlags;
 
   /*!
    * Level of detail for component visualization

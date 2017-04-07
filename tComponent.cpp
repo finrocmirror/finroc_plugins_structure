@@ -79,7 +79,7 @@ tComponent::tComponent(core::tFrameworkElement *parent, const std::string &name,
   internal::AddModule(this);
   if (!internal::FindParent(this, false))
   {
-    FINROC_LOG_PRINT(ERROR, "Component ", GetQualifiedName(), " was not created using new().");
+    FINROC_LOG_PRINT(ERROR, "Component ", *this, " was not created using new().");
     abort();
   }
 }
@@ -113,7 +113,9 @@ tInterface& tComponent::GetInterface(const tInterfaceInfo& interface_info, bool 
   }
   if (!interface->GetFlag(tFlag::INTERFACE))
   {
-    throw std::runtime_error(interface->GetQualifiedName() + " is no interface");
+    std::stringstream stream;
+    stream << (*interface) << " is no interface";
+    throw std::runtime_error(stream.str());
   }
   return static_cast<tInterface&>(*interface);
 }
@@ -142,7 +144,7 @@ void tComponent::SetVisualizationPort(core::tPortWrapperBase port, tLevelOfDetai
   }
   else if (port.IsReady())
   {
-    FINROC_LOG_PRINT_STATIC(ERROR, "Port '", port.GetWrapped()->GetQualifiedName(), "' has already been initialized. Ignoring SetVisualizationPort() call.");
+    FINROC_LOG_PRINT_STATIC(ERROR, "Port '", port, "' has already been initialized. Ignoring SetVisualizationPort() call.");
     return;
   }
 

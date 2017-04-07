@@ -93,7 +93,7 @@ tSenseControlModule::tSenseControlModule(tFrameworkElement *parent, const std::s
 tSenseControlModule::~tSenseControlModule()
 {}
 
-void tSenseControlModule::PostChildInit()
+void tSenseControlModule::OnInitialization()
 {
   {
     data_ports::tOutputPort<rrlib::time::tDuration> execution_duration;

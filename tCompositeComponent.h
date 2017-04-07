@@ -195,7 +195,7 @@ protected:
 
   virtual core::tFrameworkElement& GetVisualizationParent() override;
   virtual void OnStaticParameterChange() override;
-  virtual void PostChildInit() override;
+  virtual void OnInitialization() override;
 
 //----------------------------------------------------------------------
 // Private fields and methods

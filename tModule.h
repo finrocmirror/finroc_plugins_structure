@@ -147,7 +147,7 @@ protected:
     return input_changed;
   }
 
-  virtual void PostChildInit() override;
+  virtual void OnInitialization() override;
 
 //----------------------------------------------------------------------
 // Private fields and methods

@@ -86,7 +86,7 @@ tModule::tModule(tFrameworkElement *parent, const std::string &name, bool share_
 tModule::~tModule()
 {}
 
-void tModule::PostChildInit()
+void tModule::OnInitialization()
 {
   data_ports::tOutputPort<rrlib::time::tDuration> execution_duration;
   if (scheduling::IsProfilingEnabled())
