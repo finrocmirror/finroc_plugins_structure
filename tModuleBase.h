@@ -133,8 +133,11 @@ public:
     explicit tParameter(const ARGS&... args)
       : tConveniencePort<parameters::tParameter<T>, tComponent, tFrameworkElement, &tModuleBase::GetParameterParent>(args...)
     {
-      assert(this->GetWrapped()->GetParent()->NameEquals("Parameters"));
-      this->AddListenerSimple(static_cast<tModuleBase*>(this->GetWrapped()->GetParent()->GetParent())->parameters_changed);
+      if (this->GetWrapped())
+      {
+        assert(this->GetWrapped()->GetParent()->NameEquals("Parameters"));
+        this->AddListenerSimple(static_cast<tModuleBase*>(this->GetWrapped()->GetParent()->GetParent())->parameters_changed);
+      }
     }
   };
 
