@@ -244,8 +244,11 @@ bool OptionsHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
   if (connect_option->IsActive())
   {
 #ifdef _LIB_FINROC_PLUGINS_TCP_PRESENT_
-    tcp::tOptions::GetDefaultOptions().connect_to.push_back(rrlib::getopt::EvaluateValue(connect_option));
-    FINROC_LOG_PRINT(DEBUG, "Connecting to ", rrlib::getopt::EvaluateValue(connect_option));
+    for (auto & address : rrlib::getopt::EvaluateValueList(connect_option))
+    {
+      tcp::tOptions::GetDefaultOptions().connect_to.push_back(address);
+      FINROC_LOG_PRINT_STATIC(DEBUG, "Connecting to ", address);
+    }
 #endif
   }
 
@@ -335,12 +338,12 @@ bool InstallSignalHandler()
 //----------------------------------------------------------------------
 void RegisterCommonOptions()
 {
-  rrlib::getopt::AddValue("log-config", 'l', "Log config file", &OptionsHandler);
-  rrlib::getopt::AddValue("config-file", 'c', "Parameter config file", &OptionsHandler);
+  rrlib::getopt::AddValue("log-config", 'l', "Log config file", &OptionsHandler, true);
+  rrlib::getopt::AddValue("config-file", 'c', "Parameter config file", &OptionsHandler, true);
   rrlib::getopt::AddValue("listen-address", 0, "Address on which to listen for connections (default: 0.0.0.0), set this to :: to enable IPv6", &OptionsHandler);
-  rrlib::getopt::AddValue("port", 'p', "Network port to use", &OptionsHandler);
+  rrlib::getopt::AddValue("port", 'p', "Network port to use", &OptionsHandler, true);
   rrlib::getopt::AddValue("connect", 0, "TCP address of finroc application to connect to (default: localhost:<port>)", &OptionsHandler);
-  rrlib::getopt::AddValue("crash-handler", 0, "Enable/disable crash handler (default: 'on' in debug mode - 'off' in release mode).", &OptionsHandler);
+  rrlib::getopt::AddValue("crash-handler", 0, "Enable/disable crash handler (default: 'on' in debug mode - 'off' in release mode).", &OptionsHandler, true);
   rrlib::getopt::AddFlag("pause", 0, "Pause program at startup", &OptionsHandler);
   rrlib::getopt::AddFlag("port-links-are-not-unique", 0, "Port links in this part are not unique in P2P network (=> host name is prepended in GUI, for instance).", &OptionsHandler);
   rrlib::getopt::AddFlag("profiling", 0, "Enables profiling (creates additional ports with profiling information)", &OptionsHandler);
