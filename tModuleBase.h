@@ -156,7 +156,7 @@ public:
     {
       if (this->GetWrapped())
       {
-        assert(this->GetWrapped()->GetParent()->NameEquals("Parameters"));
+        assert(this->GetWrapped()->GetParent()->GetName() == "Parameters");
         this->AddListenerSimple(static_cast<tModuleBase*>(this->GetWrapped()->GetParent()->GetParent())->parameters_changed);
       }
     }
