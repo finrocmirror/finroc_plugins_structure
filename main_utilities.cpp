@@ -196,18 +196,36 @@ bool OptionsHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
   rrlib::getopt::tOption parameter_config(name_to_option_map.at("config-file"));
   if (parameter_config->IsActive())
   {
-    const std::string &file = rrlib::getopt::EvaluateValue(parameter_config);
-    if (!core::FinrocFileExists(file))
+    parameters::tConfigFile* config_file = nullptr;
+    for (auto & file : rrlib::getopt::EvaluateValueList(parameter_config))
     {
-      FINROC_LOG_PRINT(ERROR, "Could not find specified config file ", file);
-      return false;
+      if (!core::FinrocFileExists(file))
+      {
+        FINROC_LOG_PRINT(ERROR, "Could not find specified config file ", file);
+        return false;
+      }
+      else
+      {
+        FINROC_LOG_PRINT(DEBUG, "Loading config file ", file);
+      }
+      if (!config_file)
+      {
+        parameters::tConfigurablePlugin::SetConfigFile(file);
+        config_file = new parameters::tConfigFile(file);
+        core::tRuntimeEnvironment::GetInstance().AddAnnotation(*config_file);
+      }
+      else
+      {
+        try
+        {
+          config_file->Append(file);
+        }
+        catch (const std::exception& e)
+        {
+          FINROC_LOG_PRINT(ERROR, "Could not append config file '", file, "': ", e.what());
+        }
+      }
     }
-    else
-    {
-      FINROC_LOG_PRINT(DEBUG, "Loading config file ", file);
-    }
-    parameters::tConfigurablePlugin::SetConfigFile(file);
-    core::tRuntimeEnvironment::GetInstance().AddAnnotation(*new parameters::tConfigFile(file));
   }
 
   // pause
@@ -339,7 +357,7 @@ bool InstallSignalHandler()
 void RegisterCommonOptions()
 {
   rrlib::getopt::AddValue("log-config", 'l', "Log config file", &OptionsHandler, true);
-  rrlib::getopt::AddValue("config-file", 'c', "Parameter config file", &OptionsHandler, true);
+  rrlib::getopt::AddValue("config-file", 'c', "Parameter config file", &OptionsHandler);
   rrlib::getopt::AddValue("listen-address", 0, "Address on which to listen for connections (default: 0.0.0.0), set this to :: to enable IPv6", &OptionsHandler);
   rrlib::getopt::AddValue("port", 'p', "Network port to use", &OptionsHandler, true);
   rrlib::getopt::AddValue("connect", 0, "TCP address of finroc application to connect to (default: localhost:<port>)", &OptionsHandler);
