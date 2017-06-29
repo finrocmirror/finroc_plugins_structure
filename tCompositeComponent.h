@@ -162,7 +162,7 @@ public:
     explicit tParameter(const ARGS&... args)
       : tConveniencePort<parameters::tParameter<T>, tCompositeComponent, tInterface, &tCompositeComponent::GetParameters>(args..., core::tFrameworkElement::tFlag::EMITS_DATA)
     {
-      assert(this->GetWrapped()->GetParent()->NameEquals("Parameters"));
+      assert(this->GetWrapped()->GetParent()->GetName() == "Parameters");
     }
 
     /*!
