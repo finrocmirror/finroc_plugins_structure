@@ -195,18 +195,36 @@ bool OptionsHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
   rrlib::getopt::tOption parameter_config(name_to_option_map.at("config-file"));
   if (parameter_config->IsActive())
   {
-    const std::string &file = rrlib::getopt::EvaluateValue(parameter_config);
-    if (!core::FinrocFileExists(file))
+    parameters::tConfigFile* config_file = nullptr;
+    for (auto & file : rrlib::getopt::EvaluateValueList(parameter_config))
     {
-      FINROC_LOG_PRINT_STATIC(ERROR, "Could not find specified config file ", file);
-      return false;
+      if (!core::FinrocFileExists(file))
+      {
+        FINROC_LOG_PRINT_STATIC(ERROR, "Could not find specified config file ", file);
+        return false;
+      }
+      else
+      {
+        FINROC_LOG_PRINT_STATIC(DEBUG, "Loading config file ", file);
+      }
+      if (!config_file)
+      {
+        parameters::tConfigurablePlugin::SetConfigFile(file);
+        config_file = new parameters::tConfigFile(file);
+        core::tRuntimeEnvironment::GetInstance().AddAnnotation(*config_file);
+      }
+      else
+      {
+        try
+        {
+          config_file->Append(file);
+        }
+        catch (const std::exception& e)
+        {
+          FINROC_LOG_PRINT(ERROR, "Could not append config file '", file, "': ", e.what());
+        }
+      }
     }
-    else
-    {
-      FINROC_LOG_PRINT_STATIC(DEBUG, "Loading config file ", file);
-    }
-    parameters::tConfigurablePlugin::SetConfigFile(file);
-    core::tRuntimeEnvironment::GetInstance().AddAnnotation(*new parameters::tConfigFile(file));
   }
 
   // pause
@@ -243,8 +261,11 @@ bool OptionsHandler(const rrlib::getopt::tNameToOptionMap &name_to_option_map)
   if (connect_option->IsActive())
   {
 #ifdef _LIB_FINROC_PLUGINS_TCP_PRESENT_
-    tcp::tTCPPlugin::GetInstance().AddRuntimeToConnectTo(rrlib::getopt::EvaluateValue(connect_option));
-    FINROC_LOG_PRINT_STATIC(DEBUG, "Connecting to ", rrlib::getopt::EvaluateValue(connect_option));
+    for (auto & address : rrlib::getopt::EvaluateValueList(connect_option))
+    {
+      tcp::tTCPPlugin::GetInstance().AddRuntimeToConnectTo(address);
+      FINROC_LOG_PRINT_STATIC(DEBUG, "Connecting to ", address);
+    }
 #endif
   }
 
@@ -334,12 +355,12 @@ bool InstallSignalHandler()
 //----------------------------------------------------------------------
 void RegisterCommonOptions()
 {
-  rrlib::getopt::AddValue("log-config", 'l', "Log config file", &OptionsHandler);
+  rrlib::getopt::AddValue("log-config", 'l', "Log config file", &OptionsHandler, true);
   rrlib::getopt::AddValue("config-file", 'c', "Parameter config file", &OptionsHandler);
   rrlib::getopt::AddValue("listen-address", 0, "Address on which to listen for connections (default: 0.0.0.0), set this to :: to enable IPv6", &OptionsHandler);
-  rrlib::getopt::AddValue("port", 'p', "Network port to use", &OptionsHandler);
+  rrlib::getopt::AddValue("port", 'p', "Network port to use", &OptionsHandler, true);
   rrlib::getopt::AddValue("connect", 0, "TCP address of finroc application to connect to (default: localhost:<port>)", &OptionsHandler);
-  rrlib::getopt::AddValue("crash-handler", 0, "Enable/disable crash handler (default: 'on' in debug mode - 'off' in release mode).", &OptionsHandler);
+  rrlib::getopt::AddValue("crash-handler", 0, "Enable/disable crash handler (default: 'on' in debug mode - 'off' in release mode).", &OptionsHandler, true);
   rrlib::getopt::AddFlag("pause", 0, "Pause program at startup", &OptionsHandler);
   rrlib::getopt::AddFlag("port-links-are-not-unique", 0, "Port links in this part are not unique in P2P network (=> host name is prepended in GUI, for instance).", &OptionsHandler);
   rrlib::getopt::AddFlag("profiling", 0, "Enables profiling (creates additional ports with profiling information)", &OptionsHandler);
