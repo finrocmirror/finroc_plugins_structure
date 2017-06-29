@@ -172,7 +172,7 @@ public:
    * \param start_index Common postfix of all ports names (see port naming above; could be e.g. ']')
    */
   template <typename TPort>
-  void ResizePortVector(std::vector<TPort>& port_vector, int number_of_ports, const std::string& common_prefix, size_t start_index = 1, const std::string& common_postfix = "")
+  void ResizePortVector(std::vector<TPort>& port_vector, size_t number_of_ports, const std::string& common_prefix, size_t start_index = 1, const std::string& common_postfix = "")
   {
     while (port_vector.size() > number_of_ports)
     {
