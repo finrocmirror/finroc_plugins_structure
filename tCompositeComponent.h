@@ -86,6 +86,22 @@ class tCompositeComponent : public tComponent
 //----------------------------------------------------------------------
 public:
 
+  template <typename T>
+  using tStaticParameter = tConveniencePort<parameters::tStaticParameter<T>, tComponent, core::tFrameworkElement, &tComponent::GetThis>;
+
+  /*!
+   * Whether this composite component stores and loads configuration of parameters below (config file links in particular)
+   * (For parameters that are below another sub-composite-component that manages parameter configuration, this component is responsible for their configuration)
+   */
+  std::unique_ptr<tStaticParameter<bool>> par_manages_parameter_configuration;
+
+  /*!
+   * Contains name of XML file to use
+   * Parameter only exists if no (fixed) XML file was provided via constructor
+   */
+  std::unique_ptr<tStaticParameter<std::string>> structure_config_file_parameter;
+
+
   /*!
    * \param parent Parent
    * \param name Name of component
@@ -174,16 +190,6 @@ public:
       this->GetWrapped()->ConnectTo(*other.GetWrapped());
     }
   };
-
-  template <typename T>
-  using tStaticParameter = tConveniencePort<parameters::tStaticParameter<T>, tComponent, core::tFrameworkElement, &tComponent::GetThis>;
-
-
-  /*!
-   * Contains name of XML file to use
-   * Parameter only exists if no (fixed) XML file was provided via constructor
-   */
-  std::unique_ptr<tStaticParameter<std::string>> structure_config_file_parameter;
 
   /*! Static interface info on common interfaces of composite components */
   static const tInterfaceInfo cVISUALIZATION_INTERFACE_INFO, cSERVICES_INTERFACE_INFO, cPARAMETERS_INTERFACE_INFO;

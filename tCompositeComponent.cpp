@@ -35,6 +35,7 @@
 #ifdef _LIB_FINROC_PLUGINS_RUNTIME_CONSTRUCTION_PRESENT_
 #include "plugins/runtime_construction/tFinstructable.h"
 #endif
+#include "core/tRuntimeEnvironment.h"
 
 //----------------------------------------------------------------------
 // Internal includes with ""
@@ -79,6 +80,7 @@ const tComponent::tInterfaceInfo tCompositeComponent::cPARAMETERS_INTERFACE_INFO
 
 tCompositeComponent::tCompositeComponent(core::tFrameworkElement *parent, const std::string &name, const std::string &structure_config_file, tFlags extra_flags, bool share_ports) :
   tComponent(parent, name, extra_flags | tFlag::FINSTRUCTABLE_GROUP | (share_ports ? tFlag::SHARED : tFlag::FINSTRUCTABLE_GROUP)),
+  par_manages_parameter_configuration(parent == &core::tRuntimeEnvironment::GetInstance() ? nullptr : new tStaticParameter<bool>("Manages Parameter Configuration", this)),
   structure_config_file_parameter(structure_config_file.length() > 0 ? NULL : new tStaticParameter<std::string>("XML file", this, "")),
   structure_config_file(rrlib::util::StartsWith(structure_config_file, cUNWANTED_XML_FILE_PREFIX) ? structure_config_file.substr(strlen(cUNWANTED_XML_FILE_PREFIX)) : structure_config_file)
 {
@@ -86,6 +88,10 @@ tCompositeComponent::tCompositeComponent(core::tFrameworkElement *parent, const 
   if (structure_config_file.length() > 0) // Fixed name? => we can help finstruct by adding annotation
   {
     core::tFrameworkElementTags::AddTag(*this, "finstructable structure file: " + this->structure_config_file);
+  }
+  if (!par_manages_parameter_configuration)
+  {
+    SetFlag(tFlag::MANAGES_PARAMETER_CONFIGURATION, true);
   }
 
 #ifdef _LIB_FINROC_PLUGINS_RUNTIME_CONSTRUCTION_PRESENT_
@@ -121,6 +127,11 @@ void tCompositeComponent::OnStaticParameterChange()
       }
 #endif
     }
+  }
+  if (par_manages_parameter_configuration && par_manages_parameter_configuration->Get() != GetFlag(tFlag::MANAGES_PARAMETER_CONFIGURATION))
+  {
+    rrlib::thread::tLock lock(GetStructureMutex());
+    SetFlag(tFlag::MANAGES_PARAMETER_CONFIGURATION, par_manages_parameter_configuration->Get());
   }
 }
 
