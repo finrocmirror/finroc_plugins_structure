@@ -176,7 +176,7 @@ public:
   {
     while (port_vector.size() > number_of_ports)
     {
-      port_vector.rbegin()->GetWrapped()->ManagedDelete();
+      port_vector.rbegin()->ManagedDelete();
       port_vector.pop_back();
     }
     while (port_vector.size() < number_of_ports)
