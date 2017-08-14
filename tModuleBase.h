@@ -97,6 +97,10 @@ public:
   {
     return GetInterface(parameters_interface, cPARAMETERS_INTERFACE_INFO, false);
   }
+  inline tInterface& GetParameterParent() __attribute__((deprecated("USE GetParameters()")))
+  {
+    return GetParameters();
+  }
 
   /*!
    * \return Returns 'Services' interface of this component
