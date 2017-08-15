@@ -66,8 +66,8 @@ typedef core::tFrameworkElement::tFlags tFlags;
 // Const values
 //----------------------------------------------------------------------
 
-const tComponent::tInterfaceInfo tModule::cINPUT_INTERFACE_INFO = { "Input", tFlags(), data_ports::cDEFAULT_INPUT_PORT_FLAGS };
-const tComponent::tInterfaceInfo tModule::cOUTPUT_INTERFACE_INFO = { "Output", tFlags(), data_ports::cDEFAULT_OUTPUT_PORT_FLAGS };
+const tComponent::tInterfaceInfo tModule::cINPUT_INTERFACE_INFO = { "Input", tFlag::INTERFACE_FOR_DATA_PORTS | tFlag::INTERFACE_FOR_INPUTS };
+const tComponent::tInterfaceInfo tModule::cOUTPUT_INTERFACE_INFO = { "Output", tFlag::INTERFACE_FOR_DATA_PORTS | tFlag::INTERFACE_FOR_OUTPUTS };
 
 //----------------------------------------------------------------------
 // Implementation

@@ -63,7 +63,7 @@ namespace structure
 //----------------------------------------------------------------------
 // Const values
 //----------------------------------------------------------------------
-const tComponent::tInterfaceInfo tComponent::cPROFILING_INTERFACE_INFO = { "Profiling", core::tFrameworkElementFlags(), data_ports::cDEFAULT_OUTPUT_PORT_FLAGS };
+const tComponent::tInterfaceInfo tComponent::cPROFILING_INTERFACE_INFO = { "Profiling", tFlag::INTERFACE_FOR_DATA_PORTS | tFlag::INTERFACE_FOR_OUTPUTS };
 
 //----------------------------------------------------------------------
 // Implementation
@@ -96,7 +96,34 @@ void tComponent::CheckStaticParameters()
 
 tInterface& tComponent::CreateInterface(const tInterfaceInfo& interface_info, bool shared_ports)
 {
-  tInterface* result = new tInterface(this, interface_info.name, interface_info.extra_interface_flags | tFlag::INTERFACE, interface_info.default_port_flags | (shared_ports ? tFlag::SHARED : tFlag::PORT));
+  tFlags port_flags = interface_info.default_port_flags | (shared_ports ? tFlag::SHARED : tFlag::PORT);
+  if (interface_info.interface_flags.Get(tFlag::SENSOR_DATA))
+  {
+    port_flags |= tFlag::SENSOR_DATA;
+  }
+  if (interface_info.interface_flags.Get(tFlag::CONTROLLER_DATA))
+  {
+    port_flags |= tFlag::CONTROLLER_DATA;
+  }
+  bool input_interface = interface_info.interface_flags.Get(tFlag::INTERFACE_FOR_INPUTS) || interface_info.interface_flags.Get(tFlag::PARAMETER_INTERFACE);
+  if (input_interface && interface_info.interface_flags.Get(tFlag::INTERFACE_FOR_OUTPUTS))
+  {
+    port_flags |= tFlag::PUSH_STRATEGY;
+  }
+  else if (input_interface)
+  {
+    port_flags |= data_ports::cDEFAULT_INPUT_PORT_FLAGS;
+  }
+  else if (interface_info.interface_flags.Get(tFlag::INTERFACE_FOR_OUTPUTS))
+  {
+    port_flags |= data_ports::cDEFAULT_OUTPUT_PORT_FLAGS;
+  }
+  if (interface_info.interface_flags.Get(tFlag::PROXY_INTERFACE))
+  {
+    port_flags |= tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA;
+  }
+
+  tInterface* result = new tInterface(this, interface_info.name, interface_info.interface_flags | tFlag::INTERFACE, port_flags);
   if (IsReady())
   {
     result->Init();

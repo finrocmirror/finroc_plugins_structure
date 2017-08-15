@@ -68,8 +68,8 @@ typedef core::tFrameworkElement::tFlags tFlags;
 
 static runtime_construction::tStandardCreateModuleAction<tGroup> cCREATE_ACTION_FOR_GROUP("Group");
 
-const tComponent::tInterfaceInfo tGroup::cINPUT_INTERFACE_INFO = { "Input", tFlags(), tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA | tFlag::PUSH_STRATEGY };
-const tComponent::tInterfaceInfo tGroup::cOUTPUT_INTERFACE_INFO = { "Output", tFlags(), tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA | tFlag::OUTPUT_PORT | tFlag::PUSH_STRATEGY };
+const tComponent::tInterfaceInfo tGroup::cINPUT_INTERFACE_INFO = { "Input", tFlag::PROXY_INTERFACE | tFlag::INTERFACE_FOR_DATA_PORTS | tFlag::INTERFACE_FOR_INPUTS };
+const tComponent::tInterfaceInfo tGroup::cOUTPUT_INTERFACE_INFO = { "Output", tFlag::PROXY_INTERFACE | tFlag::INTERFACE_FOR_DATA_PORTS | tFlag::INTERFACE_FOR_OUTPUTS };
 
 //----------------------------------------------------------------------
 // Implementation

@@ -70,9 +70,9 @@ typedef core::tFrameworkElement::tFlags tFlags;
 /*! We do not want to have this prefix in XML file names, as this will not be found when a system installation is used */
 static const char* cUNWANTED_XML_FILE_PREFIX = "sources/cpp/";
 
-const tComponent::tInterfaceInfo tCompositeComponent::cVISUALIZATION_INTERFACE_INFO = { "Visualization", tFlags(), tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA | tFlag::OUTPUT_PORT | tFlag::PUSH_STRATEGY };
-const tComponent::tInterfaceInfo tCompositeComponent::cSERVICES_INTERFACE_INFO = { "Services", tFlags(), tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA | tFlag::PUSH_STRATEGY };
-const tComponent::tInterfaceInfo tCompositeComponent::cPARAMETERS_INTERFACE_INFO = { "Parameters", tFlags(), tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA | tFlag::PUSH_STRATEGY };
+const tComponent::tInterfaceInfo tCompositeComponent::cVISUALIZATION_INTERFACE_INFO = { "Visualization", tFlag::PROXY_INTERFACE | tFlag::INTERFACE_FOR_DATA_PORTS | tFlag::INTERFACE_FOR_OUTPUTS };
+const tComponent::tInterfaceInfo tCompositeComponent::cSERVICES_INTERFACE_INFO = { "Services", tFlag::PROXY_INTERFACE | tFlag::INTERFACE_FOR_RPC_PORTS };
+const tComponent::tInterfaceInfo tCompositeComponent::cPARAMETERS_INTERFACE_INFO = { "Parameters", tFlag::PROXY_INTERFACE | tFlag::INTERFACE_FOR_DATA_PORTS | tFlag::PARAMETER_INTERFACE | tFlag::INTERFACE_FOR_INPUTS };
 
 //----------------------------------------------------------------------
 // Implementation

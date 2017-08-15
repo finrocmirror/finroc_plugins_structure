@@ -300,10 +300,13 @@ public:
     /*! Interface name */
     const char* name;
 
-    /*! Any extra flags to assign to interface */
-    core::tFrameworkElement::tFlags extra_interface_flags;
+    /*!
+     * Flags to assign to interface (typically interface classification flags)
+     * INTERFACE and EDGE_AGGREGATOR flags are set automatically
+     */
+    core::tFrameworkElement::tFlags interface_flags;
 
-    /*! Any extra flags to assign to all ports */
+    /*! Any extra flags to assign to all ports (default port flags are derived from interface classification flags) */
     core::tFrameworkElement::tFlags default_port_flags;
   };
 

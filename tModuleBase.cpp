@@ -64,9 +64,9 @@ namespace structure
 //----------------------------------------------------------------------
 static constexpr uint cMANDATORY_PORT_FLAGS_FOR_CHANGED_CHECK = (core::tFrameworkElementFlag::READY | core::tFrameworkElementFlag::PUSH_STRATEGY).Raw();
 
-const tComponent::tInterfaceInfo tModuleBase::cVISUALIZATION_INTERFACE_INFO = { "Visualization", core::tFrameworkElementFlags(), data_ports::cDEFAULT_OUTPUT_PORT_FLAGS };
-const tComponent::tInterfaceInfo tModuleBase::cSERVICES_INTERFACE_INFO = { "Services", core::tFrameworkElementFlags(), core::tFrameworkElementFlags() };
-const tComponent::tInterfaceInfo tModuleBase::cPARAMETERS_INTERFACE_INFO = { "Parameters", core::tFrameworkElementFlags(), data_ports::cDEFAULT_INPUT_PORT_FLAGS };
+const tComponent::tInterfaceInfo tModuleBase::cVISUALIZATION_INTERFACE_INFO = { "Visualization", tFlag::INTERFACE_FOR_DATA_PORTS | tFlag::INTERFACE_FOR_OUTPUTS };
+const tComponent::tInterfaceInfo tModuleBase::cSERVICES_INTERFACE_INFO = { "Services", tFlag::INTERFACE_FOR_RPC_PORTS };
+const tComponent::tInterfaceInfo tModuleBase::cPARAMETERS_INTERFACE_INFO = { "Parameters", tFlag::INTERFACE_FOR_DATA_PORTS | tFlag::PARAMETER_INTERFACE | tFlag::INTERFACE_FOR_INPUTS };
 
 //----------------------------------------------------------------------
 // Implementation

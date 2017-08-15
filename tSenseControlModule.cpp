@@ -66,10 +66,10 @@ typedef core::tFrameworkElement::tFlags tFlags;
 // Const values
 //----------------------------------------------------------------------
 
-const tComponent::tInterfaceInfo tSenseControlModule::cSENSOR_INPUT_INTERFACE_INFO = { "Sensor Input", tFlag::SENSOR_DATA, data_ports::cDEFAULT_INPUT_PORT_FLAGS };
-const tComponent::tInterfaceInfo tSenseControlModule::cSENSOR_OUTPUT_INTERFACE_INFO = { "Sensor Output", tFlag::SENSOR_DATA, data_ports::cDEFAULT_OUTPUT_PORT_FLAGS };
-const tComponent::tInterfaceInfo tSenseControlModule::cCONTROLLER_INPUT_INTERFACE_INFO = { "Controller Input", tFlag::CONTROLLER_DATA, data_ports::cDEFAULT_INPUT_PORT_FLAGS };
-const tComponent::tInterfaceInfo tSenseControlModule::cCONTROLLER_OUTPUT_INTERFACE_INFO = { "Controller Output", tFlag::CONTROLLER_DATA, data_ports::cDEFAULT_OUTPUT_PORT_FLAGS };
+const tComponent::tInterfaceInfo tSenseControlModule::cSENSOR_INPUT_INTERFACE_INFO = { "Sensor Input", tFlag::INTERFACE_FOR_DATA_PORTS | tFlag::SENSOR_DATA | tFlag::INTERFACE_FOR_INPUTS };
+const tComponent::tInterfaceInfo tSenseControlModule::cSENSOR_OUTPUT_INTERFACE_INFO = { "Sensor Output", tFlag::INTERFACE_FOR_DATA_PORTS | tFlag::SENSOR_DATA | tFlag::INTERFACE_FOR_OUTPUTS };
+const tComponent::tInterfaceInfo tSenseControlModule::cCONTROLLER_INPUT_INTERFACE_INFO = { "Controller Input", tFlag::INTERFACE_FOR_DATA_PORTS | tFlag::CONTROLLER_DATA | tFlag::INTERFACE_FOR_INPUTS };
+const tComponent::tInterfaceInfo tSenseControlModule::cCONTROLLER_OUTPUT_INTERFACE_INFO = { "Controller Output", tFlag::INTERFACE_FOR_DATA_PORTS | tFlag::CONTROLLER_DATA | tFlag::INTERFACE_FOR_OUTPUTS };
 
 //----------------------------------------------------------------------
 // Implementation

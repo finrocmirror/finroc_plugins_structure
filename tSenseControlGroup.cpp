@@ -68,10 +68,10 @@ typedef core::tFrameworkElement::tFlags tFlags;
 
 static runtime_construction::tStandardCreateModuleAction<tSenseControlGroup> cCREATE_ACTION_FOR_SENSE_CONTROL_GROUP("SenseControlGroup");
 
-const tComponent::tInterfaceInfo tSenseControlGroup::cSENSOR_INPUT_INTERFACE_INFO = { "Sensor Input", tFlag::SENSOR_DATA, tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA | tFlag::PUSH_STRATEGY };
-const tComponent::tInterfaceInfo tSenseControlGroup::cSENSOR_OUTPUT_INTERFACE_INFO = { "Sensor Output", tFlag::SENSOR_DATA, tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA | tFlag::PUSH_STRATEGY | tFlag::OUTPUT_PORT };
-const tComponent::tInterfaceInfo tSenseControlGroup::cCONTROLLER_INPUT_INTERFACE_INFO = { "Controller Input", tFlag::CONTROLLER_DATA, tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA | tFlag::PUSH_STRATEGY };
-const tComponent::tInterfaceInfo tSenseControlGroup::cCONTROLLER_OUTPUT_INTERFACE_INFO = { "Controller Output", tFlag::CONTROLLER_DATA, tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA | tFlag::PUSH_STRATEGY | tFlag::OUTPUT_PORT };
+const tComponent::tInterfaceInfo tSenseControlGroup::cSENSOR_INPUT_INTERFACE_INFO = { "Sensor Input", tFlag::PROXY_INTERFACE | tFlag::INTERFACE_FOR_DATA_PORTS | tFlag::SENSOR_DATA | tFlag::INTERFACE_FOR_INPUTS };
+const tComponent::tInterfaceInfo tSenseControlGroup::cSENSOR_OUTPUT_INTERFACE_INFO = { "Sensor Output", tFlag::PROXY_INTERFACE | tFlag::INTERFACE_FOR_DATA_PORTS | tFlag::SENSOR_DATA | tFlag::INTERFACE_FOR_OUTPUTS };
+const tComponent::tInterfaceInfo tSenseControlGroup::cCONTROLLER_INPUT_INTERFACE_INFO = { "Controller Input", tFlag::PROXY_INTERFACE | tFlag::INTERFACE_FOR_DATA_PORTS | tFlag::CONTROLLER_DATA | tFlag::INTERFACE_FOR_INPUTS };
+const tComponent::tInterfaceInfo tSenseControlGroup::cCONTROLLER_OUTPUT_INTERFACE_INFO = { "Controller Output", tFlag::PROXY_INTERFACE | tFlag::INTERFACE_FOR_DATA_PORTS | tFlag::CONTROLLER_DATA | tFlag::INTERFACE_FOR_OUTPUTS };
 
 //----------------------------------------------------------------------
 // Implementation
