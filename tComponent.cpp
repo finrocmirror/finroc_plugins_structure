@@ -120,7 +120,7 @@ tInterface& tComponent::CreateInterface(const tInterfaceInfo& interface_info, bo
   }
   if (interface_info.interface_flags.Get(tFlag::PROXY_INTERFACE))
   {
-    port_flags |= tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA;
+    port_flags |= tFlag::EMITS_DATA | tFlag::ACCEPTS_DATA | tFlag::PUSH_STRATEGY;
   }
 
   tInterface* result = new tInterface(this, interface_info.name, interface_info.interface_flags | tFlag::INTERFACE, port_flags);
